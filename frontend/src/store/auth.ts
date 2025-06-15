@@ -38,8 +38,6 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           error: null,
         });
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('refreshToken', data.refreshToken);
       },
 
       clearAuth: () => {
@@ -50,8 +48,6 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           error: null,
         });
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
       },
 
       updateUser: (user: User) => {
@@ -143,8 +139,6 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
       partialize: (state) => ({
         user: state.user,
-        token: state.token,
-        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
     }
