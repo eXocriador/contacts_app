@@ -40,16 +40,18 @@ export const register = ctrlWrapper(async (
 
   const hashedPassword = await hashPassword(password);
 
-  await User.create({
+  const user = await User.create({
     name,
     email,
     password: hashedPassword,
   });
 
+  const { password: _, ...userWithoutPassword } = user.toObject();
+
   res.status(201).json({
     status: 201,
     message: "Successfully registered a user!",
-    data: {}
+    data: userWithoutPassword
   });
 });
 

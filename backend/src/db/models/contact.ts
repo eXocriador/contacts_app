@@ -11,7 +11,6 @@ const contactSchema = new Schema<IContact>(
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
     },
     phone: {
       type: String,

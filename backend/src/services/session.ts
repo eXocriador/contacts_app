@@ -15,13 +15,13 @@ interface Tokens {
 export const generateAuthTokens = (user: IUser): Tokens => {
   const payload = { id: user._id };
   const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' });
-  const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '30d' });
   return { accessToken, refreshToken };
 };
 
 export const createSession = async (user: IUser, accessToken: string, refreshToken: string): Promise<ISession> => {
   const accessTokenValidUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
-  const refreshTokenValidUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+  const refreshTokenValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
 
   // Remove any existing sessions for the user to ensure only one active session
   await Session.deleteMany({ userId: user._id });

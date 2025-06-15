@@ -5,6 +5,8 @@ import { getPaginationParams, formatContactResponse } from '../services/contacts
 import { Contacts } from '../db/models/contact';
 import { uploadImage, deleteImage } from '../services/cloudinary';
 import createHttpError from 'http-errors';
+import { parseSortParams } from '../utils/filters/parseSortParams';
+import { parseFilterParams } from '../utils/filters/parseFilterParams';
 
 export const getContacts = async (
   req: CustomRequest,
@@ -12,11 +14,20 @@ export const getContacts = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { page, limit, skip, favorite } = getPaginationParams(req.query);
-    const query = { owner: req.user?.id, ...(favorite && { favorite }) };
+    const { page, limit, skip } = getPaginationParams(req.query);
+    const { sortBy, sortOrder } = parseSortParams(req.query);
+    const filters = parseFilterParams(req.query);
+
+    const query = {
+      owner: req.user?.id,
+      ...filters
+    };
 
     const [contacts, total] = await Promise.all([
-      Contacts.find(query).skip(skip).limit(limit),
+      Contacts.find(query)
+        .sort({ [sortBy]: sortOrder })
+        .skip(skip)
+        .limit(limit),
       Contacts.countDocuments(query),
     ]);
 
