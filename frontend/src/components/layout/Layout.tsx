@@ -1,8 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../store/auth';
-import { useTheme } from '../ThemeProvider';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/auth";
+import { useTheme } from "../ThemeProvider";
 
-export function Layout({ children }: { children: React.ReactNode }) {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
@@ -10,9 +11,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/login');
+      navigate("/login", { replace: true });
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
+      // Even if there's an error, we still want to navigate to login
+      navigate("/login", { replace: true });
     }
   };
 
@@ -44,7 +47,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 onClick={toggleTheme}
                 className="p-1 rounded-full text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
-                {theme === 'dark' ? (
+                {theme === "dark" ? (
                   <svg
                     className="h-6 w-6"
                     fill="none"
@@ -116,4 +119,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">{children}</main>
     </div>
   );
-}
+};
+
+export default Layout;

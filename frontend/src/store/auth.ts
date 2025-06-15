@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { User, AuthResponse, LoginRequest } from '../types/api';
+import type { User, AuthResponse, LoginRequest, RegisterRequest, UpdateProfileRequest } from '../types/api';
 import { authApi } from '../api/auth';
 
 interface AuthState {
@@ -13,9 +13,11 @@ interface AuthState {
   setAuth: (data: AuthResponse) => void;
   clearAuth: () => void;
   updateUser: (user: User) => void;
-  login: (email: string, password: string) => Promise<void>;
+  login: (data: LoginRequest) => Promise<void>;
+  register: (data: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
+  updateProfile: (data: UpdateProfileRequest) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -56,11 +58,11 @@ export const useAuthStore = create<AuthState>()(
         set({ user });
       },
 
-      login: async (email: string, password: string) => {
+      login: async (data: LoginRequest) => {
         set({ isLoading: true, error: null });
         try {
-          const data = await authApi.login({ email, password });
-          get().setAuth(data);
+          const response = await authApi.login(data);
+          get().setAuth(response);
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Failed to login';
           set({ error: message });
@@ -70,12 +72,33 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      register: async (data: RegisterRequest) => {
+        set({ isLoading: true, error: null });
+        try {
+          const response = await authApi.register(data);
+          get().setAuth(response);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to register';
+          set({ error: message });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
       logout: async () => {
+        const token = get().token;
+        if (!token) {
+          get().clearAuth();
+          return;
+        }
+
         set({ isLoading: true, error: null });
         try {
           await authApi.logout();
         } catch (error) {
           console.error('Logout error:', error);
+          // Even if the server request fails, we still want to clear the local auth state
         } finally {
           get().clearAuth();
           set({ isLoading: false });
@@ -95,6 +118,20 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           get().clearAuth();
           const message = error instanceof Error ? error.message : 'Failed to refresh token';
+          set({ error: message });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      updateProfile: async (data: UpdateProfileRequest) => {
+        set({ isLoading: true, error: null });
+        try {
+          const updatedUser = await authApi.updateProfile(data);
+          set({ user: updatedUser });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to update profile';
           set({ error: message });
           throw error;
         } finally {

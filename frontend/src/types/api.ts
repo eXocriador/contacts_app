@@ -1,64 +1,52 @@
 export interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Contact {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  favorite: boolean;
-  photo?: string;
-  createdAt: string;
-  updatedAt: string;
+  id: string
+  name: string
+  email: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface AuthResponse {
-  user: User;
-  token: string;
-  refreshToken: string;
+  user: User
+  token: string
+  refreshToken: string
 }
 
 export interface LoginRequest {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
 export interface RegisterRequest {
-  email: string;
-  password: string;
-  name: string;
+  name: string
+  email: string
+  password: string
 }
 
 export interface UpdateProfileRequest {
-  name: string;
-  email: string;
-  currentPassword?: string;
-  newPassword?: string;
+  name?: string
+  email?: string
+  currentPassword?: string
+  newPassword?: string
+}
+
+export interface Contact {
+  id: string
+  name: string
+  email: string
+  phone: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface CreateContactRequest {
-  name: string;
-  email: string;
-  phone: string;
-  photo?: File;
+  name: string
+  email: string
+  phone: string
 }
 
 export interface UpdateContactRequest {
-  name?: string;
-  email?: string;
-  phone?: string;
-  photo?: File;
-  favorite?: boolean;
-}
-
-export interface ApiError {
-  message: string;
-  status: number;
-  errors?: Record<string, string[]>;
+  name?: string
+  email?: string
+  phone?: string
 }

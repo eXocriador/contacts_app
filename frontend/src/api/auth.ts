@@ -1,55 +1,43 @@
-import { client } from './client';
-import type { AuthResponse, LoginRequest, RegisterRequest, User, UpdateProfileRequest } from '../types/api';
+import axios from 'axios'
+import type { AuthResponse, LoginRequest, RegisterRequest, UpdateProfileRequest, User } from '../types/api'
 
-interface GoogleAuthUrlResponse {
-  url: string;
-}
+const API_URL = 'http://localhost:3000/api'
+
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+})
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
 
 export const authApi = {
-  async register(data: RegisterRequest): Promise<AuthResponse> {
-    const response = await client.post<AuthResponse>('/auth/register', data);
-    return response.data;
+  login: async (data: LoginRequest): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/login', data)
+    return response.data
   },
 
-  async login(data: LoginRequest): Promise<AuthResponse> {
-    const response = await client.post<AuthResponse>('/auth/login', data);
-    return response.data;
+  register: async (data: RegisterRequest): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/register', data)
+    return response.data
   },
 
-  async logout(): Promise<void> {
-    await client.post('/auth/logout');
+  logout: async (): Promise<void> => {
+    await api.post('/auth/logout')
   },
 
-  async getCurrentUser(): Promise<User> {
-    const response = await client.get<User>('/auth/me');
-    return response.data;
+  refresh: async (refreshToken: string): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/refresh', { refreshToken })
+    return response.data
   },
 
-  async refresh(refreshToken: string): Promise<AuthResponse> {
-    const response = await client.post<AuthResponse>('/auth/refresh', { refreshToken });
-    return response.data;
+  updateProfile: async (data: UpdateProfileRequest): Promise<User> => {
+    const response = await api.patch<User>('/auth/profile', data)
+    return response.data
   },
-
-  async forgotPassword(email: string): Promise<void> {
-    await client.post('/auth/forgot-password', { email });
-  },
-
-  async resetPassword(token: string, password: string): Promise<void> {
-    await client.post('/auth/reset-password', { token, password });
-  },
-
-  async getGoogleAuthUrl(): Promise<GoogleAuthUrlResponse> {
-    const response = await client.get<GoogleAuthUrlResponse>('/auth/google/url');
-    return response.data;
-  },
-
-  async loginWithGoogle(code: string): Promise<AuthResponse> {
-    const response = await client.post<AuthResponse>('/auth/google/callback', { code });
-    return response.data;
-  },
-
-  async updateProfile(data: UpdateProfileRequest): Promise<User> {
-    const response = await client.put<User>('/auth/profile', data);
-    return response.data;
-  },
-};
+}
