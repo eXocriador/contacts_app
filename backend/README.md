@@ -1,54 +1,70 @@
-# React + TypeScript + Vite
+# Contacts App Backend API
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the backend API for the Contacts App, built with Node.js, Express, and TypeScript.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- RESTful API for managing contacts
+- User authentication with JWT
+- File upload support with Cloudinary
+- API documentation with Swagger/OpenAPI
+- Rate limiting and security features
 
-## Expanding the ESLint configuration
+## Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js >= 18.0.0
+- MongoDB
+- Cloudinary account (for file uploads)
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+PORT=3000
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+JWT_REFRESH_SECRET=your_jwt_refresh_secret
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Installation
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Install dependencies:
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+yarn install
 ```
+
+2. Start the development server:
+
+```bash
+yarn dev
+```
+
+3. Build for production:
+
+```bash
+yarn build
+```
+
+4. Start production server:
+
+```bash
+yarn start
+```
+
+## API Documentation
+
+API documentation is available at `/api-docs` when the server is running. The documentation is generated using Swagger/OpenAPI.
+
+## Available Scripts
+
+- `yarn dev` - Start development server with hot reload
+- `yarn build` - Build the project
+- `yarn start` - Start production server
+- `yarn lint` - Run ESLint
+- `yarn build-docs` - Build API documentation
+- `yarn preview-docs` - Preview API documentation

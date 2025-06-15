@@ -152,36 +152,3 @@ export const deleteContact = async (
     next(error);
   }
 };
-
-export const updateStatusContact = async (
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const { contactId } = req.params;
-    const user = req.user as IUser;
-    const { favorite } = req.body;
-
-    const contact = await Contacts.findOne({ _id: contactId, owner: user._id });
-    if (!contact) {
-      res.status(404).json({ message: 'Contact not found' });
-      return;
-    }
-
-    const updatedContact = await Contacts.findByIdAndUpdate(
-      contactId,
-      { favorite },
-      { new: true }
-    );
-
-    if (!updatedContact) {
-      res.status(404).json({ message: 'Contact not found' });
-      return;
-    }
-
-    res.json(formatContactResponse(updatedContact));
-  } catch (error) {
-    next(error);
-  }
-};

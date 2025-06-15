@@ -7,13 +7,19 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from '../docs/swagger.json';
-import path from 'path';
 import { getEnvVar } from './utils/getEnvVar';
 import router from './routers/index';
 import { notFoundHandler } from './middlewares/notFoundHandler';
 import { errorHandler } from './middlewares/errorHandler';
 import { logger } from './middlewares/logger';
 import { startLogs } from './utils/startLogs';
+import {
+  corsOptions,
+  rateLimiter,
+  helmetConfig,
+  requestSizeLimiter,
+  securityHeaders
+} from './middlewares/security';
 
 dotenv.config();
 const PORT = Number(getEnvVar('PORT', '3000'));
@@ -34,34 +40,19 @@ export const serverSetup = (): Express => {
   const app = express();
 
   // Security middleware
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "cdn.tailwindcss.com", "cdnjs.cloudflare.com"],
-        styleSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'", "cdnjs.cloudflare.com"],
-        objectSrc: ["'none'"],
-        mediaSrc: ["'self'"],
-        frameSrc: ["'none'"],
-      },
-    },
-  }));
-  app.use(cors());
+  app.use(helmetConfig);
+  app.use(corsOptions);
+  app.use(rateLimiter);
+  app.use(requestSizeLimiter);
+  app.use(securityHeaders);
 
   // Performance middleware
   app.use(compression() as unknown as RequestHandler);
-  app.use(limiter)
 
   // Body parsing middleware
   app.use(express.json({ limit: '10kb' }));
   app.use(express.urlencoded({ extended: true, limit: '10kb' }));
   app.use(cookieParser());
-
-  // Serve static files
-  app.use(express.static(path.join(process.cwd(), 'public')));
 
   // Logging and routing
   app.use(logger);
@@ -69,19 +60,6 @@ export const serverSetup = (): Express => {
 
   // Swagger UI
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-  // Serve index.html for all routes that don't match API routes or static files
-  app.get('*', (req, res, next) => {
-    // Skip for API routes and static files
-    if (req.path.startsWith('/api') ||
-        req.path.startsWith('/api-docs') ||
-        req.path.endsWith('.html') ||
-        req.path.endsWith('.js') ||
-        req.path.endsWith('.css')) {
-      return next();
-    }
-    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
-  });
 
   // Error handling
   app.use(notFoundHandler);
