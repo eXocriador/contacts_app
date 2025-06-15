@@ -16,7 +16,7 @@ const HomePage = () => {
         className="relative h-screen flex items-center justify-center text-white"
         style={{
           backgroundImage:
-            "url(https://images.unsplash.com/photo-1528747045269-390fe33c19f2?q=80&w=2070&auto=format&fit=crop)",
+            "url(https://res.cloudinary.com/db7t8zyft/image/upload/v1750023550/daniel-sessler-g3O3xWspoN4-unsplash_vpiusw.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center"
         }}
