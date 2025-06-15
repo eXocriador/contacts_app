@@ -13,7 +13,7 @@ const HomePage = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section
-        className="fixed top-0 left-0 w-full h-screen flex items-center justify-center text-white"
+        className="relative h-screen flex items-center justify-center text-white"
         style={{
           backgroundImage:
             "url(https://res.cloudinary.com/db7t8zyft/image/upload/v1750023550/daniel-sessler-g3O3xWspoN4-unsplash_vpiusw.jpg)",
@@ -59,9 +59,6 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* Spacer to prevent content overlap */}
-      <div className="h-screen" />
 
       {/* Features Section */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
