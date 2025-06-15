@@ -1,9 +1,68 @@
-#my
-.vscode
+# IDE and OS files
+.vscode/
 .DS_Store
-.idea
+.idea/
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.*
+!.env.example
 google-oauth.json
+
+# Dependencies
+node_modules/
+**/node_modules/
+.pnp/
+.pnp.js
+
+# Build outputs
+dist/
+build/
+**/dist/
+**/build/
+.next/
+out/
+.nuxt/
+.vuepress/dist/
+**/.vitepress/dist/
+
+# Cache and logs
+.cache/
+.parcel-cache/
+.temp/
+**/.temp/
+coverage/
+.nyc_output/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+.DS_Store
+*.pem
 .env.test
+.env.production
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local files
+**/uploads/
+**/temp/
 
 # Logs
 logs
@@ -46,7 +105,6 @@ bower_components
 build/Release
 
 # Dependency directories
-node_modules/
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
