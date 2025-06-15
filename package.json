@@ -6,12 +6,13 @@
   "scripts": {
     "dev:front": "yarn --cwd frontend dev",
     "dev:back": "yarn --cwd backend dev",
-    "build:front": "yarn --cwd frontend build",
+    "build:front": "yarn --cwd frontend install && yarn --cwd frontend build",
     "build:back": "yarn --cwd backend build",
     "start:front": "yarn --cwd frontend preview",
     "start:back": "yarn --cwd backend start",
     "lint:front": "yarn --cwd frontend lint",
     "lint:back": "yarn --cwd backend lint",
+    "build": "yarn build:front",
     "start": "yarn start:front"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
