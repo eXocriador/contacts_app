@@ -22,6 +22,7 @@ const HomePage = () => {
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent dark:from-black/80 dark:to-transparent" />
+        <div className="absolute inset-0 bg-white/20 dark:bg-black/50 backdrop-blur-sm" />
         <div className="relative z-10 text-center px-4">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
