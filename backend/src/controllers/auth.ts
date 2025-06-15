@@ -231,6 +231,9 @@ export const handleResetPassword = ctrlWrapper(async (
     user.password = await hashPassword(password);
     await user.save();
 
+    // Delete all user sessions after password reset
+    await Session.deleteMany({ userId: user._id });
+
     res.status(200).json({
       status: 200,
       message: 'Password has been reset successfully!',
