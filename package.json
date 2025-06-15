@@ -8,7 +8,7 @@
     "dev:back": "yarn --cwd backend dev",
     "build:front": "yarn --cwd frontend install && yarn --cwd frontend build",
     "build:back": "yarn --cwd backend build",
-    "start:front": "yarn --cwd frontend preview",
+    "start:front": "yarn --cwd frontend install && yarn --cwd frontend preview --host",
     "start:back": "yarn --cwd backend start",
     "lint:front": "yarn --cwd frontend lint",
     "lint:back": "yarn --cwd backend lint",
