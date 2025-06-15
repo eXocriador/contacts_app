@@ -11,6 +11,7 @@ const api = axios.create({
 export interface GetContactsParams {
   page?: number;
   limit?: number;
+  search?: string;
 }
 
 export interface GetContactsResponse {
@@ -25,14 +26,45 @@ export const contactsApi = {
     const { data } = await api.get<GetContactsResponse>('/contacts', { params });
     return data;
   },
-  createContact: async (contact: CreateContactRequest): Promise<Contact> => {
+
+  createContact: async (contact: CreateContactRequest & { photo?: File }): Promise<Contact> => {
+    if (contact.photo) {
+      const formData = new FormData();
+      Object.entries(contact).forEach(([key, value]) => {
+        if (value !== undefined) {
+          formData.append(key, value);
+        }
+      });
+      const { data } = await api.post<Contact>('/contacts', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return data;
+    }
     const { data } = await api.post<Contact>('/contacts', contact);
     return data;
   },
-  updateContact: async (id: string, contact: UpdateContactRequest): Promise<Contact> => {
+
+  updateContact: async (id: string, contact: UpdateContactRequest & { photo?: File }): Promise<Contact> => {
+    if (contact.photo) {
+      const formData = new FormData();
+      Object.entries(contact).forEach(([key, value]) => {
+        if (value !== undefined) {
+          formData.append(key, value);
+        }
+      });
+      const { data } = await api.patch<Contact>(`/contacts/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return data;
+    }
     const { data } = await api.patch<Contact>(`/contacts/${id}`, contact);
     return data;
   },
+
   deleteContact: async (id: string): Promise<void> => {
     await api.delete(`/contacts/${id}`);
   },

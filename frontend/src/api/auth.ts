@@ -1,16 +1,19 @@
 import axios from 'axios'
-import type { AuthResponse, LoginRequest, RegisterRequest, UpdateProfileRequest, User } from '../types/api'
+import type { AuthResponse, LoginRequest, RegisterRequest, UpdateProfileRequest, User, UpdatePasswordRequest } from '../types/api'
 import { useAuthStore } from '../store/auth'
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 })
 
+// Add token to requests if it exists
 api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token
+  const token = localStorage.getItem('token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -46,28 +49,48 @@ api.interceptors.response.use(
   }
 )
 
-export const authApi = {
-  login: async (data: LoginRequest): Promise<AuthResponse> => {
+class AuthApi {
+  async login(data: LoginRequest): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>('/auth/login', data)
     return response.data
-  },
+  }
 
-  register: async (data: RegisterRequest): Promise<AuthResponse> => {
+  async register(data: RegisterRequest): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>('/auth/register', data)
     return response.data
-  },
+  }
 
-  logout: async (): Promise<void> => {
+  async logout(): Promise<void> {
     await api.post('/auth/logout')
-  },
+  }
 
-  refresh: async (): Promise<AuthResponse> => {
+  async refresh(): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>('/auth/refresh')
     return response.data
-  },
+  }
 
-  updateProfile: async (data: UpdateProfileRequest): Promise<User> => {
-    const response = await api.patch<User>('/auth/profile', data)
+  async updateProfile(data: FormData): Promise<AuthResponse> {
+    const response = await api.put<AuthResponse>('/auth/profile', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
     return response.data
-  },
+  }
+
+  async getGoogleOAuthUrl(): Promise<string> {
+    const response = await api.get<{ url: string }>('/auth/google')
+    return response.data.url
+  }
+
+  async loginWithGoogle(code: string): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>('/auth/google', { code })
+    return response.data
+  }
+
+  async updatePassword(data: UpdatePasswordRequest): Promise<void> {
+    await api.put('/auth/password', data)
+  }
 }
+
+export const authApi = new AuthApi()

@@ -2,6 +2,7 @@ export interface User {
   id: string
   name: string
   email: string
+  photo?: string
   createdAt: string
   updatedAt: string
 }
@@ -9,7 +10,6 @@ export interface User {
 export interface AuthResponse {
   user: User
   token: string
-  refreshToken: string
 }
 
 export interface LoginRequest {
@@ -26,8 +26,7 @@ export interface RegisterRequest {
 export interface UpdateProfileRequest {
   name?: string
   email?: string
-  currentPassword?: string
-  newPassword?: string
+  photo?: File
 }
 
 export interface Contact {
@@ -35,6 +34,8 @@ export interface Contact {
   name: string
   email: string
   phone: string
+  photo?: string
+  isFavourite: boolean
   createdAt: string
   updatedAt: string
 }
@@ -43,10 +44,34 @@ export interface CreateContactRequest {
   name: string
   email: string
   phone: string
+  photo?: File
+  isFavourite?: boolean
 }
 
 export interface UpdateContactRequest {
   name?: string
   email?: string
   phone?: string
+  photo?: File
+  isFavourite?: boolean
+}
+
+export interface GetContactsResponse {
+  contacts: Contact[]
+  total: number
+  page: number
+  limit: number
+}
+
+export interface GetContactsParams {
+  page: number
+  limit: number
+  search?: string
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+}
+
+export interface UpdatePasswordRequest {
+  currentPassword: string
+  newPassword: string
 }

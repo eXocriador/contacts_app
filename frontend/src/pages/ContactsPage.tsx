@@ -8,25 +8,21 @@ import type {
 } from "../types/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { contactsApi, GetContactsResponse } from "../api/contacts";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import ContactCard from "../components/contacts/ContactCard";
+import ContactFormModal from "../components/contacts/ContactFormModal";
+import ConfirmDeleteModal from "../components/contacts/ConfirmDeleteModal";
+import ContactCardSkeleton from "../components/contacts/ContactCardSkeleton";
 
 const PAGE_SIZE = 10;
-
-const contactSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  email: z.string().email("Invalid email"),
-  phone: z.string().min(5, "Phone is required")
-});
-type ContactFormValues = z.infer<typeof contactSchema>;
 
 const ContactsPage = () => {
   const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
 
   // Fetch contacts
   const { data, isLoading, isError, error } = useQuery<
@@ -65,6 +61,8 @@ const ContactsPage = () => {
     onSuccess: () => {
       toast.success("Contact deleted");
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      setDeleteModalOpen(false);
+      setDeletingContact(null);
     },
     onError: () => toast.error("Failed to delete contact")
   });
@@ -73,29 +71,19 @@ const ContactsPage = () => {
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  // Form
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting }
-  } = useForm<ContactFormValues>({
-    resolver: zodResolver(contactSchema),
-    defaultValues: editingContact || { name: "", email: "", phone: "" },
-    values: editingContact || undefined
-  });
+  const handleEdit = (contact: Contact) => {
+    setEditingContact(contact);
+    setModalOpen(true);
+  };
 
-  React.useEffect(() => {
-    if (modalOpen) {
-      reset(editingContact || { name: "", email: "", phone: "" });
-    }
-  }, [modalOpen, editingContact, reset]);
+  const handleDelete = (contact: Contact) => {
+    setDeletingContact(contact);
+    setDeleteModalOpen(true);
+  };
 
-  const onSubmit = async (values: ContactFormValues) => {
-    if (editingContact) {
-      await updateMutation.mutateAsync({ id: editingContact.id, data: values });
-    } else {
-      await createMutation.mutateAsync(values);
+  const handleConfirmDelete = async () => {
+    if (deletingContact) {
+      await deleteMutation.mutateAsync(deletingContact.id);
     }
   };
 
@@ -108,16 +96,20 @@ const ContactsPage = () => {
             setEditingContact(null);
             setModalOpen(true);
           }}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="btn"
         >
           Add Contact
         </button>
       </div>
 
       {isLoading ? (
-        <div>Loading contacts...</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }, (_, i) => (
+            <ContactCardSkeleton key={i} />
+          ))}
+        </div>
       ) : isError ? (
-        <div className="text-red-500">
+        <div className="text-red-500 text-center py-8">
           {(error as Error).message || "Failed to load contacts"}
         </div>
       ) : !data || data.contacts.length === 0 ? (
@@ -128,39 +120,20 @@ const ContactsPage = () => {
               setEditingContact(null);
               setModalOpen(true);
             }}
-            className="mt-4 text-blue-500 hover:underline"
+            className="mt-4 text-primary-500 hover:text-primary-600 hover:underline"
           >
             Add your first contact
           </button>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {data.contacts.map((contact) => (
-            <div
+            <ContactCard
               key={contact.id}
-              className="border rounded p-4 hover:shadow-md transition-shadow"
-            >
-              <h3 className="text-xl font-semibold">{contact.name}</h3>
-              <p className="text-gray-600">{contact.email}</p>
-              <p className="text-gray-600">{contact.phone}</p>
-              <div className="mt-4 space-x-2">
-                <button
-                  onClick={() => {
-                    setEditingContact(contact);
-                    setModalOpen(true);
-                  }}
-                  className="text-blue-500 hover:underline"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => deleteMutation.mutate(contact.id)}
-                  className="text-red-500 hover:underline"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
+              contact={contact}
+              onEdit={() => handleEdit(contact)}
+              onDelete={() => handleDelete(contact)}
+            />
           ))}
         </div>
       )}
@@ -171,7 +144,7 @@ const ContactsPage = () => {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-3 py-1 rounded border disabled:opacity-50"
+            className="btn-secondary"
           >
             Prev
           </button>
@@ -179,8 +152,8 @@ const ContactsPage = () => {
             <button
               key={i + 1}
               onClick={() => setPage(i + 1)}
-              className={`px-3 py-1 rounded border ${
-                page === i + 1 ? "bg-blue-500 text-white" : ""
+              className={`btn ${
+                page === i + 1 ? "bg-primary-500 text-white" : "btn-secondary"
               }`}
             >
               {i + 1}
@@ -189,116 +162,45 @@ const ContactsPage = () => {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-3 py-1 rounded border disabled:opacity-50"
+            className="btn-secondary"
           >
             Next
           </button>
         </div>
       )}
 
-      {/* Modal for add/edit contact */}
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded shadow-lg p-6 min-w-[320px] relative">
-            <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-              onClick={() => {
-                setModalOpen(false);
-                setEditingContact(null);
-              }}
-            >
-              &times;
-            </button>
-            <h2 className="text-xl font-bold mb-4">
-              {editingContact ? "Edit Contact" : "Add Contact"}
-            </h2>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <label className="block mb-1">Name</label>
-                <input
-                  type="text"
-                  {...register("name")}
-                  className="w-full border rounded px-3 py-2"
-                  disabled={
-                    isSubmitting ||
-                    createMutation.isPending ||
-                    updateMutation.isPending
-                  }
-                />
-                {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block mb-1">Email</label>
-                <input
-                  type="email"
-                  {...register("email")}
-                  className="w-full border rounded px-3 py-2"
-                  disabled={
-                    isSubmitting ||
-                    createMutation.isPending ||
-                    updateMutation.isPending
-                  }
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block mb-1">Phone</label>
-                <input
-                  type="text"
-                  {...register("phone")}
-                  className="w-full border rounded px-3 py-2"
-                  disabled={
-                    isSubmitting ||
-                    createMutation.isPending ||
-                    updateMutation.isPending
-                  }
-                />
-                {errors.phone && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.phone.message}
-                  </p>
-                )}
-              </div>
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  className="px-4 py-2 rounded border"
-                  onClick={() => {
-                    setModalOpen(false);
-                    setEditingContact(null);
-                  }}
-                  disabled={
-                    isSubmitting ||
-                    createMutation.isPending ||
-                    updateMutation.isPending
-                  }
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
-                  disabled={
-                    isSubmitting ||
-                    createMutation.isPending ||
-                    updateMutation.isPending
-                  }
-                >
-                  {editingContact ? "Save" : "Add"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Contact Form Modal */}
+      <ContactFormModal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setEditingContact(null);
+        }}
+        onSubmit={async (data) => {
+          if (editingContact) {
+            await updateMutation.mutateAsync({
+              id: editingContact.id,
+              data: data as UpdateContactRequest
+            });
+          } else {
+            await createMutation.mutateAsync(data as CreateContactRequest);
+          }
+        }}
+        contact={editingContact || undefined}
+        isSubmitting={createMutation.isPending || updateMutation.isPending}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setDeletingContact(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        contact={deletingContact!}
+        isDeleting={deleteMutation.isPending}
+      />
     </div>
   );
 };
