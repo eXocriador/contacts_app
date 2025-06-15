@@ -13,7 +13,7 @@ const HomePage = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section
-        className="relative h-screen flex items-center justify-center text-white -mt-16"
+        className="fixed top-0 left-0 w-full h-screen flex items-center justify-center text-white"
         style={{
           backgroundImage:
             "url(https://res.cloudinary.com/db7t8zyft/image/upload/v1750023550/daniel-sessler-g3O3xWspoN4-unsplash_vpiusw.jpg)",
@@ -23,7 +23,7 @@ const HomePage = () => {
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent dark:from-black/80 dark:to-transparent" />
         <div className="absolute inset-0 bg-white/20 dark:bg-black/50 backdrop-blur-sm" />
-        <div className="relative z-10 text-center px-4">
+        <div className="relative z-10 text-center px-4 pt-16">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -59,6 +59,9 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Spacer to prevent content overlap */}
+      <div className="h-screen" />
 
       {/* Features Section */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
