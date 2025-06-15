@@ -15,7 +15,7 @@ const HomePage = () => {
       <section
         className="relative h-screen flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage: `url(https://res.cloudinary.com/db7t8zyft/image/upload/v1750023550/daniel-sessler-g3O3xWspoN4-unsplash_vpiusw.jpg)`,
+          backgroundImage: `url(/images/hero.jpg)`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           willChange: "transform",
