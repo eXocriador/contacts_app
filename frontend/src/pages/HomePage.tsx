@@ -13,49 +13,43 @@ const HomePage = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section
-        className="relative h-screen flex items-center justify-center text-white"
+        className="relative h-screen flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage:
-            "url(https://res.cloudinary.com/db7t8zyft/image/upload/v1750023550/daniel-sessler-g3O3xWspoN4-unsplash_vpiusw.jpg)",
+          backgroundImage: `url(https://res.cloudinary.com/db7t8zyft/image/upload/v1750023550/daniel-sessler-g3O3xWspoN4-unsplash_vpiusw.jpg)`,
           backgroundSize: "cover",
-          backgroundPosition: "center"
+          backgroundPosition: "center",
+          willChange: "transform"
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent dark:from-black/80 dark:to-transparent" />
-        <div className="absolute inset-0 bg-white/20 dark:bg-black/50 backdrop-blur-sm" />
-        <div className="relative z-10 text-center px-4 pt-16">
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl md:text-6xl font-bold mb-6"
+            transition={{ duration: 0.6 }}
+            className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6"
           >
-            Your Contacts, Seamlessly Managed
+            Manage Your Contacts
+            <br />
+            <span className="text-primary-400">With Ease</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto"
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto"
           >
-            Keep your contacts organized, accessible, and secure with our
-            powerful contact management solution.
+            Keep all your contacts organized in one place. Add, edit, and manage
+            your contacts effortlessly.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <Link to="/register" className="btn text-lg px-8 py-3">
+            <Link to="/register" className="btn btn-lg">
               Get Started
             </Link>
-            <button
-              onClick={scrollToFeatures}
-              className="btn-secondary text-lg px-8 py-3"
-            >
-              Learn More
-            </button>
           </motion.div>
         </div>
       </section>
@@ -67,8 +61,8 @@ const HomePage = () => {
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5 }}
               className="text-4xl font-bold text-center mb-16"
             >
               Why You'll Love It
@@ -98,8 +92,8 @@ const HomePage = () => {
                   key={feature.title}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: index * 0.2 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg"
                 >
                   <div className="text-primary-500 mb-4">{feature.icon}</div>
@@ -121,8 +115,8 @@ const HomePage = () => {
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5 }}
               className="text-4xl font-bold mb-8 text-gray-900 dark:text-white"
             >
               Ready to Get Started?
@@ -130,8 +124,8 @@ const HomePage = () => {
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5, delay: 0.1 }}
               className="text-xl mb-8 max-w-2xl mx-auto text-gray-600 dark:text-gray-400"
             >
               Join thousands of users who trust our platform to manage their
@@ -140,8 +134,8 @@ const HomePage = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
               <Link
                 to="/register"

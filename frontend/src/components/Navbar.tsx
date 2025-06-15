@@ -16,7 +16,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg will-change-transform">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-2xl font-bold text-primary-500">
@@ -28,21 +28,22 @@ const Navbar = () => {
               <>
                 <Link
                   to="/contacts"
-                  className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400"
+                  className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors duration-200"
                 >
                   Contacts
                 </Link>
                 <Link
                   to="/profile"
-                  className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400"
+                  className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors duration-200"
                 >
                   Profile
                 </Link>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
                   onClick={toggleTheme}
-                  className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                 >
                   {theme === "dark" ? (
                     <Sun className="w-5 h-5" />
@@ -53,6 +54,7 @@ const Navbar = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
                   onClick={handleLogout}
                   className="btn-secondary"
                 >
@@ -63,7 +65,7 @@ const Navbar = () => {
               <>
                 <Link
                   to="/login"
-                  className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400"
+                  className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors duration-200"
                 >
                   Login
                 </Link>
@@ -73,8 +75,9 @@ const Navbar = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
                   onClick={toggleTheme}
-                  className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                 >
                   {theme === "dark" ? (
                     <Sun className="w-5 h-5" />
