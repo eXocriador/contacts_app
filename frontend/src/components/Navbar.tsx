@@ -17,7 +17,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-lg">
-      <div className="container mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-2xl font-bold text-primary-500">
             Contacts App

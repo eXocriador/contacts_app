@@ -1,23 +1,18 @@
 {
-  "name": "contacts-app-root",
-  "version": "1.0.0",
-  "description": "Root package.json for Contacts App with Frontend and Backend",
-  "main": "index.js",
-  "packageManager": "yarn@1.22.22",
+  "name": "contacts-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "concurrently \"yarn --cwd frontend dev\" \"yarn --cwd backend dev\"",
     "dev:front": "yarn --cwd frontend dev",
     "dev:back": "yarn --cwd backend dev",
-    "install:all": "yarn install && yarn install --cwd frontend && yarn install --cwd backend",
-    "build:all": "yarn build --cwd frontend && yarn build --cwd backend",
-    "start:all": "concurrently \"yarn --cwd frontend start\" \"yarn --cwd backend start\""
+    "build:front": "yarn --cwd frontend build",
+    "build:back": "yarn --cwd backend build",
+    "start:front": "yarn --cwd frontend preview",
+    "start:back": "yarn --cwd backend start",
+    "lint:front": "yarn --cwd frontend lint",
+    "lint:back": "yarn --cwd backend lint"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@tailwindcss/postcss7-compat": "^2.2.17",
-    "concurrently": "^8.2.2",
-    "postcss": "^8.4.31"
-  }
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "devDependencies": {}
 }
