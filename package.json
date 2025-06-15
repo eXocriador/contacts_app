@@ -6,8 +6,8 @@
   "packageManager": "yarn@1.22.22",
   "scripts": {
     "dev": "concurrently \"yarn --cwd frontend dev\" \"yarn --cwd backend dev\"",
-    "dev:frontend": "yarn --cwd frontend dev",
-    "dev:backend": "yarn --cwd backend dev",
+    "dev:front": "yarn --cwd frontend dev",
+    "dev:back": "yarn --cwd backend dev",
     "install:all": "yarn install && yarn install --cwd frontend && yarn install --cwd backend",
     "build:all": "yarn build --cwd frontend && yarn build --cwd backend",
     "start:all": "concurrently \"yarn --cwd frontend start\" \"yarn --cwd backend start\""

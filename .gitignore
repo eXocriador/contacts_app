@@ -1,5 +1,7 @@
 # Dependencies
 node_modules/
+**/node_modules/
+.pnp/
 .pnp.js
 .pnp-data/
 .yarn/cache
@@ -55,3 +57,9 @@ uploads/
 
 # Documentation
 backend/docs/swagger.json
+
+# Environment files
+.env.*
+!.env.example
+google-oauth.json
+.env.test
