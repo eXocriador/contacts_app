@@ -6,11 +6,18 @@ import { toast } from "react-hot-toast";
 import { useAuthStore } from "../store/auth";
 import { authApi } from "../api/auth";
 import { motion } from "framer-motion";
+import type { UpdateProfileRequest } from "../types/api"; // Додано для updateProfile
 
-const profileSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  email: z.string().email("Invalid email")
-});
+const profileSchema = z
+  .object({
+    name: z.string().min(2, "Name is required").optional(), // Зробити optional, оскільки можуть оновлювати тільки email
+    email: z.string().email("Invalid email").optional() // Зробити optional
+  })
+  .refine((data) => data.name !== undefined || data.email !== undefined, {
+    message:
+      "At least one field (name or email) must be provided for profile update",
+    path: ["name"] // Показуємо помилку біля імені
+  });
 
 const passwordSchema = z
   .object({
@@ -30,6 +37,7 @@ type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 const ProfilePage = () => {
   const user = useAuthStore((state) => state.user);
+  const updateUserInStore = useAuthStore((state) => state.updateUser); // Отримуємо функцію для оновлення користувача в сторі
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
@@ -37,23 +45,33 @@ const ProfilePage = () => {
   const {
     register: registerProfile,
     handleSubmit: handleProfileSubmit,
-    formState: { errors: profileErrors }
+    formState: { errors: profileErrors },
+    reset: resetProfileForm
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user?.name || "",
       email: user?.email || ""
-    }
+    },
+    mode: "onBlur"
   });
 
   const {
     register: registerPassword,
     handleSubmit: handlePasswordSubmit,
-    reset: resetPassword,
+    reset: resetPasswordForm,
     formState: { errors: passwordErrors }
   } = useForm<PasswordFormValues>({
-    resolver: zodResolver(passwordSchema)
+    resolver: zodResolver(passwordSchema),
+    mode: "onBlur"
   });
+
+  React.useEffect(() => {
+    if (user) {
+      resetProfileForm({ name: user.name, email: user.email });
+      setPhotoPreview(user.photo || null);
+    }
+  }, [user, resetProfileForm]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,6 +81,8 @@ const ProfilePage = () => {
         setPhotoPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    } else {
+      setPhotoPreview(user?.photo || null); // Якщо файл видалено, повертаємося до поточного фото
     }
   };
 
@@ -70,8 +90,8 @@ const ProfilePage = () => {
     try {
       setIsUpdatingProfile(true);
       const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("email", data.email);
+      if (data.name !== undefined) formData.append("name", data.name);
+      if (data.email !== undefined) formData.append("email", data.email);
 
       const photoInput = document.querySelector(
         'input[type="file"]'
@@ -80,7 +100,9 @@ const ProfilePage = () => {
         formData.append("photo", photoInput.files[0]);
       }
 
-      await authApi.updateProfile(formData);
+      // Виклик updateProfile з FormData
+      const updatedUserResponse = await authApi.updateProfile(formData);
+      updateUserInStore(updatedUserResponse.user); // Оновлюємо стан користувача в Zustand
       toast.success("Profile updated successfully");
     } catch (error) {
       toast.error("Failed to update profile");
@@ -97,7 +119,7 @@ const ProfilePage = () => {
         newPassword: data.newPassword
       });
       toast.success("Password updated successfully");
-      resetPassword();
+      resetPasswordForm(); // Очищаємо форму пароля
     } catch (error) {
       toast.error("Failed to update password");
     } finally {

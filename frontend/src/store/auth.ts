@@ -109,7 +109,7 @@ export const useAuthStore = create<AuthState>()(
 
         set({ isLoading: true, error: null });
         try {
-          const data = await authApi.refresh(refreshToken);
+          const data = await authApi.refresh(refreshToken); //
           get().setAuth(data);
         } catch (error) {
           get().clearAuth();

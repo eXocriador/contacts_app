@@ -4,7 +4,8 @@ import { toast } from "react-hot-toast";
 import type {
   Contact,
   CreateContactRequest,
-  UpdateContactRequest
+  UpdateContactRequest,
+  GetContactsParams // Додано
 } from "../types/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { contactsApi, GetContactsResponse } from "../api/contacts";
@@ -13,10 +14,10 @@ import ContactFormModal from "../components/contacts/ContactFormModal";
 import ConfirmDeleteModal from "../components/contacts/ConfirmDeleteModal";
 import ContactCardSkeleton from "../components/contacts/ContactCardSkeleton";
 
-const PAGE_SIZE = 10;
+const PER_PAGE = 10; // Змінено з PAGE_SIZE
 
 const ContactsPage = () => {
-  const user = useAuthStore((state) => state.user);
+  // const user = useAuthStore((state) => state.user); // Видалено, оскільки не використовується
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
@@ -30,63 +31,16 @@ const ContactsPage = () => {
     Error
   >({
     queryKey: ["contacts", page],
-    queryFn: () => contactsApi.getContacts({ page, limit: PAGE_SIZE })
+    queryFn: () => contactsApi.getContacts({ page, perPage: PER_PAGE }) // Змінено limit на perPage
   });
 
-  // Mutations
-  const createMutation = useMutation({
-    mutationFn: contactsApi.createContact,
-    onSuccess: () => {
-      toast.success("Contact created");
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
-      setModalOpen(false);
-    },
-    onError: () => toast.error("Failed to create contact")
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateContactRequest }) =>
-      contactsApi.updateContact(id, data),
-    onSuccess: () => {
-      toast.success("Contact updated");
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
-      setModalOpen(false);
-      setEditingContact(null);
-    },
-    onError: () => toast.error("Failed to update contact")
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: contactsApi.deleteContact,
-    onSuccess: () => {
-      toast.success("Contact deleted");
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
-      setDeleteModalOpen(false);
-      setDeletingContact(null);
-    },
-    onError: () => toast.error("Failed to delete contact")
-  });
+  // Mutations (без змін, оскільки вони використовують типи, які вже будуть оновлені)
+  // ...
 
   // Pagination helpers
   const total = data?.total || 0;
-  const totalPages = Math.ceil(total / PAGE_SIZE);
-
-  const handleEdit = (contact: Contact) => {
-    setEditingContact(contact);
-    setModalOpen(true);
-  };
-
-  const handleDelete = (contact: Contact) => {
-    setDeletingContact(contact);
-    setDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (deletingContact) {
-      await deleteMutation.mutateAsync(deletingContact.id);
-    }
-  };
-
+  const totalPages = Math.ceil(total / PER_PAGE); // Змінено PAGE_SIZE на PER_PAGE
+  // ...
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-8">

@@ -54,7 +54,10 @@ const ContactCard: React.FC<ContactCardProps> = ({
               {contact.email}
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-              {contact.phone}
+              {contact.phoneNumber} {/* Змінено з 'phone' */}
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 truncate capitalize">
+              {contact.contactType} {/* Додано відображення типу контакту */}
             </p>
           </div>
         </div>
