@@ -1,5 +1,4 @@
 import { Document } from 'mongoose';
-import { ContactType } from '../constants/contacts';
 
 export interface IUser extends Document {
   name: string;
@@ -24,14 +23,11 @@ export interface ISession extends Document {
 export interface IContact extends Document {
   name: string;
   email: string;
-  phone: string;
-  favorite: boolean;
+  phoneNumber: string;
+  isFavourite: boolean;
   owner: IUser['_id'];
-  photo?: {
-    secure_url: string;
-    public_id: string;
-  };
-  contactType: ContactType;
+  photo?: string;
+  contactType: boolean | 'personal';
 }
 
 export interface AuthRequest {
@@ -43,31 +39,21 @@ export interface AuthRequest {
 export interface ContactRequest {
   name: string;
   email: string;
-  phone: string;
-  favorite?: boolean;
-  photo?: {
-    secure_url: string;
-    public_id: string;
-  };
-  contactType?: ContactType;
+  phoneNumber: string;
+  isFavourite?: boolean;
 }
 
 export interface UpdateContactRequest {
   name?: string;
   email?: string;
-  phone?: string;
-  favorite?: boolean;
-  photo?: {
-    secure_url: string;
-    public_id: string;
-  };
-  contactType?: ContactType;
+  phoneNumber?: string;
+  isFavourite?: boolean;
 }
 
 export interface PaginationQuery {
   page?: string;
   limit?: string;
-  favorite?: string;
+  isFavourite?: string;
 }
 
 export interface RequestResetEmailRequest {
@@ -94,11 +80,10 @@ export interface ContactResponse {
   id: IContact['_id'];
   name: string;
   email: string;
-  phone: string;
-  favorite: boolean;
+  phoneNumber: string;
+  isFavourite: boolean;
   owner: IContact['owner'];
   photo?: string;
-  contactType: ContactType;
 }
 
 export interface LoginWithGoogleOAuthRequest {
@@ -112,5 +97,22 @@ export interface UpdateProfileRequest {
   name?: string;
   email?: string;
   currentPassword?: string;
-  newPassword?: string;
+  password?: string;
+}
+
+export interface ContactRequest {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  isFavourite?: boolean;
+  contactType: string;
+}
+
+
+export interface UpdateContactRequest {
+  name?: string;
+  email?: string;
+  phoneNumber?: string;
+  isFavourite?: boolean;
+  contactType?: string;
 }

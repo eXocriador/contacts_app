@@ -2,8 +2,9 @@ type: object
 required:
   - name
   - email
-  - phone
+  - phoneNumber
   - owner
+  - contactType
 properties:
   _id:
     type: string
@@ -15,13 +16,20 @@ properties:
     type: string
     format: email
     description: Email контакту
-  phone:
+  phoneNumber:
     type: string
     description: Номер телефону контакту
-  favorite:
+  isFavourite:
     type: boolean
     default: false
     description: Чи є контакт улюбленим
+  contactType:
+    type: string
+    enum: ['personal', 'work', 'other']
+    description: Тип контакту
+  photo:
+    type: string
+    description: URL фотографії контакту
   owner:
     type: string
     description: ID власника контакту

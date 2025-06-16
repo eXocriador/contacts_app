@@ -1,37 +1,42 @@
 import { Response, NextFunction } from 'express';
 import { IUser } from '../types/models';
 import { CustomRequest } from '../types/index';
-import { getPaginationParams, formatContactResponse } from '../services/contacts';
+import { formatContactResponse } from '../services/contacts';
 import { Contacts } from '../db/models/contact';
-import { uploadImage, deleteImage } from '../services/cloudinary';
 import createHttpError from 'http-errors';
+import { uploadImage } from '../services/cloudinary';
 import { parseSortParams } from '../utils/filters/parseSortParams';
 import { parseFilterParams } from '../utils/filters/parseFilterParams';
+
+import { parsePaginationParams } from '../utils/filters/parsePaginationParams';
 
 export const getContacts = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
-    const { page, limit, skip } = getPaginationParams(req.query);
+
+    const { page, perPage } = parsePaginationParams(req.query);
     const { sortBy, sortOrder } = parseSortParams(req.query);
     const filters = parseFilterParams(req.query);
 
+    const skip = (page - 1) * perPage;
+
     const query = {
       owner: req.user?.id,
-      ...filters
+      ...filters,
     };
 
     const [contacts, total] = await Promise.all([
       Contacts.find(query)
         .sort({ [sortBy]: sortOrder })
         .skip(skip)
-        .limit(limit),
+        .limit(perPage),
       Contacts.countDocuments(query),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(total / perPage);
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
 
@@ -41,7 +46,7 @@ export const getContacts = async (
       data: {
         data: contacts.map(formatContactResponse),
         page: page,
-        perPage: limit,
+        perPage: perPage,
         totalItems: total,
         totalPages: totalPages,
         hasPreviousPage: hasPrevPage,
@@ -56,7 +61,7 @@ export const getContacts = async (
 export const getContactById = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const { contactId } = req.params;
@@ -82,20 +87,21 @@ export const getContactById = async (
 export const createContact = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const user = req.user as IUser;
-    const contactData = req.body;
+    let photoUrl: string | undefined;
 
     if (req.file) {
-      const photoData = await uploadImage(req.file);
-      contactData.photo = photoData;
+      const result = await uploadImage(req.file);
+      photoUrl = result.secure_url;
     }
 
     const contact = await Contacts.create({
-      ...contactData,
+      ...req.body,
       owner: user._id,
+      photo: photoUrl,
     });
 
     res.status(201).json({
@@ -111,30 +117,25 @@ export const createContact = async (
 export const updateContact = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const { contactId } = req.params;
     const user = req.user as IUser;
-    const updateData = req.body;
-
-    const contact = await Contacts.findOne({ _id: contactId, owner: user._id });
-    if (!contact) {
-      throw createHttpError(404, 'Contact not found');
-    }
+    let photoUrl: string | undefined;
 
     if (req.file) {
-      if (contact.photo?.public_id) {
-        await deleteImage(contact.photo.public_id);
-      }
-      const photoData = await uploadImage(req.file);
-      updateData.photo = photoData;
+      const result = await uploadImage(req.file);
+      photoUrl = result.secure_url;
     }
 
-    const updatedContact = await Contacts.findByIdAndUpdate(
-      contactId,
-      updateData,
-      { new: true }
+    const updatedContact = await Contacts.findOneAndUpdate(
+      { _id: contactId, owner: user._id },
+      {
+        ...req.body,
+        ...(photoUrl && { photo: photoUrl }),
+      },
+      { new: true, runValidators: true, upsert: true },
     );
 
     if (!updatedContact) {
@@ -154,10 +155,10 @@ export const updateContact = async (
 export const deleteContact = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
-    const contact = await Contacts.findOne({
+    const contact = await Contacts.findOneAndDelete({
       _id: req.params.contactId,
       owner: req.user?.id,
     });
@@ -166,11 +167,6 @@ export const deleteContact = async (
       throw createHttpError(404, 'Contact not found');
     }
 
-    if (contact.photo?.public_id) {
-      await deleteImage(contact.photo.public_id);
-    }
-
-    await Contacts.findByIdAndDelete(contact._id);
     res.status(204).send();
   } catch (error) {
     next(error);

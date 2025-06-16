@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { handeSaveError, setUpdateSettings } from './hooks';
-import { IContact } from '../../types/models'; // Імпортуємо IContact з types/models.ts
+import { IContact } from '../../types/models';
 import { typeList } from '../../constants/contacts';
 
 const contactSchema = new Schema<IContact>(
@@ -11,27 +11,23 @@ const contactSchema = new Schema<IContact>(
     },
     email: {
       type: String,
+      required: [true, 'Email is required'],
     },
-    phone: {
+    phoneNumber: {
       type: String,
-      required: [true, 'Phone is required'],
+      required: [true, 'Phone number is required'],
     },
-    favorite: {
+    isFavourite: {
       type: Boolean,
       default: false,
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: 'User', // Важливо, щоб це посилалося на модель User
+      ref: 'User',
       required: true,
     },
     photo: {
-      secure_url: {
-        type: String,
-      },
-      public_id: {
-        type: String,
-      },
+      type: String,
     },
     contactType: {
       type: String,
@@ -42,7 +38,7 @@ const contactSchema = new Schema<IContact>(
   },
   {
     timestamps: true,
-    versionKey: false, // Додано для консистентності з іншими моделями в db/models
+    versionKey: false,
   },
 );
 
@@ -50,4 +46,4 @@ contactSchema.post('save', handeSaveError);
 contactSchema.pre('findOneAndUpdate', setUpdateSettings);
 contactSchema.post('findOneAndUpdate', handeSaveError);
 
-export const Contacts = model<IContact>('Contact', contactSchema); // Експортуємо як Contacts
+export const Contacts = model<IContact>('Contact', contactSchema);

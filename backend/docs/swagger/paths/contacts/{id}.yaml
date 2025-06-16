@@ -35,24 +35,34 @@ get:
         application/json:
           schema:
             $ref: '../../components/schemas/Error.yaml'
+          example:
+            status: 404
+            message: "Contact not found"
+            data: null
     '401':
       description: Не авторизований
       content:
         application/json:
           schema:
             $ref: '../../components/schemas/Error.yaml'
+          example:
+            status: 401
+            message: "Authentication required"
+            data: null
+
+# docs/swagger/paths/contacts/{id}.yaml
 
 patch:
   tags:
     - Contacts
   summary: Оновити контакт
-  description: Оновлює існуючий контакт
+  description: Оновлює існуючий контакт з можливістю завантаження нового фото.
   security:
     - bearerAuth: []
   requestBody:
     required: true
     content:
-      multipart/form-data:
+      multipart/form-data: # Змінено тип контенту
         schema:
           type: object
           properties:
@@ -63,16 +73,19 @@ patch:
             email:
               type: string
               format: email
-            phone:
+            phoneNumber:
               type: string
               minLength: 3
               maxLength: 20
-            favorite:
+            isFavourite:
               type: boolean
+            contactType: # Додано відсутнє поле
+              type: string
+              enum: ['personal', 'work', 'other']
             photo:
               type: string
-              format: binary
-              description: Фото контакту
+              format: binary # Додано поле для завантаження файлу
+              description: Нова фотографія контакту
   responses:
     '200':
       description: Контакт оновлено
@@ -107,6 +120,10 @@ patch:
         application/json:
           schema:
             $ref: '../../components/schemas/Error.yaml'
+          example:
+            status: 401
+            message: "Authentication required"
+            data: null
 
 delete:
   tags:
@@ -124,9 +141,17 @@ delete:
         application/json:
           schema:
             $ref: '../../components/schemas/Error.yaml'
+          example:
+            status: 404
+            message: "Contact not found"
+            data: null
     '401':
       description: Не авторизований
       content:
         application/json:
           schema:
             $ref: '../../components/schemas/Error.yaml'
+          example:
+            status: 401
+            message: "Authentication required"
+            data: null

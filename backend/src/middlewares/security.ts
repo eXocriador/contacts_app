@@ -4,48 +4,45 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { config } from '../utils/config';
 
-// Enhanced CORS configuration
-export const corsOptions = cors({
+export const corsOptions = {
   origin: config.CORS_ORIGIN,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  exposedHeaders: ['Set-Cookie'],
   credentials: true,
-  maxAge: 86400, // 24 hours
-});
+  maxAge: 86400,
+};
 
-// Enhanced rate limiting
 export const rateLimiter = rateLimit({
   windowMs: config.RATE_LIMIT_WINDOW_MS,
   max: config.RATE_LIMIT_MAX,
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => {
-    // Skip rate limiting for development environment and certain paths
+  skip: (req: Request): boolean => {
     if (config.NODE_ENV === 'development') return true;
     if (req.path.startsWith('/health')) return true;
     return false;
   },
 });
 
-// Enhanced Helmet configuration
 export const helmetConfig = helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'", "https://accounts.google.com", "https://oauth2.googleapis.com"],
       fontSrc: ["'self'"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
+      frameSrc: ["'self'", "https://accounts.google.com"],
     },
   },
   crossOriginEmbedderPolicy: true,
   crossOriginOpenerPolicy: true,
-  crossOriginResourcePolicy: { policy: "same-site" },
+  crossOriginResourcePolicy: { policy: "cross-origin" },
   dnsPrefetchControl: { allow: false },
   frameguard: { action: "deny" },
   hidePoweredBy: true,
@@ -60,27 +57,21 @@ export const helmetConfig = helmet({
   xssFilter: true,
 });
 
-// Request size limiter middleware
-export const requestSizeLimiter = (req: Request, res: Response, next: NextFunction) => {
+export const requestSizeLimiter = (req: Request, res: Response, next: NextFunction): void => {
   const MAX_REQUEST_SIZE = '10mb';
   if (req.headers['content-length'] && parseInt(req.headers['content-length']) > 10 * 1024 * 1024) {
-    return res.status(413).json({ message: 'Request entity too large' });
+    res.status(413).json({ message: 'Request entity too large' });
+    return;
   }
   next();
 };
 
-// Security headers middleware
-export const securityHeaders = (req: Request, res: Response, next: NextFunction) => {
-  // Prevent clickjacking
+export const securityHeaders = (req: Request, res: Response, next: NextFunction): void => {
   res.setHeader('X-Frame-Options', 'DENY');
-
-  // Prevent MIME type sniffing
   res.setHeader('X-Content-Type-Options', 'nosniff');
-
-  // Enable XSS protection
   res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
 
-  // Prevent browser from caching sensitive data
   if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');

@@ -11,12 +11,12 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000",
-      "description": "Local development server"
+      "url": "https://goit.exocriador.art",
+      "description": "Production server"
     },
     {
-      "url": "https://contacts-app-backend.onrender.com",
-      "description": "Production server"
+      "url": "http://localhost:3000",
+      "description": "Local development server"
     }
   ],
   "tags": [
@@ -98,6 +98,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Field 'email' is required",
+                  "data": null
                 }
               }
             }
@@ -108,6 +113,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Email already in use",
+                  "data": null
                 }
               }
             }
@@ -173,6 +183,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Validation failed: 'email' must be a valid email",
+                  "data": null
                 }
               }
             }
@@ -183,6 +198,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 401,
+                  "message": "Email or password is wrong",
+                  "data": null
                 }
               }
             }
@@ -267,6 +287,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 401,
+                  "message": "Invalid Google token",
+                  "data": null
                 }
               }
             }
@@ -306,6 +331,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 401,
+                  "message": "Refresh token expired.",
+                  "data": null
                 }
               }
             }
@@ -335,6 +365,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 401,
+                  "message": "Authentication required",
+                  "data": null
                 }
               }
             }
@@ -348,7 +383,7 @@
           "Contacts"
         ],
         "summary": "Отримати список контактів",
-        "description": "Повертає список контактів користувача з можливістю пагінації та фільтрації",
+        "description": "Повертає список контактів користувача з можливістю пагінації, фільтрації та сортування.",
         "security": [
           {
             "bearerAuth": []
@@ -366,7 +401,7 @@
           },
           {
             "in": "query",
-            "name": "limit",
+            "name": "perPage",
             "schema": {
               "type": "integer",
               "default": 10
@@ -375,11 +410,54 @@
           },
           {
             "in": "query",
-            "name": "favorite",
+            "name": "isFavourite",
             "schema": {
               "type": "boolean"
             },
-            "description": "Фільтр за улюбленими контактами"
+            "description": "Фільтр за улюбленими контактами (true/false)"
+          },
+          {
+            "in": "query",
+            "name": "contactType",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "personal",
+                "work",
+                "other"
+              ]
+            },
+            "description": "Фільтр за типом контакту"
+          },
+          {
+            "in": "query",
+            "name": "sortBy",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "_id",
+                "name",
+                "email",
+                "phoneNumber",
+                "isFavourite",
+                "createdAt"
+              ],
+              "default": "createdAt"
+            },
+            "description": "Поле для сортування"
+          },
+          {
+            "in": "query",
+            "name": "sortOrder",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            },
+            "description": "Порядок сортування"
           }
         ],
         "responses": {
@@ -444,6 +522,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 401,
+                  "message": "Authentication required",
+                  "data": null
                 }
               }
             }
@@ -455,7 +538,7 @@
           "Contacts"
         ],
         "summary": "Створити контакт",
-        "description": "Створює новий контакт",
+        "description": "Створює новий контакт з можливістю завантаження фото.",
         "security": [
           {
             "bearerAuth": []
@@ -470,7 +553,8 @@
                 "required": [
                   "name",
                   "email",
-                  "phone"
+                  "phoneNumber",
+                  "contactType"
                 ],
                 "properties": {
                   "name": {
@@ -484,21 +568,30 @@
                     "format": "email",
                     "description": "Email контакту"
                   },
-                  "phone": {
+                  "phoneNumber": {
                     "type": "string",
                     "description": "Номер телефону контакту",
                     "minLength": 3,
                     "maxLength": 20
                   },
-                  "favorite": {
+                  "isFavourite": {
                     "type": "boolean",
                     "default": false,
                     "description": "Чи є контакт улюбленим"
                   },
+                  "contactType": {
+                    "type": "string",
+                    "enum": [
+                      "personal",
+                      "work",
+                      "other"
+                    ],
+                    "description": "Тип контакту"
+                  },
                   "photo": {
                     "type": "string",
                     "format": "binary",
-                    "description": "Фото контакту"
+                    "description": "Фотографія контакту"
                   }
                 }
               }
@@ -535,6 +628,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Validation failed: 'name' is required",
+                  "data": null
                 }
               }
             }
@@ -545,6 +643,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 401,
+                  "message": "Authentication required",
+                  "data": null
                 }
               }
             }
@@ -605,6 +708,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 401,
+                  "message": "Authentication required",
+                  "data": null
                 }
               }
             }
@@ -615,6 +723,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Contact not found",
+                  "data": null
                 }
               }
             }
@@ -626,7 +739,7 @@
           "Contacts"
         ],
         "summary": "Оновити контакт",
-        "description": "Оновлює існуючий контакт",
+        "description": "Оновлює існуючий контакт з можливістю завантаження нового фото.",
         "security": [
           {
             "bearerAuth": []
@@ -648,18 +761,26 @@
                     "type": "string",
                     "format": "email"
                   },
-                  "phone": {
+                  "phoneNumber": {
                     "type": "string",
                     "minLength": 3,
                     "maxLength": 20
                   },
-                  "favorite": {
+                  "isFavourite": {
                     "type": "boolean"
+                  },
+                  "contactType": {
+                    "type": "string",
+                    "enum": [
+                      "personal",
+                      "work",
+                      "other"
+                    ]
                   },
                   "photo": {
                     "type": "string",
                     "format": "binary",
-                    "description": "Фото контакту"
+                    "description": "Нова фотографія контакту"
                   }
                 }
               }
@@ -706,6 +827,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 401,
+                  "message": "Authentication required",
+                  "data": null
                 }
               }
             }
@@ -743,6 +869,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 401,
+                  "message": "Authentication required",
+                  "data": null
                 }
               }
             }
@@ -753,6 +884,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Contact not found",
+                  "data": null
                 }
               }
             }
@@ -775,8 +911,9 @@
         "required": [
           "name",
           "email",
-          "phone",
-          "owner"
+          "phoneNumber",
+          "owner",
+          "contactType"
         ],
         "properties": {
           "_id": {
@@ -792,14 +929,27 @@
             "format": "email",
             "description": "Email контакту"
           },
-          "phone": {
+          "phoneNumber": {
             "type": "string",
             "description": "Номер телефону контакту"
           },
-          "favorite": {
+          "isFavourite": {
             "type": "boolean",
             "default": false,
             "description": "Чи є контакт улюбленим"
+          },
+          "contactType": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "work",
+              "other"
+            ],
+            "description": "Тип контакту"
+          },
+          "photo": {
+            "type": "string",
+            "description": "URL фотографії контакту"
           },
           "owner": {
             "type": "string",

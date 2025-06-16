@@ -2,7 +2,7 @@ get:
   tags:
     - Contacts
   summary: Отримати список контактів
-  description: Повертає список контактів користувача з можливістю пагінації та фільтрації
+  description: Повертає список контактів користувача з можливістю пагінації, фільтрації та сортування.
   security:
     - bearerAuth: []
   parameters:
@@ -13,16 +13,36 @@ get:
         default: 1
       description: Номер сторінки
     - in: query
-      name: limit
+      name: perPage
       schema:
         type: integer
         default: 10
       description: Кількість контактів на сторінці
     - in: query
-      name: favorite
+      name: isFavourite
       schema:
         type: boolean
-      description: Фільтр за улюбленими контактами
+      description: Фільтр за улюбленими контактами (true/false)
+    - in: query
+      name: contactType
+      schema:
+        type: string
+        enum: ['personal', 'work', 'other']
+      description: Фільтр за типом контакту
+    - in: query
+      name: sortBy
+      schema:
+        type: string
+        enum: ['_id', 'name', 'email', 'phoneNumber', 'isFavourite', 'createdAt']
+        default: 'createdAt'
+      description: Поле для сортування
+    - in: query
+      name: sortOrder
+      schema:
+        type: string
+        enum: ['asc', 'desc']
+        default: 'asc'
+      description: Порядок сортування
   responses:
     '200':
       description: Список контактів
@@ -68,24 +88,29 @@ get:
         application/json:
           schema:
             $ref: '../../components/schemas/Error.yaml'
+          example:
+            status: 401
+            message: "Authentication required"
+            data: null
 
 post:
   tags:
     - Contacts
   summary: Створити контакт
-  description: Створює новий контакт
+  description: Створює новий контакт з можливістю завантаження фото.
   security:
     - bearerAuth: []
   requestBody:
     required: true
     content:
-      multipart/form-data:
+      multipart/form-data: # Змінено тип контенту
         schema:
           type: object
           required:
             - name
             - email
-            - phone
+            - phoneNumber
+            - contactType
           properties:
             name:
               type: string
@@ -96,19 +121,23 @@ post:
               type: string
               format: email
               description: Email контакту
-            phone:
+            phoneNumber:
               type: string
               description: Номер телефону контакту
               minLength: 3
               maxLength: 20
-            favorite:
+            isFavourite:
               type: boolean
               default: false
               description: Чи є контакт улюбленим
+            contactType:
+              type: string
+              enum: ['personal', 'work', 'other']
+              description: Тип контакту
             photo:
               type: string
-              format: binary
-              description: Фото контакту
+              format: binary # Додано поле для завантаження файлу
+              description: Фотографія контакту
   responses:
     '201':
       description: Контакт створено
@@ -131,9 +160,17 @@ post:
         application/json:
           schema:
             $ref: '../../components/schemas/Error.yaml'
+          example:
+            status: 400
+            message: "Validation failed: 'name' is required"
+            data: null
     '401':
       description: Не авторизований
       content:
         application/json:
           schema:
             $ref: '../../components/schemas/Error.yaml'
+          example:
+            status: 401
+            message: "Authentication required"
+            data: null

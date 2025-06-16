@@ -8,18 +8,17 @@ export const getPaginationParams = (query: PaginationQuery) => {
     Math.max(MIN_LIMIT, parseInt(query.limit || String(DEFAULT_LIMIT)))
   );
   const skip = (page - 1) * limit;
-  const favorite = query.favorite === 'true';
+  const isFavourite = query.isFavourite === 'true';
 
-  return { page, limit, skip, favorite };
+  return { page, limit, skip, isFavourite };
 };
 
 export const formatContactResponse = (contact: IContact): ContactResponse => ({
   id: contact._id,
   name: contact.name,
   email: contact.email,
-  phone: contact.phone,
-  favorite: contact.favorite,
+  phoneNumber: contact.phoneNumber,
+  isFavourite: contact.isFavourite,
   owner: contact.owner,
-  photo: contact.photo?.secure_url,
-  contactType: contact.contactType,
+  photo: contact.photo,
 });
