@@ -13,10 +13,12 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       proxy: {
-        "/": {
-          target: env.VITE_API_URL || "https://api.exocriador.art",
+        "/api": {
+          // Змінено на '/api' для проксування лише API запитів
+          target: env.VITE_API_URL || "https://api.exocriador.com",
           changeOrigin: true,
-          secure: true
+          secure: true,
+          rewrite: (path) => path.replace(/^\/api/, "") // Переписуємо шлях, видаляючи '/api'
         }
       }
     },

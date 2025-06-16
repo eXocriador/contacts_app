@@ -1,23 +1,20 @@
 import React, { useState } from "react";
-import { useAuthStore } from "../store/auth";
 import { toast } from "react-hot-toast";
 import type {
   Contact,
   CreateContactRequest,
-  UpdateContactRequest,
-  GetContactsParams // Додано
+  UpdateContactRequest
 } from "../types/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { contactsApi, GetContactsResponse } from "../api/contacts";
+import { contactsApi, GetContactsResponse } from "../api/contacts"; // Імпортуємо GetContactsResponse з оновленого файлу
 import ContactCard from "../components/contacts/ContactCard";
 import ContactFormModal from "../components/contacts/ContactFormModal";
 import ConfirmDeleteModal from "../components/contacts/ConfirmDeleteModal";
 import ContactCardSkeleton from "../components/contacts/ContactCardSkeleton";
 
-const PER_PAGE = 10; // Змінено з PAGE_SIZE
+const PER_PAGE = 10;
 
 const ContactsPage = () => {
-  // const user = useAuthStore((state) => state.user); // Видалено, оскільки не використовується
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
@@ -25,22 +22,70 @@ const ContactsPage = () => {
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
 
-  // Fetch contacts
   const { data, isLoading, isError, error } = useQuery<
     GetContactsResponse,
     Error
   >({
     queryKey: ["contacts", page],
-    queryFn: () => contactsApi.getContacts({ page, perPage: PER_PAGE }) // Змінено limit на perPage
+    queryFn: () => contactsApi.getContacts({ page, perPage: PER_PAGE })
   });
 
-  // Mutations (без змін, оскільки вони використовують типи, які вже будуть оновлені)
-  // ...
+  const createMutation = useMutation({
+    mutationFn: contactsApi.createContact,
+    onSuccess: () => {
+      toast.success("Contact created successfully!");
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      setModalOpen(false);
+    },
+    onError: (err) => {
+      toast.error(`Failed to create contact: ${err.message}`);
+    }
+  });
 
-  // Pagination helpers
-  const total = data?.total || 0;
-  const totalPages = Math.ceil(total / PER_PAGE); // Змінено PAGE_SIZE на PER_PAGE
-  // ...
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateContactRequest }) =>
+      contactsApi.updateContact(id, data),
+    onSuccess: () => {
+      toast.success("Contact updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      setModalOpen(false);
+    },
+    onError: (err) => {
+      toast.error(`Failed to update contact: ${err.message}`);
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: contactsApi.deleteContact,
+    onSuccess: () => {
+      toast.success("Contact deleted successfully!");
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      setDeleteModalOpen(false);
+      setDeletingContact(null);
+    },
+    onError: (err) => {
+      toast.error(`Failed to delete contact: ${err.message}`);
+    }
+  });
+
+  const handleEdit = (contact: Contact) => {
+    setEditingContact(contact);
+    setModalOpen(true);
+  };
+
+  const handleDelete = (contact: Contact) => {
+    setDeletingContact(contact);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deletingContact) {
+      await deleteMutation.mutateAsync(deletingContact.id);
+    }
+  };
+
+  const totalPages = data?.totalPages || 0; // Використовуємо totalPages з відповіді бекенду
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-8">
@@ -92,7 +137,6 @@ const ContactsPage = () => {
         </div>
       )}
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-8 space-x-2">
           <button
@@ -123,7 +167,6 @@ const ContactsPage = () => {
         </div>
       )}
 
-      {/* Contact Form Modal */}
       <ContactFormModal
         isOpen={modalOpen}
         onClose={() => {
@@ -144,7 +187,6 @@ const ContactsPage = () => {
         isSubmitting={createMutation.isPending || updateMutation.isPending}
       />
 
-      {/* Delete Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={deleteModalOpen}
         onClose={() => {

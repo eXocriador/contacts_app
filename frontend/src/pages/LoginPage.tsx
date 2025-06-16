@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react"; // Додано useEffect
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom"; // Додано useSearchParams
 import { useAuthStore } from "../store/auth";
 import { toast } from "react-hot-toast";
 import type { LoginRequest } from "../types/api";
@@ -11,11 +11,30 @@ import { authApi } from "../api/auth";
 const LoginPage = () => {
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
+  const loginWithGoogle = useAuthStore((state) => state.loginWithGoogle); // Додано
+  const [searchParams] = useSearchParams(); // Додано
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm<LoginRequest>();
+
+  // Додаємо useEffect для обробки Google OAuth callback
+  useEffect(() => {
+    const code = searchParams.get("code");
+    if (code) {
+      (async () => {
+        try {
+          await authApi.loginWithGoogle(code);
+          toast.success("Successfully logged in with Google!");
+          navigate("/contacts");
+        } catch (error) {
+          toast.error("Failed to login with Google");
+          navigate("/login", { replace: true }); // Перенаправити без коду в URL
+        }
+      })();
+    }
+  }, [searchParams, navigate]);
 
   const onSubmit = async (data: LoginRequest) => {
     try {

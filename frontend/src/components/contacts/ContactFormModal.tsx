@@ -7,6 +7,7 @@ import type {
   CreateContactRequest,
   UpdateContactRequest
 } from "../../types/api";
+import { typeList } from "../../constants/contacts"; // Імпортуємо typeList
 
 interface ContactFormModalProps {
   isOpen: boolean;
@@ -36,19 +37,26 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
     formState: { errors },
     reset
   } = useForm<CreateContactRequest | UpdateContactRequest>({
-    // Змінено тип для коректності
-    defaultValues: contact || {
-      name: "",
-      email: "",
-      phoneNumber: "", // Змінено з 'phone'
-      isFavourite: false,
-      contactType: "personal" // Додано дефолтне значення
-    }
+    defaultValues: contact
+      ? {
+          ...contact,
+          contactType: contact.contactType // Вибираємо перший елемент з кортежу, якщо contactType є масивом
+        }
+      : {
+          name: "",
+          email: "",
+          phoneNumber: "",
+          isFavourite: false,
+          contactType: "personal"
+        }
   });
 
   React.useEffect(() => {
     if (contact) {
-      reset(contact);
+      reset({
+        ...contact,
+        contactType: contact.contactType // Знову ж таки, для коректного відображення
+      });
       setPreviewUrl(contact.photo || null);
     }
   }, [contact, reset]);
@@ -65,12 +73,10 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
     data: CreateContactRequest | UpdateContactRequest
   ) => {
     const formData = new FormData();
-    // Оскільки бекенд очікує multipart/form-data для всіх полів, включаючи JSON,
-    // ми просто додаємо всі поля до FormData.
-    // Якщо поле є boolean, перетворюємо його на string.
+
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        const value = (data as any)[key]; // Використовуємо 'any' для доступу до динамічних ключів
+        const value = (data as any)[key];
         if (value !== undefined && value !== null) {
           if (typeof value === "boolean") {
             formData.append(key, String(value));
@@ -84,16 +90,12 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
     const file = fileInputRef.current?.files?.[0];
     if (file) {
       formData.append("photo", file);
-    } else if (contact && !contact.photo && previewUrl === null) {
-      // Якщо контакт був з фото, а тепер його видалили, то надіслати порожній рядок
-      // або спеціальний прапорець, який бекенд інтерпретує як видалення фото.
-      // За поточним бекендом, просто не надсилаємо 'photo' поле, якщо його немає.
     }
 
-    await onSubmit(formData as any); // Типізація FormData як CreateContactRequest | UpdateContactRequest
+    // Передача FormData
+    await onSubmit(formData as any);
     if (!contact) {
       reset({
-        // Скидаємо форму для нового контакту
         name: "",
         email: "",
         phoneNumber: "",
@@ -217,11 +219,11 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
                   type="tel"
                   {...register("phoneNumber", {
                     required: "Phone number is required"
-                  })} // Змінено з 'phone'
+                  })}
                   className="input"
                   placeholder="Enter phone number"
                 />
-                {errors.phoneNumber && ( // Змінено з 'phone'
+                {errors.phoneNumber && (
                   <p className="mt-1 text-sm text-red-500">
                     {errors.phoneNumber.message}
                   </p>
@@ -238,9 +240,11 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
                   })}
                   className="input"
                 >
-                  <option value="personal">Personal</option>
-                  <option value="work">Work</option>
-                  <option value="other">Other</option>
+                  {typeList.map((type) => (
+                    <option key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </option>
+                  ))}
                 </select>
                 {errors.contactType && (
                   <p className="mt-1 text-sm text-red-500">

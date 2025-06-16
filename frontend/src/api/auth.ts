@@ -4,18 +4,10 @@ import type {
   LoginRequest,
   RegisterRequest,
   UpdateProfileRequest,
-  User,
-  UpdatePasswordRequest
+  UpdatePasswordRequest,
+  User // Додано User
 } from "../types/api";
 import { useAuthStore } from "../store/auth";
-
-interface ImportMetaEnv {
-  readonly VITE_API_URL?: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -60,13 +52,13 @@ api.interceptors.response.use(
 class AuthApi {
   async login(data: LoginRequest): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/login", data);
-    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("token", response.data.data.accessToken); // Змінено на response.data.data.accessToken
     return response.data;
   }
 
   async register(data: RegisterRequest): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/register", data);
-    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("token", response.data.data.accessToken); // Змінено на response.data.data.accessToken
     return response.data;
   }
 
@@ -77,12 +69,14 @@ class AuthApi {
 
   async refresh(): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/refresh");
-    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("token", response.data.data.accessToken); // Змінено на response.data.data.accessToken
     return response.data;
   }
 
-  async updateProfile(data: FormData): Promise<AuthResponse> {
-    const response = await api.put<AuthResponse>("/auth/profile", data, {
+  async updateProfile(data: FormData): Promise<{ user: User }> {
+    // Змінено тип повернення на { user: User }
+    const response = await api.put<{ user: User }>("/auth/profile", data, {
+      // Змінено на { user: User }
       headers: {
         "Content-Type": "multipart/form-data"
       }
@@ -97,12 +91,12 @@ class AuthApi {
 
   async loginWithGoogle(code: string): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/google", { code });
-    localStorage.setItem("token", response.data.token); // Аналогічно
+    localStorage.setItem("token", response.data.data.accessToken); // Змінено на response.data.data.accessToken
     return response.data;
   }
 
   async updatePassword(data: UpdatePasswordRequest): Promise<void> {
-    await api.put("/auth/password", data);
+    await api.patch("/auth/profile", data); // Змінено на patch і на /auth/profile
   }
 }
 

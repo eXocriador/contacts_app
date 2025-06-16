@@ -6,17 +6,20 @@ import { toast } from "react-hot-toast";
 import { useAuthStore } from "../store/auth";
 import { authApi } from "../api/auth";
 import { motion } from "framer-motion";
-import type { UpdateProfileRequest } from "../types/api"; // Додано для updateProfile
 
 const profileSchema = z
   .object({
-    name: z.string().min(2, "Name is required").optional(), // Зробити optional, оскільки можуть оновлювати тільки email
-    email: z.string().email("Invalid email").optional() // Зробити optional
+    name: z
+      .string()
+      .min(2, "Name must be at least 2 characters")
+      .optional()
+      .or(z.literal("")),
+    email: z.string().email("Invalid email").optional().or(z.literal(""))
   })
   .refine((data) => data.name !== undefined || data.email !== undefined, {
     message:
       "At least one field (name or email) must be provided for profile update",
-    path: ["name"] // Показуємо помилку біля імені
+    path: ["name"]
   });
 
 const passwordSchema = z
@@ -24,7 +27,14 @@ const passwordSchema = z
     currentPassword: z.string().min(6, "Current password is required"),
     newPassword: z
       .string()
-      .min(6, "New password must be at least 6 characters"),
+      .min(6, "New password must be at least 6 characters")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        {
+          message:
+            "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+        }
+      ),
     confirmPassword: z.string().min(6, "Confirm password is required")
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -37,7 +47,7 @@ type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 const ProfilePage = () => {
   const user = useAuthStore((state) => state.user);
-  const updateUserInStore = useAuthStore((state) => state.updateUser); // Отримуємо функцію для оновлення користувача в сторі
+  const updateUserInStore = useAuthStore((state) => state.updateUser);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
@@ -82,7 +92,7 @@ const ProfilePage = () => {
       };
       reader.readAsDataURL(file);
     } else {
-      setPhotoPreview(user?.photo || null); // Якщо файл видалено, повертаємося до поточного фото
+      setPhotoPreview(user?.photo || null);
     }
   };
 
@@ -90,8 +100,10 @@ const ProfilePage = () => {
     try {
       setIsUpdatingProfile(true);
       const formData = new FormData();
-      if (data.name !== undefined) formData.append("name", data.name);
-      if (data.email !== undefined) formData.append("email", data.email);
+      if (data.name !== undefined && data.name !== "")
+        formData.append("name", data.name);
+      if (data.email !== undefined && data.email !== "")
+        formData.append("email", data.email);
 
       const photoInput = document.querySelector(
         'input[type="file"]'
@@ -100,9 +112,20 @@ const ProfilePage = () => {
         formData.append("photo", photoInput.files[0]);
       }
 
-      // Виклик updateProfile з FormData
-      const updatedUserResponse = await authApi.updateProfile(formData);
-      updateUserInStore(updatedUserResponse.user); // Оновлюємо стан користувача в Zustand
+      // Перевірка, чи є якісь дані для оновлення
+      if (
+        !formData.get("name") &&
+        !formData.get("email") &&
+        !formData.get("photo")
+      ) {
+        toast.error(
+          "At least one field (name, email or photo) must be provided for profile update"
+        );
+        return;
+      }
+
+      const response = await authApi.updateProfile(formData); // Очікуємо { user: User }
+      updateUserInStore(response.user);
       toast.success("Profile updated successfully");
     } catch (error) {
       toast.error("Failed to update profile");
@@ -119,7 +142,7 @@ const ProfilePage = () => {
         newPassword: data.newPassword
       });
       toast.success("Password updated successfully");
-      resetPasswordForm(); // Очищаємо форму пароля
+      resetPasswordForm();
     } catch (error) {
       toast.error("Failed to update password");
     } finally {
