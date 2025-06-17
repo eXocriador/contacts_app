@@ -11,7 +11,12 @@ import { IUser } from '../types/models';
 import { TEMPLATES_DIR } from '../constants';
 import { authSchema, loginSchema } from '../validation/auth';
 import { hashPassword, comparePassword } from '../services/auth';
-import { generateAuthTokens, setupSession, deleteSession, findSessionByRefreshToken } from '../services/session';
+import {
+  generateAuthTokens,
+  setupSession,
+  deleteSession,
+  findSessionByRefreshToken,
+} from '../services/session';
 import { generateAuthUrl, validateCode } from '../utils/googleOAuth2';
 import { sendEmail } from '../services/email';
 import { getEnvVar } from '../utils/getEnvVar';
@@ -23,7 +28,11 @@ interface AuthenticatedRequest extends Request {
   user?: IUser;
 }
 
-export const register = async (req: Request, res: Response, next: NextFunction) => {
+export const register = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { error } = authSchema.validate(req.body);
     if (error) {
@@ -47,6 +56,12 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       message: 'Successfully registered a user!',
       data: {
         accessToken,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          photo: user.avatarURL,
+        },
       },
     });
   } catch (error) {
@@ -54,7 +69,11 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { error } = loginSchema.validate(req.body);
     if (error) {
@@ -81,6 +100,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       message: 'Successfully logged in!',
       data: {
         accessToken,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          photo: user.avatarURL,
+        },
       },
     });
   } catch (error) {
@@ -88,7 +113,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-export const logout = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const logout = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (refreshToken) {
@@ -101,7 +130,11 @@ export const logout = async (req: AuthenticatedRequest, res: Response, next: Nex
   }
 };
 
-export const getCurrentUser = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const getCurrentUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const user = await User.findById(req.user?._id).select('-password');
     if (!user) {
@@ -116,7 +149,11 @@ export const getCurrentUser = async (req: AuthenticatedRequest, res: Response, n
   }
 };
 
-export const refresh = async (req: Request, res: Response, next: NextFunction) => {
+export const refresh = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
@@ -133,7 +170,8 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
       throw createHttpError(404, 'User not found');
     }
 
-    const { accessToken, refreshToken: newRefreshToken } = generateAuthTokens(user);
+    const { accessToken, refreshToken: newRefreshToken } =
+      generateAuthTokens(user);
     await setupSession(user, accessToken, newRefreshToken, res);
 
     res.json({
@@ -145,24 +183,35 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
-export const sendResetEmail = async (req: Request, res: Response, next: NextFunction) => {
+export const sendResetEmail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
       return res.json({
         status: 200,
-        message: 'If an account with this email exists, a password reset email has been sent.',
+        message:
+          'If an account with this email exists, a password reset email has been sent.',
       });
     }
 
     const resetToken = crypto.randomBytes(32).toString('hex');
 
-    user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.passwordResetToken = crypto
+      .createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
     user.passwordResetExpires = new Date(Date.now() + 3600000);
     await user.save();
 
-    const resetUrl = `${getEnvVar('APP_DOMAIN', 'http://localhost:3000')}/reset-password?token=${resetToken}`;
+    const resetUrl = `${getEnvVar(
+      'APP_DOMAIN',
+      'http://localhost:3000',
+    )}/reset-password?token=${resetToken}`;
 
     const templatePath = path.join(TEMPLATES_DIR, 'reset-password-email.html');
     let html = await fs.readFile(templatePath, 'utf-8');
@@ -177,14 +226,19 @@ export const sendResetEmail = async (req: Request, res: Response, next: NextFunc
 
     res.json({
       status: 200,
-      message: 'If an account with this email exists, a password reset email has been sent.',
+      message:
+        'If an account with this email exists, a password reset email has been sent.',
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const handleResetPassword = async (req: Request, res: Response, next: NextFunction) => {
+export const handleResetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { token, password } = req.body;
 
@@ -215,7 +269,11 @@ export const handleResetPassword = async (req: Request, res: Response, next: Nex
   }
 };
 
-export const getGoogleOAuthUrlController = async (req: Request, res: Response, next: NextFunction) => {
+export const getGoogleOAuthUrlController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const url = generateAuthUrl();
     res.json({
@@ -227,7 +285,11 @@ export const getGoogleOAuthUrlController = async (req: Request, res: Response, n
   }
 };
 
-export const loginWithGoogleController = async (req: Request, res: Response, next: NextFunction) => {
+export const loginWithGoogleController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { code } = req.body;
     const { user } = await loginOrSignupWithGoogle(code);
@@ -247,7 +309,11 @@ export const loginWithGoogleController = async (req: Request, res: Response, nex
   }
 };
 
-export const updateProfileController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const updateProfileController = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { name, email } = req.body;
     const userId = req.user?._id;
