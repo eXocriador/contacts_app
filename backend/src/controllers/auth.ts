@@ -21,6 +21,7 @@ import { generateAuthUrl, validateCode } from '../utils/googleOAuth2';
 import { sendEmail } from '../services/email';
 import { getEnvVar } from '../utils/getEnvVar';
 import { loginOrSignupWithGoogle } from '../services/auth';
+import { uploadImage } from '../services/cloudinary'; // 👈 **ADD THIS LINE**
 
 const JWT_SECRET = getEnvVar('JWT_SECRET');
 

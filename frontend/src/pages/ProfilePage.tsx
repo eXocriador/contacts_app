@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "../store/auth";
 import { authApi } from "../api/auth";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Edit2 } from "lucide-react";
 
 // Schemas for validation
