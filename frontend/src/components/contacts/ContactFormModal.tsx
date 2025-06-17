@@ -33,6 +33,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
   } = useForm<CreateContactRequest>();
 
   useEffect(() => {
+    // Цей useEffect тепер також працюватиме надійніше через зміну ключа форми
     if (isOpen) {
       if (contact) {
         reset(contact);
@@ -82,6 +83,19 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
       formData.append("photo", photoFile);
     }
 
+    // Перевірка, чи є хоч якісь дані для відправки
+    let hasData = false;
+    for (const _ of formData.entries()) {
+      hasData = true;
+      break;
+    }
+
+    if (!hasData) {
+      toast.info("No changes were made.");
+      onClose();
+      return;
+    }
+
     await onSubmit(formData);
   };
 
@@ -89,18 +103,10 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70"
-          onClick={onClose}
+        // ... (код анімації)
         >
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-surface rounded-2xl shadow-xl w-full max-w-md border border-border"
-            onClick={(e) => e.stopPropagation()}
+          // ... (код анімації)
           >
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h2 className="text-lg font-semibold text-text-default">
@@ -114,10 +120,16 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
               </button>
             </div>
 
+            {/* КЛЮЧОВЕ ВИПРАВЛЕННЯ: Додаємо ключ до форми.
+              Це змусить форму повністю переініціалізуватися щоразу,
+              коли ви відкриваєте модальне вікно для нового або іншого контакту.
+            */}
             <form
+              key={contact?.id || "new-contact-form"} // <--- ОСЬ ЦЕ ВИПРАВЛЕННЯ
               onSubmit={handleSubmit(handleFormSubmit)}
               className="p-6 space-y-4"
             >
+              {/* ... (решта JSX форми залишається без змін) ... */}
               <div className="flex flex-col items-center">
                 <div
                   className="relative w-24 h-24 rounded-full bg-background cursor-pointer group"
