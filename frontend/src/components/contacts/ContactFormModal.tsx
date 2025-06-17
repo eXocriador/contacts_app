@@ -2,7 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import type { Contact, CreateContactRequest } from "../../types/api";
+import type {
+  Contact,
+  CreateContactRequest,
+  UpdateContactRequest
+} from "../../types/api";
 import { typeList } from "../../constants/contacts";
 import { toast } from "react-hot-toast";
 
@@ -28,12 +32,10 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
     register,
     handleSubmit,
     formState: { errors },
-    reset,
-    setValue
+    reset
   } = useForm<CreateContactRequest>();
 
   useEffect(() => {
-    // Цей useEffect тепер також працюватиме надійніше через зміну ключа форми
     if (isOpen) {
       if (contact) {
         reset(contact);
@@ -72,28 +74,29 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
   const handleFormSubmit = async (data: CreateContactRequest) => {
     const formData = new FormData();
 
-    Object.entries(data).forEach(([key, value]) => {
-      if (key !== "photo" && value !== undefined && value !== null) {
+    // ================= КЛЮЧОВЕ ВИПРАВЛЕННЯ =================
+    // Створюємо об'єкт payload лише з тими полями, які дозволено редагувати.
+    // Це запобігає відправці 'id', 'owner' та інших системних полів.
+    const editableData: UpdateContactRequest = {
+      name: data.name,
+      email: data.email,
+      phoneNumber: data.phoneNumber,
+      isFavourite: data.isFavourite,
+      contactType: data.contactType
+    };
+
+    // Додаємо до FormData лише дозволені поля.
+    Object.entries(editableData).forEach(([key, value]) => {
+      // Додаємо поле, лише якщо воно існує (не undefined або null)
+      if (value !== undefined && value !== null) {
         formData.append(key, String(value));
       }
     });
+    // =======================================================
 
     const photoFile = fileInputRef.current?.files?.[0];
     if (photoFile) {
       formData.append("photo", photoFile);
-    }
-
-    // Перевірка, чи є хоч якісь дані для відправки
-    let hasData = false;
-    for (const _ of formData.entries()) {
-      hasData = true;
-      break;
-    }
-
-    if (!hasData) {
-      toast.info("No changes were made.");
-      onClose();
-      return;
     }
 
     await onSubmit(formData);
@@ -103,10 +106,18 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-        // ... (код анімації)
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70"
+          onClick={onClose}
         >
           <motion.div
-          // ... (код анімації)
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="bg-surface rounded-2xl shadow-xl w-full max-w-md border border-border"
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h2 className="text-lg font-semibold text-text-default">
@@ -120,16 +131,12 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
               </button>
             </div>
 
-            {/* КЛЮЧОВЕ ВИПРАВЛЕННЯ: Додаємо ключ до форми.
-              Це змусить форму повністю переініціалізуватися щоразу,
-              коли ви відкриваєте модальне вікно для нового або іншого контакту.
-            */}
             <form
-              key={contact?.id || "new-contact-form"} // <--- ОСЬ ЦЕ ВИПРАВЛЕННЯ
+              key={contact?.id || "new-contact-form"}
               onSubmit={handleSubmit(handleFormSubmit)}
               className="p-6 space-y-4"
             >
-              {/* ... (решта JSX форми залишається без змін) ... */}
+              {/* ... решта форми без змін ... */}
               <div className="flex flex-col items-center">
                 <div
                   className="relative w-24 h-24 rounded-full bg-background cursor-pointer group"
