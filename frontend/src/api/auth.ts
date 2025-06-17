@@ -85,12 +85,14 @@ class AuthApi {
   }
 
   async getGoogleOAuthUrl(): Promise<string> {
-    const response = await api.get<{ url: string }>("/auth/google");
+    const response = await api.get<{ url: string }>("/auth/google/callback");
     return response.data.url;
   }
 
   async loginWithGoogle(code: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>("/auth/google", { code });
+    const response = await api.post<AuthResponse>("/auth/google/callback", {
+      code
+    });
     localStorage.setItem("token", response.data.data.accessToken); // Змінено на response.data.data.accessToken
     return response.data;
   }
