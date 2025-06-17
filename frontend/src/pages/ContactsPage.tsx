@@ -1,19 +1,18 @@
+// frontend/src/pages/ContactsPage.tsx
+
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
-import type {
-  Contact,
-  CreateContactRequest,
-  UpdateContactRequest
-} from "../types/api";
+import type { Contact } from "../types/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { contactsApi, GetContactsResponse } from "../api/contacts";
+import { authProtectedApiCall } from "../store/auth"; // Import wrapper
 import ContactCard from "../components/contacts/ContactCard";
 import ContactFormModal from "../components/contacts/ContactFormModal";
 import ConfirmDeleteModal from "../components/contacts/ConfirmDeleteModal";
 import ContactCardSkeleton from "../components/contacts/ContactCardSkeleton";
 import { PlusCircle } from "lucide-react";
 
-const PER_PAGE = 9; // Збільшено для кращого вигляду
+const PER_PAGE = 9;
 
 const ContactsPage = () => {
   const queryClient = useQueryClient();
@@ -28,53 +27,62 @@ const ContactsPage = () => {
     Error
   >({
     queryKey: ["contacts", page],
-    queryFn: () => contactsApi.getContacts({ page, perPage: PER_PAGE })
+    queryFn: () =>
+      authProtectedApiCall(() =>
+        contactsApi.getContacts({ page, perPage: PER_PAGE })
+      )
   });
 
-  const createMutation = useMutation({
-    mutationFn: (newData: CreateContactRequest) =>
-      contactsApi.createContact(newData),
+  const mutationOptions = {
     onSuccess: () => {
-      toast.success("Contact created successfully!");
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
       setModalOpen(false);
+      setDeleteModalOpen(false);
+      setEditingContact(null);
+      setDeletingContact(null);
     },
-    onError: (err) => toast.error(`Failed to create contact: ${err.message}`)
+    onError: (err: any) =>
+      toast.error(
+        err.response?.data?.message ||
+          "An unexpected error occurred. Please try again."
+      )
+  };
+
+  const createMutation = useMutation({
+    mutationFn: (formData: FormData) =>
+      authProtectedApiCall(() => contactsApi.createContact(formData)),
+    onSuccess: () => {
+      toast.success("Contact created successfully!");
+      mutationOptions.onSuccess();
+    },
+    onError: mutationOptions.onError
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateContactRequest }) =>
-      contactsApi.updateContact(id, data),
+    mutationFn: ({ id, formData }: { id: string; formData: FormData }) =>
+      authProtectedApiCall(() => contactsApi.updateContact(id, formData)),
     onSuccess: () => {
       toast.success("Contact updated successfully!");
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
-      setModalOpen(false);
-      setEditingContact(null);
+      mutationOptions.onSuccess();
     },
-    onError: (err) => toast.error(`Failed to update contact: ${err.message}`)
+    onError: mutationOptions.onError
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => contactsApi.deleteContact(id),
+    mutationFn: (id: string) =>
+      authProtectedApiCall(() => contactsApi.deleteContact(id)),
     onSuccess: () => {
       toast.success("Contact deleted successfully!");
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
-      setDeleteModalOpen(false);
-      setDeletingContact(null);
+      mutationOptions.onSuccess();
     },
-    onError: (err) => toast.error(`Failed to delete contact: ${err.message}`)
+    onError: mutationOptions.onError
   });
 
-  const handleSaveContact = async (
-    formData: CreateContactRequest | UpdateContactRequest
-  ) => {
+  const handleSaveContact = async (formData: FormData) => {
     if (editingContact) {
-      await updateMutation.mutateAsync({
-        id: editingContact.id,
-        data: formData
-      });
+      await updateMutation.mutateAsync({ id: editingContact.id, formData });
     } else {
-      await createMutation.mutateAsync(formData as CreateContactRequest);
+      await createMutation.mutateAsync(formData);
     }
   };
 
@@ -85,7 +93,10 @@ const ContactsPage = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-text-default">Your Contacts</h1>
         <button
-          onClick={() => setModalOpen(true)}
+          onClick={() => {
+            setEditingContact(null);
+            setModalOpen(true);
+          }}
           className="btn-primary flex items-center gap-2"
         >
           <PlusCircle size={20} />
@@ -110,7 +121,7 @@ const ContactsPage = () => {
           <p className="text-text-secondary text-lg">No contacts found.</p>
           <button
             onClick={() => setModalOpen(true)}
-            className="mt-4 text-primary-text font-semibold hover:underline"
+            className="mt-4 text-primary-500 font-semibold hover:underline"
           >
             Add your first contact
           </button>
@@ -136,16 +147,13 @@ const ContactsPage = () => {
 
       {totalPages > 1 && (
         <div className="flex justify-center mt-10 space-x-2">
-          {/* Pagination buttons can be added here */}
+          {/* Pagination can be added here */}
         </div>
       )}
 
       <ContactFormModal
         isOpen={modalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          setEditingContact(null);
-        }}
+        onClose={() => setModalOpen(false)}
         onSubmit={handleSaveContact}
         contact={editingContact}
         isSubmitting={createMutation.isPending || updateMutation.isPending}

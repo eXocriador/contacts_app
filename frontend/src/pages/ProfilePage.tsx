@@ -1,11 +1,11 @@
 // frontend/src/pages/ProfilePage.tsx
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
-import { useAuthStore } from "../store/auth";
+import { useAuthStore, authProtectedApiCall } from "../store/auth";
 import { authApi } from "../api/auth";
 import { motion } from "framer-motion";
 import { Edit2 } from "lucide-react";
@@ -17,9 +17,7 @@ const profileSchema = z.object({
 
 const passwordSchema = z
   .object({
-    currentPassword: z
-      .string()
-      .min(6, "Current password must be at least 6 characters"),
+    currentPassword: z.string().min(1, "Current password is required"),
     newPassword: z
       .string()
       .min(6, "New password must be at least 6 characters"),
@@ -34,10 +32,8 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 const ProfilePage = () => {
-  const { user, updateUser } = useAuthStore(); // Використовуємо updateUser
-  const [photoPreview, setPhotoPreview] = useState<string | null>(
-    user?.photo || null
-  );
+  const { user, updateUser } = useAuthStore();
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -45,7 +41,7 @@ const ProfilePage = () => {
   const {
     register: registerProfile,
     handleSubmit: handleProfileSubmit,
-    formState: { errors: profileErrors },
+    formState: { errors: profileErrors, isDirty: isProfileDirty },
     reset: resetProfile
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -61,9 +57,10 @@ const ProfilePage = () => {
     resolver: zodResolver(passwordSchema)
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
-      resetProfile({ name: user.name, email: user.email });
+      const defaultValues = { name: user.name, email: user.email };
+      resetProfile(defaultValues);
       setPhotoPreview(
         user.photo ||
           `https://ui-avatars.com/api/?name=${user.name.replace(
@@ -74,9 +71,11 @@ const ProfilePage = () => {
     }
   }, [user, resetProfile]);
 
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setPhotoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setPhotoPreview(reader.result as string);
       reader.readAsDataURL(file);
@@ -84,55 +83,39 @@ const ProfilePage = () => {
   };
 
   const onProfileSubmit = async (data: ProfileFormValues) => {
-    setIsUpdatingProfile(true);
-    const photoFile = photoInputRef.current?.files?.[0];
-
-    // **Ключова логіка тут**
-    if (photoFile) {
-      // 1. Інформуємо користувача про недоступність функції
-      toast.info(
-        "Функціонал оновлення фото тимчасово недоступний. Ми вже працюємо над цим!",
-        { duration: 4000 }
-      );
-      // Можна також відправити текстові дані, якщо вони змінились
-      const textData: { name?: string; email?: string } = {};
-      if (data.name !== user?.name) textData.name = data.name;
-      if (data.email !== user?.email) textData.email = data.email;
-
-      if (Object.keys(textData).length > 0) {
-        try {
-          const response = await authApi.updateProfileJSON(textData);
-          updateUser(response.data.user);
-          toast.success("Текстові дані профілю оновлено!");
-        } catch (error: any) {
-          toast.error(
-            error.response?.data?.message || "Failed to update profile."
-          );
-        }
-      }
-    } else {
-      // 2. Якщо фото не змінювалось, надсилаємо JSON
-      try {
-        const response = await authApi.updateProfileJSON(data);
-        updateUser(response.data.user);
-        toast.success("Profile updated successfully!");
-      } catch (error: any) {
-        toast.error(
-          error.response?.data?.message || "Failed to update profile."
-        );
-      }
+    if (!isProfileDirty && !photoFile) {
+      toast.info("No changes to save.");
+      return;
     }
+    setIsUpdatingProfile(true);
+    try {
+      const formData = new FormData();
+      if (data.name !== user?.name) formData.append("name", data.name);
+      if (data.email !== user?.email) formData.append("email", data.email);
+      if (photoFile) formData.append("photo", photoFile);
 
-    setIsUpdatingProfile(false);
+      const response = await authProtectedApiCall(() =>
+        authApi.updateProfileWithPhoto(formData)
+      );
+      updateUser(response.data); // Correctly pass the user object
+      toast.success("Profile updated successfully!");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to update profile.");
+    } finally {
+      setIsUpdatingProfile(false);
+      setPhotoFile(null);
+    }
   };
 
   const onPasswordSubmit = async (data: PasswordFormValues) => {
     setIsUpdatingPassword(true);
     try {
-      await authApi.updatePassword({
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword
-      });
+      await authProtectedApiCall(() =>
+        authApi.updatePassword({
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword
+        })
+      );
       toast.success("Password updated successfully!");
       resetPassword();
     } catch (error: any) {
@@ -150,7 +133,6 @@ const ProfilePage = () => {
         Profile Settings
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        {/* Profile Information Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -227,7 +209,6 @@ const ProfilePage = () => {
           </form>
         </motion.div>
 
-        {/* Change Password Form Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
