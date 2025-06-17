@@ -47,7 +47,7 @@ export const FeaturesSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg"
+              className="bg-surface border-t border-border mt-auto p-8 rounded-2xl shadow-lg" //bg-surface border-t border-border mt-auto
             >
               <div className="text-primary-500 mb-4">{feature.icon}</div>
               <h3 className="text-xl font-semibold mb-4">{feature.title}</h3>
