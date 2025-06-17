@@ -57,11 +57,11 @@ const LoginPage = () => {
     <div className="relative min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img
-          src="/auth-bg.webp" // Назва вашого зображення
+          src="/images/auth-bg.webp" // Назва вашого зображення
           alt="Abstract background"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-background/70" /> {/* Затемнення */}
+        <div className="absolute inset-0 bg-background/70" />
       </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
