@@ -16,7 +16,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <img
           src="/images/hero-green.webp" // 👈 Add your image to the /public folder
           alt="Abstract background"
-          className="w-full h-full object-cover scale-105"
+          className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-background/70"></div>{" "}
         {/* Dark overlay */}
