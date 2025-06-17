@@ -108,7 +108,6 @@ export interface ContactRequest {
   isFavourite?: boolean;
   contactType: string;
 }
-
 export interface UpdateContactRequest {
   name?: string;
   email?: string;
