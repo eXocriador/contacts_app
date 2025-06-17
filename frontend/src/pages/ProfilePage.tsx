@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
-import { useAuthStore, authProtectedApiCall } from "../store/auth";
+import { useAuthStore } from "../store/auth";
 import { authApi } from "../api/auth";
 import { motion } from "framer-motion";
 import { Edit2 } from "lucide-react";
@@ -94,10 +94,8 @@ const ProfilePage = () => {
       if (data.email !== user?.email) formData.append("email", data.email);
       if (photoFile) formData.append("photo", photoFile);
 
-      const response = await authProtectedApiCall(() =>
-        authApi.updateProfileWithPhoto(formData)
-      );
-      updateUser(response.data); // Correctly pass the user object
+      const response = await authApi.updateProfileWithPhoto(formData);
+      updateUser(response.data.user); // Corrected: pass the user object
       toast.success("Profile updated successfully!");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to update profile.");
@@ -110,12 +108,10 @@ const ProfilePage = () => {
   const onPasswordSubmit = async (data: PasswordFormValues) => {
     setIsUpdatingPassword(true);
     try {
-      await authProtectedApiCall(() =>
-        authApi.updatePassword({
-          currentPassword: data.currentPassword,
-          newPassword: data.newPassword
-        })
-      );
+      await authApi.updatePassword({
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword
+      });
       toast.success("Password updated successfully!");
       resetPassword();
     } catch (error: any) {

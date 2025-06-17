@@ -5,7 +5,6 @@ import { toast } from "react-hot-toast";
 import type { Contact } from "../types/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { contactsApi, GetContactsResponse } from "../api/contacts";
-import { authProtectedApiCall } from "../store/auth"; // Import wrapper
 import ContactCard from "../components/contacts/ContactCard";
 import ContactFormModal from "../components/contacts/ContactFormModal";
 import ConfirmDeleteModal from "../components/contacts/ConfirmDeleteModal";
@@ -27,10 +26,7 @@ const ContactsPage = () => {
     Error
   >({
     queryKey: ["contacts", page],
-    queryFn: () =>
-      authProtectedApiCall(() =>
-        contactsApi.getContacts({ page, perPage: PER_PAGE })
-      )
+    queryFn: () => contactsApi.getContacts({ page, perPage: PER_PAGE })
   });
 
   const mutationOptions = {
@@ -49,8 +45,7 @@ const ContactsPage = () => {
   };
 
   const createMutation = useMutation({
-    mutationFn: (formData: FormData) =>
-      authProtectedApiCall(() => contactsApi.createContact(formData)),
+    mutationFn: (formData: FormData) => contactsApi.createContact(formData),
     onSuccess: () => {
       toast.success("Contact created successfully!");
       mutationOptions.onSuccess();
@@ -60,7 +55,7 @@ const ContactsPage = () => {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, formData }: { id: string; formData: FormData }) =>
-      authProtectedApiCall(() => contactsApi.updateContact(id, formData)),
+      contactsApi.updateContact(id, formData),
     onSuccess: () => {
       toast.success("Contact updated successfully!");
       mutationOptions.onSuccess();
@@ -69,8 +64,7 @@ const ContactsPage = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) =>
-      authProtectedApiCall(() => contactsApi.deleteContact(id)),
+    mutationFn: (id: string) => contactsApi.deleteContact(id),
     onSuccess: () => {
       toast.success("Contact deleted successfully!");
       mutationOptions.onSuccess();

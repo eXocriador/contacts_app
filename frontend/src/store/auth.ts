@@ -2,15 +2,8 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type {
-  User,
-  AuthResponse as BackendAuthResponse,
-  LoginRequest,
-  RegisterRequest,
-  UpdateProfileRequest
-} from "../types/api";
+import type { User, LoginRequest, RegisterRequest } from "../types/api";
 import { authApi } from "../api/auth";
-import axios from "axios";
 
 interface AuthState {
   user: User | null;
@@ -57,7 +50,10 @@ export const useAuthStore = create<AuthState>()(
       },
 
       updateUser: (user: User) => {
-        set((state) => ({ ...state, user }));
+        set((state) => ({
+          ...state,
+          user: { ...state.user, ...user }
+        }));
       },
 
       login: async (data) => {
@@ -104,9 +100,8 @@ export const useAuthStore = create<AuthState>()(
       },
 
       updateProfile: async (data: FormData) => {
-        // This function now expects FormData
         const response = await authApi.updateProfileWithPhoto(data);
-        get().updateUser(response.data);
+        get().updateUser(response.data.user);
       },
 
       loginWithGoogle: async (code: string) => {
@@ -129,24 +124,3 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
-
-// Wrapper for authenticated API calls
-export const authProtectedApiCall = async <T>(
-  apiCall: () => Promise<T>
-): Promise<T> => {
-  try {
-    return await apiCall();
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      try {
-        await useAuthStore.getState().refresh();
-        // Retry the original call after successful refresh
-        return await apiCall();
-      } catch (refreshError) {
-        useAuthStore.getState().logout();
-        throw refreshError;
-      }
-    }
-    throw error;
-  }
-};
