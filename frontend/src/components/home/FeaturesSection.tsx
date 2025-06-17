@@ -6,7 +6,10 @@ import { Shield, Smartphone, Cloud } from "lucide-react";
 
 export const FeaturesSection = () => {
   return (
-    <section id="features" py-20 bg-white dark:bg-gray-800>
+    // 👇 ЗМІНІТЬ ЦЕЙ РЯДОК
+    // БУЛО: <section id="features" className="py-20 bg-gray-50 dark:bg-gray-900">
+    // СТАЛО:
+    <section id="features" className="py-20">
       <div className="container mx-auto px-4">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
