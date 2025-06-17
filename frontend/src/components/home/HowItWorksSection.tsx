@@ -4,7 +4,10 @@ import { UserPlus, PlusCircle, Settings } from "lucide-react";
 
 export const HowItWorksSection = () => {
   return (
-    <section id="how-it-works" className="py-20 bg-white dark:bg-gray-800">
+    <section
+      id="how-it-works"
+      className="py-20 bg-surface border-t border-border mt-auto"
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
