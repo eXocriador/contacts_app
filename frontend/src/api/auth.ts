@@ -5,7 +5,7 @@ import type {
   RegisterRequest,
   UpdateProfileRequest,
   UpdatePasswordRequest,
-  User // Додано User
+  User
 } from "../types/api";
 import { useAuthStore } from "../store/auth";
 

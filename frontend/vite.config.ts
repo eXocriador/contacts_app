@@ -8,17 +8,17 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     css: {
-      postcss: "./postcss.config.cjs"
+      postcss: "./postcss.config.js"
     },
     server: {
       port: 5173,
       proxy: {
+        // Проксі для запитів /api до бекенду під час розробки
         "/api": {
-          // Змінено на '/api' для проксування лише API запитів
-          target: env.VITE_API_URL || "https://api.exocriador.com",
+          target: env.VITE_API_URL || "http://localhost:3000",
           changeOrigin: true,
-          secure: true,
-          rewrite: (path) => path.replace(/^\/api/, "") // Переписуємо шлях, видаляючи '/api'
+          secure: false, // Важливо для локальної розробки (http)
+          rewrite: (path) => path.replace(/^\/api/, "")
         }
       }
     },

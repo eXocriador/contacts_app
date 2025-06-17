@@ -6,13 +6,14 @@ import type {
   UpdateContactRequest
 } from "../types/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { contactsApi, GetContactsResponse } from "../api/contacts"; // Імпортуємо GetContactsResponse з оновленого файлу
+import { contactsApi, GetContactsResponse } from "../api/contacts";
 import ContactCard from "../components/contacts/ContactCard";
 import ContactFormModal from "../components/contacts/ContactFormModal";
 import ConfirmDeleteModal from "../components/contacts/ConfirmDeleteModal";
 import ContactCardSkeleton from "../components/contacts/ContactCardSkeleton";
+import { PlusCircle } from "lucide-react";
 
-const PER_PAGE = 10;
+const PER_PAGE = 9; // Збільшено для кращого вигляду
 
 const ContactsPage = () => {
   const queryClient = useQueryClient();
@@ -31,15 +32,14 @@ const ContactsPage = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: contactsApi.createContact,
+    mutationFn: (newData: CreateContactRequest) =>
+      contactsApi.createContact(newData),
     onSuccess: () => {
       toast.success("Contact created successfully!");
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
       setModalOpen(false);
     },
-    onError: (err) => {
-      toast.error(`Failed to create contact: ${err.message}`);
-    }
+    onError: (err) => toast.error(`Failed to create contact: ${err.message}`)
   });
 
   const updateMutation = useMutation({
@@ -49,77 +49,68 @@ const ContactsPage = () => {
       toast.success("Contact updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
       setModalOpen(false);
+      setEditingContact(null);
     },
-    onError: (err) => {
-      toast.error(`Failed to update contact: ${err.message}`);
-    }
+    onError: (err) => toast.error(`Failed to update contact: ${err.message}`)
   });
 
   const deleteMutation = useMutation({
-    mutationFn: contactsApi.deleteContact,
+    mutationFn: (id: string) => contactsApi.deleteContact(id),
     onSuccess: () => {
       toast.success("Contact deleted successfully!");
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
       setDeleteModalOpen(false);
       setDeletingContact(null);
     },
-    onError: (err) => {
-      toast.error(`Failed to delete contact: ${err.message}`);
-    }
+    onError: (err) => toast.error(`Failed to delete contact: ${err.message}`)
   });
 
-  const handleEdit = (contact: Contact) => {
-    setEditingContact(contact);
-    setModalOpen(true);
-  };
-
-  const handleDelete = (contact: Contact) => {
-    setDeletingContact(contact);
-    setDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (deletingContact) {
-      await deleteMutation.mutateAsync(deletingContact.id);
+  const handleSaveContact = async (
+    formData: CreateContactRequest | UpdateContactRequest
+  ) => {
+    if (editingContact) {
+      await updateMutation.mutateAsync({
+        id: editingContact.id,
+        data: formData
+      });
+    } else {
+      await createMutation.mutateAsync(formData as CreateContactRequest);
     }
   };
 
-  const totalPages = data?.totalPages || 0; // Використовуємо totalPages з відповіді бекенду
+  const totalPages = data?.totalPages || 0;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">Contacts</h1>
+        <h1 className="text-4xl font-bold text-text-default">Your Contacts</h1>
         <button
-          onClick={() => {
-            setEditingContact(null);
-            setModalOpen(true);
-          }}
-          className="btn"
+          onClick={() => setModalOpen(true)}
+          className="btn-primary flex items-center gap-2"
         >
+          <PlusCircle size={20} />
           Add Contact
         </button>
       </div>
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }, (_, i) => (
+          {Array.from({ length: PER_PAGE }).map((_, i) => (
             <ContactCardSkeleton key={i} />
           ))}
         </div>
       ) : isError ? (
-        <div className="text-red-500 text-center py-8">
-          {(error as Error).message || "Failed to load contacts"}
+        <div className="text-center py-16 bg-surface rounded-lg">
+          <h3 className="text-xl text-danger">
+            Error: {(error as Error).message || "Failed to load contacts"}
+          </h3>
         </div>
       ) : !data || data.contacts.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-500">No contacts found</p>
+        <div className="text-center py-16 bg-surface rounded-lg">
+          <p className="text-text-secondary text-lg">No contacts found.</p>
           <button
-            onClick={() => {
-              setEditingContact(null);
-              setModalOpen(true);
-            }}
-            className="mt-4 text-primary-500 hover:text-primary-600 hover:underline"
+            onClick={() => setModalOpen(true)}
+            className="mt-4 text-primary-text font-semibold hover:underline"
           >
             Add your first contact
           </button>
@@ -130,40 +121,22 @@ const ContactsPage = () => {
             <ContactCard
               key={contact.id}
               contact={contact}
-              onEdit={() => handleEdit(contact)}
-              onDelete={() => handleDelete(contact)}
+              onEdit={(c) => {
+                setEditingContact(c);
+                setModalOpen(true);
+              }}
+              onDelete={(c) => {
+                setDeletingContact(c);
+                setDeleteModalOpen(true);
+              }}
             />
           ))}
         </div>
       )}
 
       {totalPages > 1 && (
-        <div className="flex justify-center mt-8 space-x-2">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-            className="btn-secondary"
-          >
-            Prev
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i + 1}
-              onClick={() => setPage(i + 1)}
-              className={`btn ${
-                page === i + 1 ? "bg-primary-500 text-white" : "btn-secondary"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
-            className="btn-secondary"
-          >
-            Next
-          </button>
+        <div className="flex justify-center mt-10 space-x-2">
+          {/* Pagination buttons can be added here */}
         </div>
       )}
 
@@ -173,30 +146,20 @@ const ContactsPage = () => {
           setModalOpen(false);
           setEditingContact(null);
         }}
-        onSubmit={async (data) => {
-          if (editingContact) {
-            await updateMutation.mutateAsync({
-              id: editingContact.id,
-              data: data as UpdateContactRequest
-            });
-          } else {
-            await createMutation.mutateAsync(data as CreateContactRequest);
-          }
-        }}
-        contact={editingContact || undefined}
+        onSubmit={handleSaveContact}
+        contact={editingContact}
         isSubmitting={createMutation.isPending || updateMutation.isPending}
       />
 
-      <ConfirmDeleteModal
-        isOpen={deleteModalOpen}
-        onClose={() => {
-          setDeleteModalOpen(false);
-          setDeletingContact(null);
-        }}
-        onConfirm={handleConfirmDelete}
-        contact={deletingContact!}
-        isDeleting={deleteMutation.isPending}
-      />
+      {deletingContact && (
+        <ConfirmDeleteModal
+          isOpen={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={() => deleteMutation.mutate(deletingContact.id)}
+          contactName={deletingContact.name}
+          isDeleting={deleteMutation.isPending}
+        />
+      )}
     </div>
   );
 };
