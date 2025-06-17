@@ -19,9 +19,15 @@ export const generateAuthTokens = (user: IUser): Tokens => {
   return { accessToken, refreshToken };
 };
 
-export const createSession = async (user: IUser, accessToken: string, refreshToken: string): Promise<ISession> => {
+export const createSession = async (
+  user: IUser,
+  accessToken: string,
+  refreshToken: string,
+): Promise<ISession> => {
   const accessTokenValidUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
-  const refreshTokenValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+  const refreshTokenValidUntil = new Date(
+    Date.now() + 30 * 24 * 60 * 60 * 1000,
+  ); // 30 days from now
 
   // Remove any existing sessions for the user to ensure only one active session
   await Session.deleteMany({ userId: user._id });
@@ -40,7 +46,9 @@ export const deleteSession = async (refreshToken: string): Promise<void> => {
   await Session.deleteOne({ refreshToken });
 };
 
-export const findSessionByRefreshToken = async (refreshToken: string): Promise<ISession | null> => {
+export const findSessionByRefreshToken = async (
+  refreshToken: string,
+): Promise<ISession | null> => {
   const session = await Session.findOne({ refreshToken });
   if (!session) {
     throw createHttpError(401, 'Session not found for refresh token.');
@@ -51,6 +59,23 @@ export const findSessionByRefreshToken = async (refreshToken: string): Promise<I
   return session;
 };
 
+// export const setupSession = async (
+//   user: IUser,
+//   accessToken: string,
+//   refreshToken: string,
+//   res: Response,
+// ): Promise<void> => {
+//   const session = await createSession(user, accessToken, refreshToken);
+//   res.cookie('refreshToken', session.refreshToken, {
+//     httpOnly: true,
+//     secure: process.env.NODE_ENV === 'production',
+//     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+//     expires: session.refreshTokenValidUntil,
+//     path: '/',
+//     domain: process.env.NODE_ENV === 'production' ? '.exocriador.art' : undefined
+//   });
+// };
+
 export const setupSession = async (
   user: IUser,
   accessToken: string,
@@ -58,12 +83,15 @@ export const setupSession = async (
   res: Response,
 ): Promise<void> => {
   const session = await createSession(user, accessToken, refreshToken);
+  const isProduction = process.env.NODE_ENV === 'production';
+
   res.cookie('refreshToken', session.refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: isProduction, // Cookie is only sent over HTTPS in production
+    sameSite: isProduction ? 'none' : 'lax', // 'none' for cross-site API requests, 'lax' for development
     expires: session.refreshTokenValidUntil,
     path: '/',
-    domain: process.env.NODE_ENV === 'production' ? '.exocriador.art' : undefined
+    // Removing the explicit domain makes the cookie more portable and less error-prone.
+    // The browser will default to the domain that set the cookie.
   });
 };
