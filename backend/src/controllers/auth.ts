@@ -322,18 +322,28 @@ export const updateProfileController = async (
       throw createHttpError(401, 'User not authenticated');
     }
 
+    const updatePayload: { name?: string; email?: string; avatarURL?: string } =
+      {};
+
+    if (name) updatePayload.name = name;
+
     if (email) {
       const existingUser = await User.findOne({ email, _id: { $ne: userId } });
       if (existingUser) {
         throw createHttpError(409, 'Email already in use');
       }
+      updatePayload.email = email;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { name, email },
-      { new: true },
-    ).select('-password');
+    // Handle photo upload
+    if (req.file) {
+      const result = await uploadImage(req.file);
+      updatePayload.avatarURL = result.secure_url;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updatePayload, {
+      new: true,
+    }).select('-password');
 
     if (!updatedUser) {
       throw createHttpError(404, 'User not found');
@@ -342,7 +352,12 @@ export const updateProfileController = async (
     res.json({
       status: 200,
       message: 'Profile updated successfully',
-      data: updatedUser,
+      data: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        photo: updatedUser.avatarURL,
+      },
     });
   } catch (error) {
     next(error);

@@ -10,8 +10,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   scrollToHowItWorks
 }) => {
   return (
-    <section className="relative min-h-[calc(80vh)] flex items-center justify-center p-4 text-center">
-      <div className="absolute inset-0 bg-background z-0" />
+    <section className="relative min-h-[calc(80vh)] flex items-center justify-center p-4 text-center overflow-hidden">
+      {/* Background Image & Overlay */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/hero-background.jpg" // 👈 Add your image to the /public folder
+          alt="Abstract background"
+          className="w-full h-full object-cover blur-sm scale-105"
+        />
+        <div className="absolute inset-0 bg-background/70"></div>{" "}
+        {/* Dark overlay */}
+      </div>
+
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background z-10" />
 
       <motion.div
@@ -20,6 +30,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         transition={{ duration: 0.7, ease: "easeOut" }}
         className="relative z-20 max-w-4xl w-full"
       >
+        {/* ... rest of the component is unchanged ... */}
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
           <span className="text-text-default">The Future of </span>
           <span className="bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
