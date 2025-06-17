@@ -16,7 +16,6 @@ export const getContacts = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-
     const { page, perPage } = parsePaginationParams(req.query);
     const { sortBy, sortOrder } = parseSortParams(req.query);
     const filters = parseFilterParams(req.query);
@@ -120,6 +119,15 @@ export const updateContact = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
+    // ДОДАЄМО ПЕРЕВІРКУ: якщо немає ні полів, ні файлу, повертаємо помилку.
+    const hasNoChanges = Object.keys(req.body).length === 0 && !req.file;
+    if (hasNoChanges) {
+      throw createHttpError(
+        400,
+        'No fields to update. Please provide some data.',
+      );
+    }
+
     const { contactId } = req.params;
     const user = req.user as IUser;
     let photoUrl: string | undefined;
@@ -135,7 +143,8 @@ export const updateContact = async (
         ...req.body,
         ...(photoUrl && { photo: photoUrl }),
       },
-      { new: true, runValidators: true, upsert: true },
+      // Видаляємо upsert: true, оскільки PATCH не повинен створювати новий документ, якщо його не знайдено
+      { new: true, runValidators: true },
     );
 
     if (!updatedContact) {
