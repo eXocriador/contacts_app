@@ -87,11 +87,10 @@ export const setupSession = async (
 
   res.cookie('refreshToken', session.refreshToken, {
     httpOnly: true,
-    secure: isProduction, // Cookie is only sent over HTTPS in production
-    sameSite: isProduction ? 'none' : 'lax', // 'none' for cross-site API requests, 'lax' for development
+    secure: isProduction, // Встановлюватиметься тільки при production
+    sameSite: isProduction ? 'none' : 'lax', // 'none' для крос-доменних запитів, 'lax' для розробки
     expires: session.refreshTokenValidUntil,
     path: '/',
-    // Removing the explicit domain makes the cookie more portable and less error-prone.
-    // The browser will default to the domain that set the cookie.
+    // Явно видалений атрибут 'domain', щоб браузер обробляв cookie більш надійно.
   });
 };
