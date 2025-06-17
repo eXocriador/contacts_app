@@ -187,6 +187,7 @@ const ProfilePage = () => {
                       src={photoPreview || ""}
                       alt="Profile"
                       className="w-full h-full rounded-full object-cover border-2 border-border"
+                      crossOrigin="anonymous" // 👈 ADD THIS ATTRIBUTE
                     />
                     <label
                       htmlFor="photo-upload"

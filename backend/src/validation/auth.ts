@@ -1,14 +1,23 @@
 import Joi from 'joi';
-import { AuthRequest, RequestResetEmailRequest, ResetPasswordRequest, LoginWithGoogleOAuthRequest, UpdateProfileRequest } from '../types/models';
+import {
+  AuthRequest,
+  RequestResetEmailRequest,
+  ResetPasswordRequest,
+  LoginWithGoogleOAuthRequest,
+  UpdateProfileRequest,
+} from '../types/models';
 import { emailRegex } from '../constants/auth';
 
 // Password validation schema
 const passwordSchema = Joi.string()
   .min(8)
   .max(100)
-  .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
+  .pattern(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+  )
   .messages({
-    'string.pattern.base': 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+    'string.pattern.base':
+      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
     'string.min': 'Password must be at least 8 characters long',
     'string.max': 'Password must not exceed 100 characters',
   });
@@ -33,9 +42,10 @@ export const resetPasswordSchema = Joi.object<ResetPasswordRequest>({
   password: passwordSchema.required(),
 });
 
-export const loginWithGoogleOAuthSchema = Joi.object<LoginWithGoogleOAuthRequest>({
-  code: Joi.string().required(),
-});
+export const loginWithGoogleOAuthSchema =
+  Joi.object<LoginWithGoogleOAuthRequest>({
+    code: Joi.string().required(),
+  });
 
 export const updateProfileSchema = Joi.object<UpdateProfileRequest>({
   name: Joi.string().min(2).max(50).optional(),
@@ -46,12 +56,4 @@ export const updateProfileSchema = Joi.object<UpdateProfileRequest>({
     otherwise: Joi.forbidden(),
   }),
   password: passwordSchema.optional(),
-}).custom((obj, helpers) => {
-  if (obj.password && !obj.currentPassword) {
-    return helpers.error('any.invalid', { message: 'Current password is required to set a new password' });
-  }
-  if (!obj.name && !obj.email && !obj.password) {
-    return helpers.error('any.invalid', { message: 'At least one field must be provided' });
-  }
-  return obj;
 });

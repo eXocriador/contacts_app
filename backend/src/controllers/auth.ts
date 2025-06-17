@@ -316,6 +316,13 @@ export const updateProfileController = async (
   next: NextFunction,
 ) => {
   try {
+    const hasNoChanges = Object.keys(req.body).length === 0 && !req.file;
+    if (hasNoChanges) {
+      throw createHttpError(
+        400,
+        'At least one field must be provided for update.',
+      );
+    }
     const { name, email } = req.body;
     const userId = req.user?._id;
 
