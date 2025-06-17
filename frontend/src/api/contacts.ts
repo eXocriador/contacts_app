@@ -1,17 +1,13 @@
-import axios from "axios";
+// frontend/src/api/contacts.ts
+
 import type {
   Contact,
   CreateContactRequest,
   UpdateContactRequest
 } from "../types/api";
+import api from "./index"; // Імпортуємо центральний екземпляр
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"; // Додано дефолтне значення
-
-const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true
-});
-
+// ... (інтерфейси GetContactsParams, BackendPaginatedResponse, GetContactsResponse залишаються без змін)
 export interface GetContactsParams {
   page?: number;
   perPage?: number;
@@ -23,7 +19,6 @@ export interface GetContactsParams {
 }
 
 export interface BackendPaginatedResponse<T> {
-  // Новий інтерфейс для відповіді бекенду
   status: number;
   message: string;
   data: {
@@ -38,7 +33,6 @@ export interface BackendPaginatedResponse<T> {
 }
 
 export interface GetContactsResponse {
-  // Адаптований інтерфейс для фронтенду
   contacts: Contact[];
   total: number;
   page: number;
@@ -60,7 +54,6 @@ export const contactsApi = {
     const { data: responseData } = await api.get<
       BackendPaginatedResponse<Contact>
     >("/contacts", {
-      // Використовуємо новий інтерфейс
       params: queryParams
     });
     return {
@@ -76,13 +69,12 @@ export const contactsApi = {
 
   createContact: async (contact: CreateContactRequest): Promise<Contact> => {
     const formData = new FormData();
-    formData.append("name", contact.name);
-    formData.append("email", contact.email);
-    formData.append("phoneNumber", contact.phoneNumber);
-    if (contact.isFavourite !== undefined) {
-      formData.append("isFavourite", String(contact.isFavourite));
-    }
-    formData.append("contactType", contact.contactType); // Завжди надсилаємо contactType
+    Object.entries(contact).forEach(([key, value]) => {
+      if (key !== "photo" && value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    });
+
     if (contact.photo) {
       formData.append("photo", contact.photo);
     }
@@ -91,7 +83,6 @@ export const contactsApi = {
       "/contacts",
       formData,
       {
-        // Змінено тип повернення
         headers: {
           "Content-Type": "multipart/form-data"
         }
@@ -105,14 +96,12 @@ export const contactsApi = {
     contact: UpdateContactRequest
   ): Promise<Contact> => {
     const formData = new FormData();
-    if (contact.name !== undefined) formData.append("name", contact.name);
-    if (contact.email !== undefined) formData.append("email", contact.email);
-    if (contact.phoneNumber !== undefined)
-      formData.append("phoneNumber", contact.phoneNumber);
-    if (contact.isFavourite !== undefined)
-      formData.append("isFavourite", String(contact.isFavourite));
-    if (contact.contactType !== undefined)
-      formData.append("contactType", contact.contactType); // Завжди надсилаємо contactType
+    Object.entries(contact).forEach(([key, value]) => {
+      if (key !== "photo" && value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    });
+
     if (contact.photo) {
       formData.append("photo", contact.photo);
     }
@@ -121,7 +110,6 @@ export const contactsApi = {
       `/contacts/${id}`,
       formData,
       {
-        // Змінено тип повернення
         headers: {
           "Content-Type": "multipart/form-data"
         }

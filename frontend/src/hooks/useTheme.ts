@@ -1,11 +1,13 @@
-import { useEffect } from "react";
+// frontend/src/hooks/useTheme.ts
+// Повертаємо оригінальний функціонал, а не хардкод
 
-// Simplified to just apply the dark theme as per the new design.
+import { useContext } from "react";
+import { ThemeContext } from "../components/ThemeProvider";
+
 export const useTheme = () => {
-  useEffect(() => {
-    const root = window.document.documentElement;
-    // Remove 'light' if it exists and ensure 'dark' is present.
-    root.classList.remove("light");
-    root.classList.add("dark");
-  }, []);
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return context;
 };

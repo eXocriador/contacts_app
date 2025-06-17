@@ -1,3 +1,5 @@
+// frontend/src/App.tsx
+
 import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
@@ -10,14 +12,12 @@ import RegisterPage from "./pages/RegisterPage";
 import ContactsPage from "./pages/ContactsPage";
 import ProfilePage from "./pages/ProfilePage";
 import PrivateRoute from "./components/PrivateRoute";
-import { useTheme } from "./hooks/useTheme";
+// useTheme тут більше не потрібен
 
 const App = () => {
   const location = useLocation();
-  useTheme(); // Initialize theme
 
   return (
-    // Use new design system colors
     <div className="min-h-screen flex flex-col bg-background text-text-default">
       <Navbar />
       <main className="flex-grow pt-16">
@@ -50,7 +50,7 @@ const App = () => {
         position="top-right"
         toastOptions={{
           style: {
-            background: "#161B22",
+            background: "#161B22", // Можна адаптувати до теми
             color: "#e6edf3",
             border: "1px solid #30363d"
           }

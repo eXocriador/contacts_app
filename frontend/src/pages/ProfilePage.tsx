@@ -1,3 +1,5 @@
+// frontend/src/pages/ProfilePage.tsx
+
 import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -32,7 +34,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 const ProfilePage = () => {
-  const { user, updateUserInStore } = useAuthStore();
+  const { user, updateUser } = useAuthStore(); // Використовуємо updateUser
   const [photoPreview, setPhotoPreview] = useState<string | null>(
     user?.photo || null
   );
@@ -75,14 +77,6 @@ const ProfilePage = () => {
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Photo size cannot exceed 5MB.");
-        return;
-      }
-      if (!file.type.startsWith("image/")) {
-        toast.error("Please upload only image files.");
-        return;
-      }
       const reader = new FileReader();
       reader.onloadend = () => setPhotoPreview(reader.result as string);
       reader.readAsDataURL(file);
@@ -91,29 +85,44 @@ const ProfilePage = () => {
 
   const onProfileSubmit = async (data: ProfileFormValues) => {
     setIsUpdatingProfile(true);
-    const formData = new FormData();
-
-    if (data.name !== user?.name) formData.append("name", data.name);
-    if (data.email !== user?.email) formData.append("email", data.email);
-
     const photoFile = photoInputRef.current?.files?.[0];
-    if (photoFile) {
-      formData.append("photo", photoFile);
-    }
 
-    if (Array.from(formData.entries()).length > 0) {
+    // **Ключова логіка тут**
+    if (photoFile) {
+      // 1. Інформуємо користувача про недоступність функції
+      toast.info(
+        "Функціонал оновлення фото тимчасово недоступний. Ми вже працюємо над цим!",
+        { duration: 4000 }
+      );
+      // Можна також відправити текстові дані, якщо вони змінились
+      const textData: { name?: string; email?: string } = {};
+      if (data.name !== user?.name) textData.name = data.name;
+      if (data.email !== user?.email) textData.email = data.email;
+
+      if (Object.keys(textData).length > 0) {
+        try {
+          const response = await authApi.updateProfileJSON(textData);
+          updateUser(response.data.user);
+          toast.success("Текстові дані профілю оновлено!");
+        } catch (error: any) {
+          toast.error(
+            error.response?.data?.message || "Failed to update profile."
+          );
+        }
+      }
+    } else {
+      // 2. Якщо фото не змінювалось, надсилаємо JSON
       try {
-        const response = await authApi.updateProfile(formData);
-        updateUserInStore(response.user);
+        const response = await authApi.updateProfileJSON(data);
+        updateUser(response.data.user);
         toast.success("Profile updated successfully!");
       } catch (error: any) {
         toast.error(
           error.response?.data?.message || "Failed to update profile."
         );
       }
-    } else {
-      toast("No changes to update.", { icon: "🤷" });
     }
+
     setIsUpdatingProfile(false);
   };
 
