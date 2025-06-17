@@ -1,3 +1,5 @@
+// frontend/src/components/ThemeProvider.tsx
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
@@ -7,18 +9,23 @@ interface ThemeContextType {
   toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+// Додаємо ключове слово 'export' тут
+export const ThemeContext = createContext<ThemeContextType | undefined>(
+  undefined
+);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => {
+    // Виправляємо, щоб за замовчуванням була темна тема, якщо нічого не збережено
     const savedTheme = localStorage.getItem("theme");
-    return (savedTheme as Theme) || "light";
+    return (savedTheme as Theme) || "dark";
   });
 
   useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove("light", "dark");
+    root.classList.add(theme);
     localStorage.setItem("theme", theme);
-    document.documentElement.classList.remove("light", "dark");
-    document.documentElement.classList.add(theme);
   }, [theme]);
 
   const toggleTheme = () => {
@@ -32,10 +39,4 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
-};
+// `useTheme` тепер знаходиться в окремому файлі, тому тут його більше немає
