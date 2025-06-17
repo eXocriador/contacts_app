@@ -7,7 +7,8 @@ import type {
   CreateContactRequest,
   UpdateContactRequest
 } from "../../types/api";
-import { typeList } from "../../constants/contacts"; // Імпортуємо typeList
+import { typeList } from "../../constants/contacts";
+import { toast } from "react-hot-toast"; // Додано toast
 
 interface ContactFormModalProps {
   isOpen: boolean;
@@ -40,7 +41,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
     defaultValues: contact
       ? {
           ...contact,
-          contactType: contact.contactType // Вибираємо перший елемент з кортежу, якщо contactType є масивом
+          contactType: contact.contactType
         }
       : {
           name: "",
@@ -55,17 +56,46 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
     if (contact) {
       reset({
         ...contact,
-        contactType: contact.contactType // Знову ж таки, для коректного відображення
+        contactType: contact.contactType
       });
       setPreviewUrl(contact.photo || null);
+    } else {
+      reset({
+        name: "",
+        email: "",
+        phoneNumber: "",
+        isFavourite: false,
+        contactType: "personal"
+      });
+      setPreviewUrl(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
-  }, [contact, reset]);
+  }, [contact, reset, isOpen]); // Додано isOpen до залежностей для скидання форми при закритті/відкритті
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Валідація розміру файлу (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Photo size cannot exceed 5MB.");
+        event.target.value = ""; // Очистити обраний файл
+        setPreviewUrl(null);
+        return;
+      }
+      // Валідація типу файлу
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please upload only image files.");
+        event.target.value = ""; // Очистити обраний файл
+        setPreviewUrl(null);
+        return;
+      }
+
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
+    } else {
+      setPreviewUrl(contact?.photo || null);
     }
   };
 
@@ -76,7 +106,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
 
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        const value = (data as any)[key];
+        const value = (data as any)[key]; // Поки залишаємо any через динамічну природу FormData
         if (value !== undefined && value !== null) {
           if (typeof value === "boolean") {
             formData.append(key, String(value));
@@ -93,20 +123,8 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
     }
 
     // Передача FormData
-    await onSubmit(formData as any);
-    if (!contact) {
-      reset({
-        name: "",
-        email: "",
-        phoneNumber: "",
-        isFavourite: false,
-        contactType: "personal"
-      });
-      setPreviewUrl(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
+    await onSubmit(formData as any); // Поки залишаємо any
+    // Логіка скидання форми перенесена в useEffect
   };
 
   return (

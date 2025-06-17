@@ -51,6 +51,7 @@ const ProfilePage = () => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null); // Додано ref
 
   const {
     register: registerProfile,
@@ -86,6 +87,21 @@ const ProfilePage = () => {
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Валідація розміру файлу (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Photo size cannot exceed 5MB.");
+        e.target.value = ""; // Очистити обраний файл
+        setPhotoPreview(user?.photo || null);
+        return;
+      }
+      // Валідація типу файлу
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please upload only image files.");
+        e.target.value = ""; // Очистити обраний файл
+        setPhotoPreview(user?.photo || null);
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoPreview(reader.result as string);
@@ -105,11 +121,9 @@ const ProfilePage = () => {
       if (data.email !== undefined && data.email !== "")
         formData.append("email", data.email);
 
-      const photoInput = document.querySelector(
-        'input[type="file"]'
-      ) as HTMLInputElement;
-      if (photoInput?.files?.[0]) {
-        formData.append("photo", photoInput.files[0]);
+      const photoFile = fileInputRef.current?.files?.[0]; // Використовуємо ref
+      if (photoFile) {
+        formData.append("photo", photoFile);
       }
 
       // Перевірка, чи є якісь дані для оновлення
@@ -124,7 +138,7 @@ const ProfilePage = () => {
         return;
       }
 
-      const response = await authApi.updateProfile(formData); // Очікуємо { user: User }
+      const response = await authApi.updateProfile(formData);
       updateUserInStore(response.user);
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -200,6 +214,7 @@ const ProfilePage = () => {
                   accept="image/*"
                   className="hidden"
                   onChange={handlePhotoChange}
+                  ref={fileInputRef} // Прив'язуємо ref
                 />
               </div>
             </div>
