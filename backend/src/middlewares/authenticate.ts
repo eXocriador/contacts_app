@@ -11,7 +11,7 @@ const JWT_SECRET = getEnvVar('JWT_SECRET');
 export const authenticate = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
@@ -24,9 +24,12 @@ export const authenticate = async (
       throw createHttpError(401, 'Authentication required');
     }
 
-    let decoded: { id: string, exp: number };
+    let decoded: { id: string; exp: number };
     try {
-      decoded = jwt.verify(accessToken, JWT_SECRET) as { id: string, exp: number };
+      decoded = jwt.verify(accessToken, JWT_SECRET) as {
+        id: string;
+        exp: number;
+      };
     } catch (jwtError) {
       if (jwtError instanceof jwt.TokenExpiredError) {
         throw createHttpError(401, 'Access token expired');
@@ -37,11 +40,14 @@ export const authenticate = async (
     const session = await Session.findOne({
       userId: decoded.id,
       accessToken: accessToken,
-      accessTokenValidUntil: { $gt: new Date() }
+      accessTokenValidUntil: { $gt: new Date() },
     });
 
     if (!session) {
-      throw createHttpError(401, 'Authentication required: No active session or token invalid.');
+      throw createHttpError(
+        401,
+        'Authentication required: No active session or token invalid.',
+      );
     }
 
     const user = await User.findById(decoded.id);
