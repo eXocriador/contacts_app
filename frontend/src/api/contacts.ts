@@ -2,58 +2,25 @@
 
 import type {
   Contact,
-  CreateContactRequest,
-  UpdateContactRequest
+  GetContactsResponse,
+  GetContactsParams
 } from "../types/api";
 import api from "./index"; // Імпортуємо центральний екземпляр
 
-// ... (інтерфейси GetContactsParams, BackendPaginatedResponse, GetContactsResponse залишаються без змін)
-export interface GetContactsParams {
-  page?: number;
-  perPage?: number;
-  search?: string;
-  sortBy?: string;
-  sortOrder?: "asc" | "desc";
-  isFavourite?: boolean;
-  contactType?: "personal" | "work" | "other";
-}
-
-export interface BackendPaginatedResponse<T> {
-  status: number;
-  message: string;
-  data: {
-    data: T[];
-    page: number;
-    perPage: number;
-    totalItems: number;
-    totalPages: number;
-    hasPreviousPage: boolean;
-    hasNextPage: boolean;
-  };
-}
-
-export interface GetContactsResponse {
-  contacts: Contact[];
-  total: number;
-  page: number;
-  perPage: number;
-  totalPages: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
-}
+export { type GetContactsResponse, type GetContactsParams };
 
 export const contactsApi = {
   getContacts: async (
     params: GetContactsParams = {}
   ): Promise<GetContactsResponse> => {
+    // Логіка отримання контактів залишається без змін
     const queryParams: any = { ...params };
     if (queryParams.perPage !== undefined) {
       queryParams.limit = queryParams.perPage;
       delete queryParams.perPage;
     }
-    const { data: responseData } = await api.get<
-      BackendPaginatedResponse<Contact>
-    >("/contacts", {
+    const { data: responseData } = await api.get<any>("/contacts", {
+      // Використовуємо any для гнучкості відповіді
       params: queryParams
     });
     return {
@@ -67,18 +34,8 @@ export const contactsApi = {
     };
   },
 
-  createContact: async (contact: CreateContactRequest): Promise<Contact> => {
-    const formData = new FormData();
-    Object.entries(contact).forEach(([key, value]) => {
-      if (key !== "photo" && value !== undefined && value !== null) {
-        formData.append(key, String(value));
-      }
-    });
-
-    if (contact.photo) {
-      formData.append("photo", contact.photo);
-    }
-
+  // Спрощено: функція тепер просто приймає і передає готовий FormData
+  createContact: async (formData: FormData): Promise<Contact> => {
     const { data: responseData } = await api.post<{ data: Contact }>(
       "/contacts",
       formData,
@@ -91,21 +48,8 @@ export const contactsApi = {
     return responseData.data;
   },
 
-  updateContact: async (
-    id: string,
-    contact: UpdateContactRequest
-  ): Promise<Contact> => {
-    const formData = new FormData();
-    Object.entries(contact).forEach(([key, value]) => {
-      if (key !== "photo" && value !== undefined && value !== null) {
-        formData.append(key, String(value));
-      }
-    });
-
-    if (contact.photo) {
-      formData.append("photo", contact.photo);
-    }
-
+  // Спрощено: функція тепер просто приймає і передає готовий FormData
+  updateContact: async (id: string, formData: FormData): Promise<Contact> => {
     const { data: responseData } = await api.patch<{ data: Contact }>(
       `/contacts/${id}`,
       formData,
