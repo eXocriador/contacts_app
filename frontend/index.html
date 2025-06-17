@@ -12,16 +12,19 @@
     />
 
     <style>
-      /* Прибираємо блимання білого фону при завантаженні */
+      /* 1. Задаємо фон за замовчуванням, щоб не було білого блимання */
       body {
-        background-color: #0d1117; /* Основний темний фон вашого застосунку */
+        background-color: #0d1117;
       }
+      /* 2. Запобігаємо "стрибку" висоти, щоб картинка не стискалась */
       #root {
         min-height: 100vh;
       }
     </style>
-    <link rel="preload" as="image" href="/hero-background.jpg" />
+
+    <link rel="preload" as="image" href="/images/hero-green.webp" />
     <link rel="preload" as="image" href="/images/auth-bg.webp" />
+
     <title>Contacts App | Your Personal Contact Manager</title>
   </head>
   <body>
