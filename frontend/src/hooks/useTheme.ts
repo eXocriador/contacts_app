@@ -1,23 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from "react";
 
-type Theme = 'light' | 'dark';
-
+// Simplified to just apply the dark theme as per the new design.
 export const useTheme = () => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem('theme');
-    return (savedTheme as Theme) || 'light';
-  });
-
   useEffect(() => {
     const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
-
-  return { theme, toggleTheme };
+    // Remove 'light' if it exists and ensure 'dark' is present.
+    root.classList.remove("light");
+    root.classList.add("dark");
+  }, []);
 };

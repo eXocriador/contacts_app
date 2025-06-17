@@ -1,22 +1,16 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import type {
-  Contact,
-  CreateContactRequest,
-  UpdateContactRequest
-} from "../../types/api";
+import type { Contact, CreateContactRequest } from "../../types/api";
 import { typeList } from "../../constants/contacts";
-import { toast } from "react-hot-toast"; // Додано toast
+import { toast } from "react-hot-toast";
 
 interface ContactFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (
-    data: CreateContactRequest | UpdateContactRequest
-  ) => Promise<void>;
-  contact?: Contact;
+  onSubmit: (data: FormData) => Promise<void>;
+  contact?: Contact | null;
   isSubmitting: boolean;
 }
 
@@ -27,104 +21,68 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
   contact,
   isSubmitting
 }) => {
-  const [previewUrl, setPreviewUrl] = React.useState<string | null>(
-    contact?.photo || null
-  );
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
-  } = useForm<CreateContactRequest | UpdateContactRequest>({
-    defaultValues: contact
-      ? {
-          ...contact,
-          contactType: contact.contactType
-        }
-      : {
+    reset,
+    setValue
+  } = useForm<CreateContactRequest>();
+
+  useEffect(() => {
+    if (isOpen) {
+      if (contact) {
+        reset(contact);
+        setPreviewUrl(contact.photo || null);
+      } else {
+        reset({
           name: "",
           email: "",
           phoneNumber: "",
           isFavourite: false,
           contactType: "personal"
-        }
-  });
-
-  React.useEffect(() => {
-    if (contact) {
-      reset({
-        ...contact,
-        contactType: contact.contactType
-      });
-      setPreviewUrl(contact.photo || null);
-    } else {
-      reset({
-        name: "",
-        email: "",
-        phoneNumber: "",
-        isFavourite: false,
-        contactType: "personal"
-      });
-      setPreviewUrl(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+        });
+        setPreviewUrl(null);
       }
     }
-  }, [contact, reset, isOpen]); // Додано isOpen до залежностей для скидання форми при закритті/відкритті
+  }, [contact, isOpen, reset]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Валідація розміру файлу (5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast.error("Photo size cannot exceed 5MB.");
-        event.target.value = ""; // Очистити обраний файл
-        setPreviewUrl(null);
+        event.target.value = "";
         return;
       }
-      // Валідація типу файлу
       if (!file.type.startsWith("image/")) {
         toast.error("Please upload only image files.");
-        event.target.value = ""; // Очистити обраний файл
-        setPreviewUrl(null);
+        event.target.value = "";
         return;
       }
-
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
-    } else {
-      setPreviewUrl(contact?.photo || null);
     }
   };
 
-  const handleFormSubmit = async (
-    data: CreateContactRequest | UpdateContactRequest
-  ) => {
+  const handleFormSubmit = async (data: CreateContactRequest) => {
     const formData = new FormData();
 
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        const value = (data as any)[key]; // Поки залишаємо any через динамічну природу FormData
-        if (value !== undefined && value !== null) {
-          if (typeof value === "boolean") {
-            formData.append(key, String(value));
-          } else {
-            formData.append(key, value);
-          }
-        }
+    Object.entries(data).forEach(([key, value]) => {
+      if (key !== "photo" && value !== undefined && value !== null) {
+        formData.append(key, String(value));
       }
+    });
+
+    const photoFile = fileInputRef.current?.files?.[0];
+    if (photoFile) {
+      formData.append("photo", photoFile);
     }
 
-    const file = fileInputRef.current?.files?.[0];
-    if (file) {
-      formData.append("photo", file);
-    }
-
-    // Передача FormData
-    await onSubmit(formData as any); // Поки залишаємо any
-    // Логіка скидання форми перенесена в useEffect
+    await onSubmit(formData);
   };
 
   return (
@@ -134,50 +92,47 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70"
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
+            initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md"
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="bg-surface rounded-2xl shadow-xl w-full max-w-md border border-border"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-lg font-semibold text-text-default">
                 {contact ? "Edit Contact" : "Add New Contact"}
               </h2>
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300"
+                className="p-1 rounded-full text-text-secondary hover:bg-border"
               >
-                <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             <form
               onSubmit={handleSubmit(handleFormSubmit)}
-              className="p-6 space-y-6"
+              className="p-6 space-y-4"
             >
-              <div className="flex flex-col items-center space-y-4">
+              <div className="flex flex-col items-center">
                 <div
-                  className="relative w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-700 cursor-pointer group"
+                  className="relative w-24 h-24 rounded-full bg-background cursor-pointer group"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  {previewUrl ? (
-                    <img
-                      src={previewUrl}
-                      alt="Contact"
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full rounded-full flex items-center justify-center text-gray-400">
-                      <span className="text-4xl">+</span>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="text-white text-sm">Change Photo</span>
+                  <img
+                    src={
+                      previewUrl ||
+                      `https://ui-avatars.com/api/?name=?&background=30363d&color=e6edf3`
+                    }
+                    alt="Contact Preview"
+                    className="w-full h-full rounded-full object-cover border-2 border-border"
+                  />
+                  <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-white text-xs">Change</span>
                   </div>
                 </div>
                 <input
@@ -190,68 +145,43 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Name
-                </label>
+                <label className="label">Name</label>
                 <input
                   type="text"
                   {...register("name", { required: "Name is required" })}
                   className="input"
-                  placeholder="Enter name"
                 />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.name.message}
-                  </p>
-                )}
+                {errors.name && <p className="error">{errors.name.message}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email
-                </label>
+                <label className="label">Email</label>
                 <input
                   type="email"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address"
-                    }
-                  })}
+                  {...register("email", { required: "Email is required" })}
                   className="input"
-                  placeholder="Enter email"
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.email.message}
-                  </p>
+                  <p className="error">{errors.email.message}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Phone Number
-                </label>
+                <label className="label">Phone Number</label>
                 <input
                   type="tel"
                   {...register("phoneNumber", {
                     required: "Phone number is required"
                   })}
                   className="input"
-                  placeholder="Enter phone number"
                 />
                 {errors.phoneNumber && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.phoneNumber.message}
-                  </p>
+                  <p className="error">{errors.phoneNumber.message}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Contact Type
-                </label>
+                <label className="label">Contact Type</label>
                 <select
                   {...register("contactType", {
                     required: "Contact type is required"
@@ -259,30 +189,33 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
                   className="input"
                 >
                   {typeList.map((type) => (
-                    <option key={type} value={type}>
+                    <option
+                      key={type}
+                      value={type}
+                      className="bg-surface text-text-default"
+                    >
                       {type.charAt(0).toUpperCase() + type.slice(1)}
                     </option>
                   ))}
                 </select>
-                {errors.contactType && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.contactType.message}
-                  </p>
-                )}
               </div>
 
               <div className="flex items-center">
                 <input
+                  id="isFavourite"
                   type="checkbox"
                   {...register("isFavourite")}
-                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  className="h-4 w-4 rounded border-border text-primary-500 focus:ring-primary-500 bg-background"
                 />
-                <label className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                <label
+                  htmlFor="isFavourite"
+                  className="ml-2 text-sm text-text-secondary"
+                >
                   Mark as favourite
                 </label>
               </div>
 
-              <div className="flex justify-end space-x-4">
+              <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
                   onClick={onClose}
@@ -293,15 +226,13 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-primary flex items-center"
+                  className="btn-primary"
                 >
-                  {isSubmitting ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : contact ? (
-                    "Save Changes"
-                  ) : (
-                    "Add Contact"
-                  )}
+                  {isSubmitting
+                    ? "Saving..."
+                    : contact
+                    ? "Save Changes"
+                    : "Create Contact"}
                 </button>
               </div>
             </form>

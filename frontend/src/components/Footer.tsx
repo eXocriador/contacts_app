@@ -3,15 +3,15 @@ import { FaGithub, FaLinkedin, FaTelegram } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="bg-white dark:bg-gray-800 shadow-lg mt-auto">
+    <footer className="bg-surface border-t border-border mt-auto">
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="flex space-x-6">
             <a
-              href="https://github.com"
+              href="https://github.com/eXocriador"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+              className="text-text-secondary hover:text-text-default"
             >
               <FaGithub className="w-6 h-6" />
             </a>
@@ -19,20 +19,20 @@ const Footer = () => {
               href="https://linkedin.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+              className="text-text-secondary hover:text-text-default"
             >
               <FaLinkedin className="w-6 h-6" />
             </a>
             <a
-              href="https://t.me"
+              href="https://t.me/eXocriador"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+              className="text-text-secondary hover:text-text-default"
             >
               <FaTelegram className="w-6 h-6" />
             </a>
           </div>
-          <p className="text-gray-600 dark:text-gray-300 text-sm">
+          <p className="text-text-secondary text-sm">
             © {new Date().getFullYear()} Contacts App. All rights reserved.
           </p>
         </div>

@@ -1,4 +1,3 @@
-// exocriador/contacts_app/contacts_app-main/frontend/src/App.tsx
 import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
@@ -11,14 +10,16 @@ import RegisterPage from "./pages/RegisterPage";
 import ContactsPage from "./pages/ContactsPage";
 import ProfilePage from "./pages/ProfilePage";
 import PrivateRoute from "./components/PrivateRoute";
+import { useTheme } from "./hooks/useTheme";
 
 const App = () => {
   const location = useLocation();
+  useTheme(); // Initialize theme
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+    // Use new design system colors
+    <div className="min-h-screen flex flex-col bg-background text-text-default">
       <Navbar />
-      {/* The main content area now has a padding-top equal to the navbar's height (h-16 -> 4rem) */}
       <main className="flex-grow pt-16">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
@@ -45,7 +46,16 @@ const App = () => {
         </AnimatePresence>
       </main>
       <Footer />
-      <Toaster position="top-right" />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "#161B22",
+            color: "#e6edf3",
+            border: "1px solid #30363d"
+          }
+        }}
+      />
     </div>
   );
 };

@@ -1,5 +1,4 @@
-// exocriador/contacts_app/contacts_app-main/frontend/src/pages/ProfilePage.tsx
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,28 +6,25 @@ import { toast } from "react-hot-toast";
 import { useAuthStore } from "../store/auth";
 import { authApi } from "../api/auth";
 import { motion } from "framer-motion";
+import { Edit2 } from "lucide-react";
 
-// Combined schema for profile information and photo
 const profileSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .optional()
-    .or(z.literal("")),
-  email: z.string().email("Invalid email").optional().or(z.literal("")),
-  photo: z.any().optional()
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address")
 });
 
 const passwordSchema = z
   .object({
-    currentPassword: z.string().min(6, "Current password is required"),
+    currentPassword: z
+      .string()
+      .min(6, "Current password must be at least 6 characters"),
     newPassword: z
       .string()
       .min(6, "New password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Confirm password is required")
+    confirmPassword: z.string()
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: "New passwords don't match",
     path: ["confirmPassword"]
   });
 
@@ -36,22 +32,19 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 const ProfilePage = () => {
-  const { user, updateUserInStore } = useAuthStore((state) => ({
-    user: state.user,
-    updateUserInStore: state.updateUser
-  }));
+  const { user, updateUserInStore } = useAuthStore();
   const [photoPreview, setPhotoPreview] = useState<string | null>(
     user?.photo || null
   );
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register: registerProfile,
     handleSubmit: handleProfileSubmit,
     formState: { errors: profileErrors },
-    reset: resetProfileForm
+    reset: resetProfile
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: { name: user?.name || "", email: user?.email || "" }
@@ -60,18 +53,24 @@ const ProfilePage = () => {
   const {
     register: registerPassword,
     handleSubmit: handlePasswordSubmit,
-    reset: resetPasswordForm,
-    formState: { errors: passwordErrors }
+    formState: { errors: passwordErrors },
+    reset: resetPassword
   } = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema)
   });
 
   React.useEffect(() => {
     if (user) {
-      resetProfileForm({ name: user.name, email: user.email });
-      setPhotoPreview(user.photo || null);
+      resetProfile({ name: user.name, email: user.email });
+      setPhotoPreview(
+        user.photo ||
+          `https://ui-avatars.com/api/?name=${user.name.replace(
+            " ",
+            "+"
+          )}&background=161B22&color=e6edf3&size=128`
+      );
     }
-  }, [user, resetProfileForm]);
+  }, [user, resetProfile]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -92,29 +91,30 @@ const ProfilePage = () => {
 
   const onProfileSubmit = async (data: ProfileFormValues) => {
     setIsUpdatingProfile(true);
-    try {
-      const formData = new FormData();
-      if (data.name) formData.append("name", data.name);
-      if (data.email) formData.append("email", data.email);
+    const formData = new FormData();
 
-      const photoFile = fileInputRef.current?.files?.[0];
-      if (photoFile) {
-        formData.append("photo", photoFile);
-      }
+    if (data.name !== user?.name) formData.append("name", data.name);
+    if (data.email !== user?.email) formData.append("email", data.email);
 
-      if (formData.entries().next().done) {
-        toast.error("No changes to submit.");
-        return;
-      }
-
-      const response = await authApi.updateProfile(formData);
-      updateUserInStore(response.user);
-      toast.success("Profile updated successfully");
-    } catch (error) {
-      toast.error("Failed to update profile");
-    } finally {
-      setIsUpdatingProfile(false);
+    const photoFile = photoInputRef.current?.files?.[0];
+    if (photoFile) {
+      formData.append("photo", photoFile);
     }
+
+    if (Array.from(formData.entries()).length > 0) {
+      try {
+        const response = await authApi.updateProfile(formData);
+        updateUserInStore(response.user);
+        toast.success("Profile updated successfully!");
+      } catch (error: any) {
+        toast.error(
+          error.response?.data?.message || "Failed to update profile."
+        );
+      }
+    } else {
+      toast("No changes to update.", { icon: "🤷" });
+    }
+    setIsUpdatingProfile(false);
   };
 
   const onPasswordSubmit = async (data: PasswordFormValues) => {
@@ -124,70 +124,66 @@ const ProfilePage = () => {
         currentPassword: data.currentPassword,
         newPassword: data.newPassword
       });
-      toast.success("Password updated successfully");
-      resetPasswordForm();
-    } catch (error) {
-      toast.error("Failed to update password.");
+      toast.success("Password updated successfully!");
+      resetPassword();
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Failed to update password."
+      );
     } finally {
       setIsUpdatingPassword(false);
     }
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 className="text-4xl font-bold mb-8 text-gray-900 dark:text-white">
+    <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-bold text-text-default mb-8">
         Profile Settings
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         {/* Profile Information Card */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-surface border border-border rounded-xl shadow-lg p-6"
         >
-          <h2 className="text-2xl font-semibold mb-6">Profile Information</h2>
+          <h3 className="text-xl font-semibold text-text-default mb-6">
+            Profile Information
+          </h3>
           <form
             onSubmit={handleProfileSubmit(onProfileSubmit)}
             className="space-y-6"
           >
-            <div className="flex flex-col items-center mb-4">
-              <div className="relative w-32 h-32">
+            <div className="flex flex-col items-center">
+              <div className="relative group w-32 h-32 mb-4">
                 <img
-                  src={photoPreview || "https://via.placeholder.com/150"}
+                  src={photoPreview || ""}
                   alt="Profile"
                   className="w-full h-full rounded-full object-cover"
                 />
                 <label
-                  htmlFor="photo"
-                  className="absolute bottom-0 right-0 bg-primary-500 text-white p-2 rounded-full cursor-pointer hover:bg-primary-600 transition-colors"
+                  htmlFor="photo-upload"
+                  className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
                 >
-                  <input
-                    type="file"
-                    id="photo"
-                    {...registerProfile("photo")}
-                    className="hidden"
-                    onChange={handlePhotoChange}
-                    ref={fileInputRef}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                    <path
-                      fillRule="evenodd"
-                      d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <Edit2 size={24} />
                 </label>
+                <input
+                  ref={photoInputRef}
+                  id="photo-upload"
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                />
               </div>
             </div>
             <div>
-              <label className="label">Name</label>
+              <label htmlFor="name" className="label">
+                Name
+              </label>
               <input
+                id="name"
                 type="text"
                 {...registerProfile("name")}
                 className="input"
@@ -197,8 +193,11 @@ const ProfilePage = () => {
               )}
             </div>
             <div>
-              <label className="label">Email</label>
+              <label htmlFor="email" className="label">
+                Email
+              </label>
               <input
+                id="email"
                 type="email"
                 {...registerProfile("email")}
                 className="input"
@@ -207,28 +206,32 @@ const ProfilePage = () => {
                 <p className="error">{profileErrors.email.message}</p>
               )}
             </div>
-            <button
-              type="submit"
-              disabled={isUpdatingProfile}
-              className="btn-primary w-full"
-            >
-              {isUpdatingProfile ? "Saving..." : "Save Profile"}
-            </button>
+            <div className="text-right">
+              <button
+                type="submit"
+                disabled={isUpdatingProfile}
+                className="btn-primary"
+              >
+                {isUpdatingProfile ? "Saving..." : "Save Profile"}
+              </button>
+            </div>
           </form>
         </motion.div>
 
-        {/* Security Card */}
+        {/* Change Password Form Card */}
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-surface border border-border rounded-xl shadow-lg p-6"
         >
-          <h2 className="text-2xl font-semibold mb-6">Security</h2>
+          <h3 className="text-xl font-semibold text-text-default mb-6">
+            Security
+          </h3>
           <form
             onSubmit={handlePasswordSubmit(onPasswordSubmit)}
             className="space-y-6"
           >
-            {/* All password fields go here, no changes needed to them */}
             <div>
               <label className="label">Current Password</label>
               <input
@@ -266,13 +269,15 @@ const ProfilePage = () => {
                 </p>
               )}
             </div>
-            <button
-              type="submit"
-              disabled={isUpdatingPassword}
-              className="btn-primary w-full"
-            >
-              {isUpdatingPassword ? "Saving..." : "Update Password"}
-            </button>
+            <div className="text-right">
+              <button
+                type="submit"
+                disabled={isUpdatingPassword}
+                className="btn-primary"
+              >
+                {isUpdatingPassword ? "Updating..." : "Update Password"}
+              </button>
+            </div>
           </form>
         </motion.div>
       </div>

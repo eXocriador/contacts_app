@@ -7,53 +7,49 @@
     @apply antialiased;
   }
 
+  /* Use the new theme colors globally */
   body {
-    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 min-h-screen;
+    @apply bg-background text-text-default;
   }
 
+  /* Universal transition for better UX */
   * {
-    @apply transition-colors duration-300;
+    @apply transition-colors duration-200;
   }
 }
 
 @layer components {
+  /* Redefined component styles for the new design system */
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200;
   }
 
   .btn-primary {
-    @apply btn bg-primary-500 text-white hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700;
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500;
   }
 
   .btn-secondary {
-    @apply btn bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
+    @apply btn bg-surface text-text-default hover:bg-border border border-border focus:ring-primary-500;
   }
 
   .btn-danger {
-    @apply btn bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700;
+    @apply btn bg-danger text-white hover:opacity-90 focus:ring-danger;
   }
 
   .input {
-    @apply w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400;
+    @apply block w-full px-4 py-2 rounded-lg border border-border bg-background text-text-default placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
   }
 
   .label {
-    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+    @apply block text-sm font-medium text-text-secondary mb-2;
   }
 
   .error {
-    @apply text-red-500 text-sm mt-1;
+    @apply text-danger text-sm mt-1;
   }
-}
 
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+  /* Consistent navigation links for header */
+  .nav-link {
+    @apply flex items-center gap-2 text-text-secondary hover:text-text-default font-medium px-3 py-2 rounded-md hover:bg-border;
+  }
 }
