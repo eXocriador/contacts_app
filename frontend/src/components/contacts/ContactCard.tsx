@@ -1,7 +1,6 @@
-// exocriador/contacts_app/contacts_app-main/frontend/src/components/contacts/ContactCard.tsx
 import React from "react";
 import { motion } from "framer-motion";
-import { FaEdit, FaTrash, FaStar } from "react-icons/fa";
+import { Edit, Trash, Star, Mail, Phone } from "lucide-react";
 import type { Contact } from "../../types/api";
 
 interface ContactCardProps {
@@ -19,61 +18,59 @@ const ContactCard: React.FC<ContactCardProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      whileHover={{
-        y: -5,
-        boxShadow:
-          "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
-      }}
-      className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden flex flex-col h-full"
+      exit={{ opacity: 0 }}
+      whileHover={{ y: -5, boxShadow: "0 0 15px 0 rgba(34, 197, 94, 0.3)" }} // Using raw shadow for glow
+      transition={{ duration: 0.2 }}
+      className="bg-surface rounded-xl border border-border overflow-hidden flex flex-col h-full"
     >
       <div className="p-6 flex-grow">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-4">
-            <div className="relative">
-              <img
-                src={
-                  contact.photo ||
-                  `https://ui-avatars.com/api/?name=${contact.name}&background=random`
-                }
-                alt={contact.name}
-                className="w-16 h-16 rounded-full object-cover"
-              />
-            </div>
+            <img
+              src={
+                contact.photo ||
+                `https://ui-avatars.com/api/?name=${contact.name.replace(
+                  " ",
+                  "+"
+                )}&background=161B22&color=e6edf3`
+              }
+              alt={contact.name}
+              className="w-16 h-16 rounded-full object-cover border-2 border-border"
+            />
             <div className="flex-1 min-w-0">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white truncate">
+              <h3 className="text-xl font-bold text-text-default truncate">
                 {contact.name}
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">
+              <p className="text-sm text-text-secondary capitalize">
                 {contact.contactType}
               </p>
             </div>
           </div>
           {contact.isFavourite && (
-            <FaStar className="text-yellow-400 w-5 h-5" />
+            <Star className="text-yellow-400 w-5 h-5 flex-shrink-0" />
           )}
         </div>
-        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-          <p className="truncate">
-            <strong>Email:</strong> {contact.email}
+        <div className="space-y-3 text-sm text-text-secondary">
+          <p className="flex items-center gap-2 truncate">
+            <Mail size={16} /> {contact.email}
           </p>
-          <p className="truncate">
-            <strong>Phone:</strong> {contact.phoneNumber}
+          <p className="flex items-center gap-2 truncate">
+            <Phone size={16} /> {contact.phoneNumber}
           </p>
         </div>
       </div>
-      <div className="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+      <div className="p-4 bg-background/50 border-t border-border flex justify-end space-x-3">
         <button
           onClick={() => onEdit(contact)}
-          className="btn btn-secondary flex items-center gap-2"
+          className="btn-secondary flex items-center gap-2"
         >
-          <FaEdit /> Edit
+          <Edit size={16} /> Edit
         </button>
         <button
           onClick={() => onDelete(contact)}
-          className="btn btn-danger flex items-center gap-2"
+          className="btn-danger flex items-center gap-2"
         >
-          <FaTrash /> Delete
+          <Trash size={16} /> Delete
         </button>
       </div>
     </motion.div>
