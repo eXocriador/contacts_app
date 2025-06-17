@@ -1,3 +1,4 @@
+// exocriador/contacts_app/contacts_app-main/frontend/src/App.tsx
 import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
@@ -17,7 +18,8 @@ const App = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
       <Navbar />
-      <main className="py-8">
+      {/* The main content area now has a padding-top equal to the navbar's height (h-16 -> 4rem) */}
+      <main className="flex-grow pt-16">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<HomePage />} />
