@@ -59,9 +59,9 @@ const LoginPage = () => {
         <img
           src="/images/auth-bg.webp" // Назва вашого зображення
           alt="Abstract background"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover blur-sm"
         />
-        <div className="absolute inset-0 bg-background/70" />
+        <div className="absolute inset-0 bg-background/70" /> {/* Затемнення */}
       </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
