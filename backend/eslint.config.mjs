@@ -1,19 +1,23 @@
-import globals from 'globals';
 import pluginJs from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import globals from 'globals';
+import tseslint from '@typescript-eslint/eslint-plugin';
+import parserTs from '@typescript-eslint/parser';
 
+/** @type {import("eslint").Linter.FlatConfig[]} */
 export default [
   pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
   {
     files: ['src/**/*.{ts,js}'],
     languageOptions: {
-      globals: globals.node,
-      parser: tseslint.parser,
+      parser: parserTs,
       parserOptions: {
         ecmaVersion: 2020,
         sourceType: 'module',
       },
+      globals: globals.node,
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
     },
     rules: {
       semi: 'error',

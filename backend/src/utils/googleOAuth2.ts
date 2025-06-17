@@ -5,7 +5,10 @@ import { getEnvVar } from './getEnvVar';
 const client = new OAuth2Client(
   getEnvVar('GOOGLE_CLIENT_ID'),
   getEnvVar('GOOGLE_CLIENT_SECRET'),
-  getEnvVar('GOOGLE_REDIRECT_URI', 'http://localhost:5173/auth/google/callback')
+  getEnvVar(
+    'GOOGLE_REDIRECT_URI',
+    'http://localhost:5173/auth/google/callback',
+  ),
 );
 
 export const generateAuthUrl = () =>
@@ -31,7 +34,9 @@ interface GoogleTokenPayload {
   family_name?: string;
 }
 
-export const getFullNameFromGoogleTokenPayload = (payload: GoogleTokenPayload) => {
+export const getFullNameFromGoogleTokenPayload = (
+  payload: GoogleTokenPayload,
+) => {
   let fullName = 'Guest';
   if (payload.given_name && payload.family_name) {
     fullName = `${payload.given_name} ${payload.family_name}`;
@@ -59,7 +64,7 @@ export const verifyGoogleToken = async (token: string) => {
       name: payload.name,
       picture: payload.picture,
     };
-  } catch (error) {
+  } catch {
     throw new Error('Invalid Google token');
   }
 };
