@@ -16,7 +16,7 @@ export const CallToActionSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg py-16 px-6" // 👈 СТИЛІ ПЕРЕНЕСЕНО СЮДИ
+          className="bg-surface border-t border-border mt-auto rounded-2xl shadow-lg py-16 px-6" // 👈 СТИЛІ ПЕРЕНЕСЕНО СЮДИ bg-surface border-t border-border mt-auto
         >
           <h2 className="text-4xl font-bold mb-8 text-gray-900 dark:text-white">
             Ready to Get Started?
