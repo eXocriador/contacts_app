@@ -1,66 +1,57 @@
-import { z } from 'zod';
+import Joi from 'joi';
+import { AuthRequest, RequestResetEmailRequest, ResetPasswordRequest, LoginWithGoogleOAuthRequest, UpdateProfileRequest } from '../types/models';
+import { emailRegex } from '../constants/auth';
 
-const passwordSchema = z
-  .string()
-  .min(8, 'Password must be at least 8 characters long')
-  .max(100, 'Password must not exceed 100 characters')
-  .regex(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-    'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-  );
-
-export const authSchema = z.object({
-  name: z
-    .string()
-    .min(2, 'Name must be at least 2 characters')
-    .max(50, 'Name must not exceed 50 characters'),
-  email: z.string().email('Invalid email address'),
-  password: passwordSchema,
-});
-
-export const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string(),
-});
-
-export const requestResetEmailSchema = z.object({
-  email: z.string().email('Invalid email address'),
-});
-
-export const resetPasswordSchema = z.object({
-  token: z.string().min(1, 'Token is required'),
-  password: passwordSchema,
-});
-
-export const loginWithGoogleOAuthSchema = z.object({
-  code: z.string().min(1, 'Code is required'),
-});
-
-export const updateProfileSchema = z
-  .object({
-    name: z
-      .string()
-      .min(2, 'Name must be at least 2 characters')
-      .max(50, 'Name must not exceed 50 characters')
-      .optional(),
-    email: z.string().email('Invalid email address').optional(),
-    currentPassword: z.string().optional(),
-    password: passwordSchema.optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.password && !data.currentPassword) {
-      ctx.addIssue({
-        path: ['currentPassword'],
-        message: 'Current password is required to set a new password',
-        code: z.ZodIssueCode.custom,
-      });
-    }
-    if (!data.name && !data.email && !data.password && !data.currentPassword) {
-      ctx.addIssue({
-        path: ['name'],
-        message:
-          'At least one field (name, email, currentPassword, or password) must be provided for profile update',
-        code: z.ZodIssueCode.custom,
-      });
-    }
+// Password validation schema
+const passwordSchema = Joi.string()
+  .min(8)
+  .max(100)
+  .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
+  .messages({
+    'string.pattern.base': 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+    'string.min': 'Password must be at least 8 characters long',
+    'string.max': 'Password must not exceed 100 characters',
   });
+
+export const authSchema = Joi.object<AuthRequest>({
+  name: Joi.string().min(2).max(50).required(),
+  email: Joi.string().pattern(emailRegex).required(),
+  password: passwordSchema.required(),
+});
+
+export const loginSchema = Joi.object<AuthRequest>({
+  email: Joi.string().pattern(emailRegex).required(),
+  password: Joi.string().required(),
+});
+
+export const requestResetEmailSchema = Joi.object<RequestResetEmailRequest>({
+  email: Joi.string().pattern(emailRegex).required(),
+});
+
+export const resetPasswordSchema = Joi.object<ResetPasswordRequest>({
+  token: Joi.string().required(),
+  password: passwordSchema.required(),
+});
+
+export const loginWithGoogleOAuthSchema = Joi.object<LoginWithGoogleOAuthRequest>({
+  code: Joi.string().required(),
+});
+
+export const updateProfileSchema = Joi.object<UpdateProfileRequest>({
+  name: Joi.string().min(2).max(50).optional(),
+  email: Joi.string().pattern(emailRegex).optional(),
+  currentPassword: Joi.string().required().when('password', {
+    is: Joi.exist(),
+    then: Joi.required(),
+    otherwise: Joi.forbidden(),
+  }),
+  password: passwordSchema.optional(),
+}).custom((obj, helpers) => {
+  if (obj.password && !obj.currentPassword) {
+    return helpers.error('any.invalid', { message: 'Current password is required to set a new password' });
+  }
+  if (!obj.name && !obj.email && !obj.password) {
+    return helpers.error('any.invalid', { message: 'At least one field must be provided' });
+  }
+  return obj;
+});

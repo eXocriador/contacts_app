@@ -27,28 +27,28 @@ export interface IContact extends Document {
   isFavourite: boolean;
   owner: IUser['_id'];
   photo?: string;
-  contactType: 'personal' | 'work' | 'other';
+  contactType: boolean | 'personal';
 }
 
-// export interface AuthRequest {
-//   name?: string;
-//   email: string;
-//   password: string;
-// }
+export interface AuthRequest {
+  name?: string;
+  email: string;
+  password: string;
+}
 
-// export interface ContactRequest {
-//   name: string;
-//   email: string;
-//   phoneNumber: string;
-//   isFavourite?: boolean;
-// }
+export interface ContactRequest {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  isFavourite?: boolean;
+}
 
-// export interface UpdateContactRequest {
-//   name?: string;
-//   email?: string;
-//   phoneNumber?: string;
-//   isFavourite?: boolean;
-// }
+export interface UpdateContactRequest {
+  name?: string;
+  email?: string;
+  phoneNumber?: string;
+  isFavourite?: boolean;
+}
 
 export interface PaginationQuery {
   page?: string;
@@ -84,7 +84,6 @@ export interface ContactResponse {
   isFavourite: boolean;
   owner: IContact['owner'];
   photo?: string;
-  contactType: string;
 }
 
 export interface LoginWithGoogleOAuthRequest {
@@ -108,6 +107,8 @@ export interface ContactRequest {
   isFavourite?: boolean;
   contactType: string;
 }
+
+
 export interface UpdateContactRequest {
   name?: string;
   email?: string;
