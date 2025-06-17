@@ -21,7 +21,7 @@ const RegisterPage = () => {
     try {
       await register(data);
       toast.success("Successfully registered!");
-      navigate("/contacts");
+      navigate("/profile");
     } catch (error) {
       toast.error("Failed to register");
     }

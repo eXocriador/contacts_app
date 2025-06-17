@@ -27,7 +27,7 @@ const LoginPage = () => {
         try {
           await authApi.loginWithGoogle(code);
           toast.success("Successfully logged in with Google!");
-          navigate("/contacts");
+          navigate("/profile");
         } catch (error) {
           toast.error("Failed to login with Google");
           navigate("/login", { replace: true }); // Перенаправити без коду в URL
@@ -40,7 +40,7 @@ const LoginPage = () => {
     try {
       await login(data);
       toast.success("Successfully logged in!");
-      navigate("/contacts");
+      navigate("/profile");
     } catch (error) {
       toast.error("Failed to login");
     }
