@@ -3,13 +3,11 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
-import { LogOut, User as UserIcon, BookUser, Moon, Sun } from "lucide-react";
-import { useTheme } from "../hooks/useTheme";
+import { LogOut, User as UserIcon, BookUser } from "lucide-react";
 
 const Navbar = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme(); // Відновлюємо хук
 
   const handleLogout = async () => {
     await logout();
@@ -50,18 +48,6 @@ const Navbar = () => {
                 </Link>
               </>
             )}
-            {/* Відновлюємо кнопку зміни теми */}
-            <button
-              onClick={toggleTheme}
-              className="nav-link px-3"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
           </div>
         </div>
       </div>

@@ -2,58 +2,75 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Shield, Smartphone, Cloud } from "lucide-react";
+import { Shield, Smartphone, Zap, Users, Lock, Cloud } from "lucide-react";
 
-export const FeaturesSection = () => {
+const FeaturesSection = () => {
+  const features = [
+    {
+      icon: Shield,
+      title: "Secure & Private",
+      description:
+        "Your contacts are encrypted and stored securely. We never share your data with third parties."
+    },
+    {
+      icon: Smartphone,
+      title: "Cross-Platform",
+      description:
+        "Access your contacts from any device - desktop, tablet, or mobile. Always in sync."
+    },
+    {
+      icon: Zap,
+      title: "Lightning Fast",
+      description:
+        "Built with modern technology for instant search and seamless performance."
+    },
+    {
+      icon: Users,
+      title: "Smart Organization",
+      description:
+        "Organize contacts by type, add favorites, and find anyone instantly with smart search."
+    },
+    {
+      icon: Lock,
+      title: "Privacy First",
+      description:
+        "Your data stays yours. We use industry-standard encryption to protect your information."
+    },
+    {
+      icon: Cloud,
+      title: "Always Available",
+      description:
+        "Cloud-based storage means your contacts are always backed up and accessible anywhere."
+    }
+  ];
+
   return (
-    // 👇 ЗМІНІТЬ ЦЕЙ РЯДОК
-    // БУЛО: <section id="features" className="py-20 bg-gray-50 dark:bg-gray-900">
-    // СТАЛО:
-    <section id="features" className="py-20">
-      <div className="container mx-auto px-4">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.5 }}
-          className="text-4xl font-bold text-center mb-16"
-        >
-          Why You'll Love It
-        </motion.h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              icon: <Smartphone className="w-12 h-12" />,
-              title: "Intuitive Design",
-              description:
-                "A clean, modern interface that makes managing your contacts a breeze."
-            },
-            {
-              icon: <Cloud className="w-12 h-12" />,
-              title: "Secure Cloud Sync",
-              description:
-                "Your contacts are automatically synced and backed up in the cloud."
-            },
-            {
-              icon: <Shield className="w-12 h-12" />,
-              title: "Cross-Platform Access",
-              description:
-                "Access your contacts from any device, anywhere, anytime."
-            }
-          ].map((feature, index) => (
+    <section id="features" className="py-20 bg-surface">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-text-default mb-4">
+            Everything you need to manage contacts
+          </h2>
+          <p className="text-text-secondary text-xl max-w-3xl mx-auto">
+            Powerful features designed to make contact management simple,
+            secure, and efficient.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
             <motion.div
               key={feature.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-surface border-t border-border  p-8 rounded-2xl shadow-lg" //bg-surface border-t border-border mt-auto
+              className="bg-background p-6 rounded-xl border border-border hover:border-primary-500 transition-colors"
             >
-              <div className="text-primary-500 mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold mb-4">{feature.title}</h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                {feature.description}
-              </p>
+              <feature.icon className="w-12 h-12 text-primary-500 mb-4" />
+              <h3 className="text-xl font-semibold text-text-default mb-2">
+                {feature.title}
+              </h3>
+              <p className="text-text-secondary">{feature.description}</p>
             </motion.div>
           ))}
         </div>
@@ -61,3 +78,5 @@ export const FeaturesSection = () => {
     </section>
   );
 };
+
+export default FeaturesSection;

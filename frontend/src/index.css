@@ -7,7 +7,6 @@
     @apply antialiased;
   }
 
-  /* Use the new theme colors globally */
   body {
     @apply bg-background text-text-default;
   }

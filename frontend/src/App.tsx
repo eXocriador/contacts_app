@@ -12,7 +12,6 @@ import RegisterPage from "./pages/RegisterPage";
 import ContactsPage from "./pages/ContactsPage";
 import ProfilePage from "./pages/ProfilePage";
 import PrivateRoute from "./components/PrivateRoute";
-// useTheme тут більше не потрібен
 
 const App = () => {
   const location = useLocation();
@@ -50,7 +49,7 @@ const App = () => {
         position="top-right"
         toastOptions={{
           style: {
-            background: "#161B22", // Можна адаптувати до теми
+            background: "#161B22",
             color: "#e6edf3",
             border: "1px solid #30363d"
           }
