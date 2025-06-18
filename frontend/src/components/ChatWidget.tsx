@@ -55,7 +55,7 @@ const ChatWidget: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
             transition={{ duration: 0.25 }}
-            className="fixed bottom-28 right-6 z-50 w-80 max-w-[95vw] bg-surface border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-28 right-6 z-50 w-[400px] max-w-[95vw] h-[520px] bg-surface border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
             style={{ boxShadow: "0 8px 32px 0 rgba(34,211,238,0.25)" }}
           >
             {/* Header */}
@@ -72,7 +72,7 @@ const ChatWidget: React.FC = () => {
             {/* Messages */}
             <div
               className="flex-1 px-4 py-3 space-y-2 overflow-y-auto bg-surface/80"
-              style={{ maxHeight: 320 }}
+              style={{ maxHeight: 370 }}
             >
               {messages.map((msg, i) => (
                 <div

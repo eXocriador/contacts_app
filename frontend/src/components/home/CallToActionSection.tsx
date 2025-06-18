@@ -137,14 +137,6 @@ const CallToActionSection = () => {
               </a>
             </div>
           </div>
-          {/* Scroll to top */}
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="absolute -bottom-7 left-1/2 -translate-x-1/2 bg-background border border-primary-500/20 rounded-full p-2 shadow-md hover:bg-surface transition"
-            aria-label="Scroll to top"
-          >
-            <ChevronUp className="w-6 h-6 text-primary-500" />
-          </button>
         </motion.div>
       </div>
     </section>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 
 interface HeroSectionProps {
   scrollToHowItWorks: () => void;
@@ -87,19 +88,34 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <Link to="/register" className="btn-primary text-lg px-10 py-4">
             Get Started for Free
           </Link>
-          <button
+          <motion.button
             onClick={scrollToHowItWorks}
-            className="btn-ghost text-lg px-10 py-4 group"
+            className="relative flex items-center gap-2 btn-ghost text-lg px-10 py-4 group focus:outline-none"
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.97 }}
+            animate={{
+              boxShadow: [
+                "0 0 0 0 rgba(34,211,238,0.15)",
+                "0 0 0 8px rgba(34,211,238,0.10)",
+                "0 0 0 0 rgba(34,211,238,0.15)"
+              ]
+            }}
+            transition={{ duration: 1.8, repeat: Infinity, repeatType: "loop" }}
           >
-            <span>Learn More</span>
-            <motion.div
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="ml-2"
+            <span className="font-semibold">Learn More</span>
+            <motion.span
+              animate={{ y: [0, 8, 0] }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="ml-2 flex items-center"
             >
-              →
-            </motion.div>
-          </button>
+              <ChevronDown className="w-6 h-6 text-primary-500 group-hover:text-primary-600 transition-colors drop-shadow" />
+            </motion.span>
+            <span className="sr-only">Scroll to next section</span>
+          </motion.button>
         </motion.div>
 
         {/* Trust indicators */}

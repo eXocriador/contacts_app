@@ -34,7 +34,7 @@ export const HowItWorksSection = () => {
   return (
     <section
       id="how-it-works"
-      className="relative min-h-screen flex items-center justify-center py-24 bg-gradient-to-br from-surface via-background to-surface overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center py-24 bg-gradient-to-br from-[#181f29] via-background to-[#181f29] overflow-hidden"
     >
       {/* Decorative blurred gradient circles */}
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl pointer-events-none" />
