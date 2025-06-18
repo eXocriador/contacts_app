@@ -39,15 +39,18 @@ const LoginPage = () => {
       await login(data);
       toast.success("Successfully logged in!");
       navigate("/contacts");
-    } catch (error) {
-      toast.error("Failed to login. Please check your credentials.");
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to login. Please check your credentials.";
+      toast.error(errorMessage);
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
-      const url = await authApi.getGoogleOAuthUrl();
-      window.location.href = url;
+      const response = await authApi.getGoogleOAuthUrl();
+      window.location.href = response.data.url;
     } catch (error) {
       toast.error("Failed to initiate Google login");
     }
@@ -85,7 +88,7 @@ const LoginPage = () => {
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
                     message: "Invalid email address"
                   }
                 })}

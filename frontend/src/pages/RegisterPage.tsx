@@ -22,15 +22,18 @@ const RegisterPage = () => {
       await registerAuth(data);
       toast.success("Successfully registered!");
       navigate("/contacts");
-    } catch (error) {
-      toast.error("Failed to register. This email might already be in use.");
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to register. This email might already be in use.";
+      toast.error(errorMessage);
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
-      const url = await authApi.getGoogleOAuthUrl();
-      window.location.href = url;
+      const response = await authApi.getGoogleOAuthUrl();
+      window.location.href = response.data.url;
     } catch (error) {
       toast.error("Failed to initiate Google login");
     }
@@ -57,7 +60,17 @@ const RegisterPage = () => {
                 id="name"
                 type="text"
                 autoComplete="name"
-                {...register("name", { required: "Name is required" })}
+                {...register("name", {
+                  required: "Name is required",
+                  minLength: {
+                    value: 2,
+                    message: "Name must be at least 2 characters"
+                  },
+                  maxLength: {
+                    value: 50,
+                    message: "Name must not exceed 50 characters"
+                  }
+                })}
                 className="input"
                 placeholder="Your Name"
               />
@@ -75,7 +88,7 @@ const RegisterPage = () => {
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
                     message: "Invalid email address"
                   }
                 })}
@@ -96,8 +109,18 @@ const RegisterPage = () => {
                 {...register("password", {
                   required: "Password is required",
                   minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters"
+                    value: 8,
+                    message: "Password must be at least 8 characters"
+                  },
+                  maxLength: {
+                    value: 100,
+                    message: "Password must not exceed 100 characters"
+                  },
+                  pattern: {
+                    value:
+                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                    message:
+                      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
                   }
                 })}
                 className="input"
