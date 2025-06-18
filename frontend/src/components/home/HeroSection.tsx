@@ -58,3 +58,5 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     </section>
   );
 };
+
+export default HeroSection;

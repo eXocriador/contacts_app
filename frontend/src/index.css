@@ -32,7 +32,7 @@
   }
 
   .btn-danger {
-    @apply btn bg-danger text-white hover:opacity-90 focus:ring-danger;
+    @apply btn bg-danger-500 text-white hover:opacity-90 focus:ring-danger-500;
   }
 
   .input {
@@ -44,7 +44,7 @@
   }
 
   .error {
-    @apply text-danger text-sm mt-1;
+    @apply text-danger-500 text-sm mt-1;
   }
 
   /* Consistent navigation links for header */
