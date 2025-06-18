@@ -22,7 +22,6 @@ backend/dist/
 .env.local
 .env.*.local
 .env.development.local
-.env.test.local
 .env.production.local
 
 # Logs
@@ -34,10 +33,6 @@ yarn-error.log*
 
 # TypeScript
 *.tsbuildinfo
-
-# Testing and Coverage
-coverage/
-*.lcov
 
 # IDE and Editor files
 .vscode/
@@ -62,4 +57,3 @@ backend/docs/swagger.json
 .env.*
 !.env.example
 google-oauth.json
-.env.test

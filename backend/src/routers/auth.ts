@@ -39,24 +39,18 @@ router.post(
   validateBody(resetPasswordSchema),
   ctrlWrapper(handleResetPassword),
 );
-router.get('/google', ctrlWrapper(getGoogleOAuthUrlController));
+router.get('/google/url', ctrlWrapper(getGoogleOAuthUrlController));
 router.post(
-  '/google/callback',
+  '/google',
   validateBody(loginWithGoogleOAuthSchema),
   ctrlWrapper(loginWithGoogleController),
 );
 router.post('/logout', authenticate, ctrlWrapper(logout));
 router.get('/current', authenticate, ctrlWrapper(getCurrentUser));
-router.put(
+router.patch(
   '/profile',
   authenticate,
-  validateBody(updateProfileSchema),
-  ctrlWrapper(updateProfileController),
-);
-router.put(
-  '/profile',
-  authenticate,
-  upload.single('photo'), // 👈 ADD THIS
+  upload.single('photo'),
   validateBody(updateProfileSchema),
   ctrlWrapper(updateProfileController),
 );

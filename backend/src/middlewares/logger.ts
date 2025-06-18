@@ -5,29 +5,26 @@ import { Request, Response } from 'express';
 const isDevelopment: boolean = getEnvVar('NODE_ENV') === 'development';
 
 export const logger = pinoHttp({
-  level: isDevelopment ? 'debug' : 'info',
+  level: isDevelopment ? 'info' : 'warn',
   transport: isDevelopment ? {
     target: 'pino-pretty',
     options: {
       colorize: true,
       levelFirst: true,
-      translateTime: 'SYS:standard',
+      translateTime: 'HH:MM:ss',
+      ignore: 'pid,hostname',
     },
-  } : undefined,
+  } : undefined as any,
   customLogLevel: (req: Request, res: Response, error?: Error): string => {
-    if (res.statusCode >= 400 && !error) return 'warn';
     if (error) return 'error';
-    if (res.statusCode >= 300) return 'silent';
-    return 'info';
-  },
-  customSuccessMessage: (req: Request, res: Response): string => {
-    return `${req.method} ${req.url} ${res.statusCode}`;
+    if (res.statusCode >= 400) return 'warn';
+    return 'silent'; // Не логуємо успішні запити
   },
   customErrorMessage: (req: Request, res: Response, error: Error): string => {
-    return `${req.method} ${req.url} ${res.statusCode} - ${error.message}`;
+    return `${req.method} ${req.url} - ${error.message}`;
   },
   redact: {
-    paths: ['req.headers.authorization', 'req.headers.cookie', 'res.headers["set-cookie"]'],
+    paths: ['req.headers.authorization', 'req.headers.cookie', 'req.body.password'],
     remove: true
   }
 });

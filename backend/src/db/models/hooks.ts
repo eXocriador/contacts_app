@@ -22,11 +22,19 @@ interface MongooseValidationError extends Error {
   };
 }
 
-export const handeSaveError = (error: CallbackError, doc: Document, next: (err?: any) => void): void => {
+export const handeSaveError = (
+  error: CallbackError,
+  doc: Document,
+  next: (err?: any) => void,
+): void => {
   const mongoError = error as MongoServerError;
   if (mongoError.name === 'MongoServerError' && mongoError.code === 11000) {
     const field = Object.keys(mongoError.keyValue || {})[0];
-    const message = `Duplicate value for ${field}: "${mongoError.keyValue?.[field]}"`;
+    const value =
+      field && mongoError.keyValue ? mongoError.keyValue[field] : '';
+    const message = field
+      ? `Duplicate value for ${field}: "${value}"`
+      : 'Duplicate value';
     return next(createHttpError(409, message));
   }
 

@@ -2,41 +2,34 @@
 
 import type {
   Contact,
-  GetContactsResponse,
-  GetContactsParams
+  ContactsResponse,
+  GetContactsParams,
+  CreateContactRequest,
+  UpdateContactRequest
 } from "../types/api";
 import api from "./index"; // Імпортуємо центральний екземпляр
 
-export { type GetContactsResponse, type GetContactsParams };
+export { type ContactsResponse, type GetContactsParams };
 
 export const contactsApi = {
   getContacts: async (
     params: GetContactsParams = {}
-  ): Promise<GetContactsResponse> => {
-    // Логіка отримання контактів залишається без змін
-    const queryParams: any = { ...params };
+  ): Promise<ContactsResponse> => {
+    const queryParams: Record<string, any> = { ...params };
     if (queryParams.perPage !== undefined) {
       queryParams.limit = queryParams.perPage;
       delete queryParams.perPage;
     }
-    const { data: responseData } = await api.get<any>("/contacts", {
-      // Використовуємо any для гнучкості відповіді
+
+    const { data } = await api.get<ContactsResponse>("/contacts", {
       params: queryParams
     });
-    return {
-      contacts: responseData.data.data,
-      total: responseData.data.totalItems,
-      page: responseData.data.page,
-      perPage: responseData.data.perPage,
-      totalPages: responseData.data.totalPages,
-      hasPreviousPage: responseData.data.hasPreviousPage,
-      hasNextPage: responseData.data.hasNextPage
-    };
+    return data;
   },
 
   // Спрощено: функція тепер просто приймає і передає готовий FormData
   createContact: async (formData: FormData): Promise<Contact> => {
-    const { data: responseData } = await api.post<{ data: Contact }>(
+    const { data } = await api.post<{ data: Contact }>(
       "/contacts",
       formData,
       {
@@ -45,12 +38,12 @@ export const contactsApi = {
         }
       }
     );
-    return responseData.data;
+    return data.data;
   },
 
   // Спрощено: функція тепер просто приймає і передає готовий FormData
   updateContact: async (id: string, formData: FormData): Promise<Contact> => {
-    const { data: responseData } = await api.patch<{ data: Contact }>(
+    const { data } = await api.patch<{ data: Contact }>(
       `/contacts/${id}`,
       formData,
       {
@@ -59,7 +52,7 @@ export const contactsApi = {
         }
       }
     );
-    return responseData.data;
+    return data.data;
   },
 
   deleteContact: async (id: string): Promise<void> => {

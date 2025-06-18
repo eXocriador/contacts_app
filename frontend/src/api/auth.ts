@@ -5,42 +5,47 @@ import type {
   LoginRequest,
   RegisterRequest,
   UpdateProfileRequest,
-  UpdatePasswordRequest,
   User
 } from "../types/api";
-import api from "./index"; // Імпортуємо центральний екземпляр
+import api from "./index";
 
-class AuthApi {
-  async login(data: LoginRequest): Promise<AuthResponse> {
+export const authApi = {
+  login: async (data: LoginRequest): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>("/auth/login", data);
-    localStorage.setItem("token", response.data.data.accessToken);
     return response.data;
-  }
+  },
 
-  async register(data: RegisterRequest): Promise<AuthResponse> {
+  register: async (data: RegisterRequest): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>("/auth/register", data);
-    localStorage.setItem("token", response.data.data.accessToken);
     return response.data;
-  }
+  },
 
-  async logout(): Promise<void> {
+  logout: async (): Promise<void> => {
     await api.post("/auth/logout");
-    localStorage.removeItem("token");
-  }
+  },
 
-  async refresh(): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>("/auth/refresh");
-    localStorage.setItem("token", response.data.data.accessToken);
+  refresh: async (): Promise<{ data: { accessToken: string } }> => {
+    const response = await api.post<{ data: { accessToken: string } }>("/auth/refresh");
     return response.data;
-  }
+  },
 
-  // Метод для оновлення з фото (використовує FormData)
-  async updateProfileWithPhoto(
-    data: FormData
-  ): Promise<{ data: { user: User } }> {
-    const response = await api.put<{ data: { user: User } }>(
+  getCurrentUser: async (): Promise<User> => {
+    const response = await api.get<{ data: User }>("/auth/current");
+    return response.data.data;
+  },
+
+  updateProfile: async (data: UpdateProfileRequest): Promise<{ data: { user: User } }> => {
+    const formData = new FormData();
+
+    if (data.name) formData.append('name', data.name);
+    if (data.email) formData.append('email', data.email);
+    if (data.currentPassword) formData.append('currentPassword', data.currentPassword);
+    if (data.newPassword) formData.append('newPassword', data.newPassword);
+    if (data.photo) formData.append('photo', data.photo);
+
+    const response = await api.patch<{ data: { user: User } }>(
       "/auth/profile",
-      data,
+      formData,
       {
         headers: {
           "Content-Type": "multipart/form-data"
@@ -48,35 +53,28 @@ class AuthApi {
       }
     );
     return response.data;
-  }
+  },
 
-  // Метод для оновлення тільки текстових даних (використовує JSON)
-  async updateProfileJSON(
-    data: UpdateProfileRequest
-  ): Promise<{ data: { user: User } }> {
-    const response = await api.put<{ data: { user: User } }>(
+  updateProfileWithPhoto: async (formData: FormData): Promise<{ data: { user: User } }> => {
+    const response = await api.patch<{ data: { user: User } }>(
       "/auth/profile",
-      data
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
     );
     return response.data;
-  }
+  },
 
-  async getGoogleOAuthUrl(): Promise<string> {
-    const response = await api.get<{ data: { url: string } }>("/auth/google");
-    return response.data.data.url;
-  }
+  getGoogleOAuthUrl: async (): Promise<{ data: { url: string } }> => {
+    const response = await api.get<{ data: { url: string } }>("/auth/google/url");
+    return response.data;
+  },
 
-  async loginWithGoogle(code: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>("/auth/google/callback", {
-      code
-    });
-    localStorage.setItem("token", response.data.data.accessToken);
+  loginWithGoogle: async (code: string): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>("/auth/google", { code });
     return response.data;
   }
-
-  async updatePassword(data: UpdatePasswordRequest): Promise<void> {
-    await api.patch("/auth/profile", data);
-  }
-}
-
-export const authApi = new AuthApi();
+};

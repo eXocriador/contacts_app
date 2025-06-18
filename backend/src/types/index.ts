@@ -4,7 +4,7 @@ import { IUser } from './models';
 
 export interface CustomRequest extends Request {
   user?: IUser;
-  file?: Express.Multer.File;
+  file?: Express.Multer.File | undefined;
 }
 
 export interface ErrorResponse {

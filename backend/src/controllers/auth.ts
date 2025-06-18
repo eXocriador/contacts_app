@@ -225,13 +225,13 @@ export const sendResetEmail = async (
       html,
     });
 
-    res.json({
+    return res.json({
       status: 200,
       message:
         'If an account with this email exists, a password reset email has been sent.',
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -255,8 +255,8 @@ export const handleResetPassword = async (
     }
 
     user.password = await hashPassword(password);
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
+    user.passwordResetToken = undefined as any;
+    user.passwordResetExpires = undefined as any;
     await user.save();
 
     await Session.deleteMany({ userId: user._id });

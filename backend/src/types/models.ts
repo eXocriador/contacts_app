@@ -83,7 +83,7 @@ export interface ContactResponse {
   phoneNumber: string;
   isFavourite: boolean;
   owner: IContact['owner'];
-  photo?: string;
+  photo?: string | undefined;
 }
 
 export interface LoginWithGoogleOAuthRequest {
@@ -107,7 +107,6 @@ export interface ContactRequest {
   isFavourite?: boolean;
   contactType: string;
 }
-
 
 export interface UpdateContactRequest {
   name?: string;

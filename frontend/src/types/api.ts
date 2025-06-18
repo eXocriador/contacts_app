@@ -1,24 +1,41 @@
 import { typeList } from "../constants/contacts";
 
+// Базові типи для API відповідей
+export interface ApiResponse<T> {
+  status: number;
+  message: string;
+  data: T;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  page: number;
+  perPage: number;
+  totalItems: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+// Типи користувача
 export interface User {
   id: string;
   name: string;
   email: string;
   photo?: string;
+  subscription?: 'starter' | 'pro' | 'business';
+  verify?: boolean;
   createdAt: string;
   updatedAt: string;
-  // Додати інші поля користувача, якщо бекенд їх повертає, наприклад subscription
 }
 
-export interface AuthResponse {
-  status: number;
-  message: string;
-  data: {
-    accessToken: string;
-    user: User; // Додаємо User до data об'єкту
-    refreshToken?: string; // Додаємо refresh token
-  };
+// Типи аутентифікації
+export interface AuthData {
+  accessToken: string;
+  user: User;
 }
+
+export type AuthResponse = ApiResponse<AuthData>;
 
 export interface LoginRequest {
   email: string;
@@ -35,10 +52,11 @@ export interface UpdateProfileRequest {
   name?: string;
   email?: string;
   photo?: File;
-  currentPassword?: string; // Додано
-  newPassword?: string; // Додано
+  currentPassword?: string;
+  newPassword?: string;
 }
 
+// Типи контактів
 export interface Contact {
   id: string;
   name: string;
@@ -46,7 +64,8 @@ export interface Contact {
   phoneNumber: string;
   photo?: string;
   isFavourite: boolean;
-  contactType: string; // Змінено на string
+  contactType: typeof typeList[number];
+  owner: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -57,7 +76,7 @@ export interface CreateContactRequest {
   phoneNumber: string;
   photo?: File;
   isFavourite?: boolean;
-  contactType: string; // Змінено на string
+  contactType?: typeof typeList[number];
 }
 
 export interface UpdateContactRequest {
@@ -66,30 +85,29 @@ export interface UpdateContactRequest {
   phoneNumber?: string;
   photo?: File;
   isFavourite?: boolean;
-  contactType?: string; // Змінено на string
+  contactType?: typeof typeList[number];
 }
 
-export interface GetContactsResponse {
-  contacts: Contact[];
-  total: number;
-  page: number;
-  perPage: number;
-  totalPages: number; // Додано
-  hasPreviousPage: boolean; // Додано
-  hasNextPage: boolean; // Додано
-}
+export type ContactsResponse = ApiResponse<PaginatedResponse<Contact>>;
 
 export interface GetContactsParams {
   page?: number;
   perPage?: number;
   search?: string;
-  sortBy?: string;
-  sortOrder?: "asc" | "desc";
-  isFavourite?: boolean; // Змінено на boolean
-  contactType?: string; // Змінено на string
+  sortBy?: 'name' | 'email' | 'phoneNumber' | 'createdAt' | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
+  isFavourite?: boolean;
+  contactType?: typeof typeList[number];
 }
 
 export interface UpdatePasswordRequest {
   currentPassword: string;
   newPassword: string;
+}
+
+// Типи для помилок
+export interface ApiError {
+  status: number;
+  message: string;
+  error?: string;
 }

@@ -1,13 +1,11 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-      "types": ["node", "jest", "pino-pretty"],
-
+      "types": ["node", "pino-pretty"]
     },
     "exclude": [
       "node_modules",
       "dist",
-      "src/**/__tests__",
-      "src/**/*.test.ts"
+      "src/**/*.spec.ts"
     ]
   }

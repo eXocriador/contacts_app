@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import type { Contact } from "../types/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { contactsApi, GetContactsResponse } from "../api/contacts";
+import { contactsApi, ContactsResponse } from "../api/contacts";
 import ContactCard from "../components/contacts/ContactCard";
 import ContactFormModal from "../components/contacts/ContactFormModal";
 import ConfirmDeleteModal from "../components/contacts/ConfirmDeleteModal";
@@ -21,13 +21,12 @@ const ContactsPage = () => {
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
 
-  const { data, isLoading, isError, error } = useQuery<
-    GetContactsResponse,
-    Error
-  >({
-    queryKey: ["contacts", page],
-    queryFn: () => contactsApi.getContacts({ page, perPage: PER_PAGE })
-  });
+  const { data, isLoading, isError, error } = useQuery<ContactsResponse, Error>(
+    {
+      queryKey: ["contacts", page],
+      queryFn: () => contactsApi.getContacts({ page, perPage: PER_PAGE })
+    }
+  );
 
   const mutationOptions = {
     onSuccess: () => {
@@ -80,7 +79,8 @@ const ContactsPage = () => {
     }
   };
 
-  const totalPages = data?.totalPages || 0;
+  const totalPages = data?.data.totalPages || 0;
+  const contacts = data?.data.data || [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -110,7 +110,7 @@ const ContactsPage = () => {
             Error: {(error as Error).message || "Failed to load contacts"}
           </h3>
         </div>
-      ) : !data || data.contacts.length === 0 ? (
+      ) : !data || contacts.length === 0 ? (
         <div className="text-center py-16 bg-surface rounded-lg">
           <p className="text-text-secondary text-lg">No contacts found.</p>
           <button
@@ -122,7 +122,7 @@ const ContactsPage = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {data.contacts.map((contact) => (
+          {contacts.map((contact) => (
             <ContactCard
               key={contact.id}
               contact={contact}

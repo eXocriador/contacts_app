@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { User, LoginRequest, RegisterRequest } from "../types/api";
+import type { User, LoginRequest, RegisterRequest, AuthData } from "../types/api";
 import { authApi } from "../api/auth";
 
 interface AuthState {
@@ -11,7 +11,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  setAuth: (data: { user: User; accessToken: string }) => void;
+  setAuth: (data: AuthData) => void;
   clearAuth: () => void;
   updateUser: (user: User) => void;
   login: (data: LoginRequest) => Promise<void>;
@@ -31,7 +31,7 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       error: null,
 
-      setAuth: (data) => {
+      setAuth: (data: AuthData) => {
         set({
           user: data.user,
           token: data.accessToken,
@@ -59,20 +59,14 @@ export const useAuthStore = create<AuthState>()(
       login: async (data) => {
         set({ isLoading: true });
         const response = await authApi.login(data);
-        get().setAuth({
-          user: response.data.user,
-          accessToken: response.data.accessToken
-        });
+        get().setAuth(response.data);
         set({ isLoading: false });
       },
 
       register: async (data) => {
         set({ isLoading: true });
         const response = await authApi.register(data);
-        get().setAuth({
-          user: response.data.user,
-          accessToken: response.data.accessToken
-        });
+        get().setAuth(response.data);
         set({ isLoading: false });
       },
 
@@ -107,10 +101,7 @@ export const useAuthStore = create<AuthState>()(
       loginWithGoogle: async (code: string) => {
         set({ isLoading: true });
         const response = await authApi.loginWithGoogle(code);
-        get().setAuth({
-          user: response.data.user,
-          accessToken: response.data.accessToken
-        });
+        get().setAuth(response.data);
         set({ isLoading: false });
       }
     }),
