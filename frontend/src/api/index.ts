@@ -25,27 +25,55 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// 👇 ADDED a response interceptor for 401 errors
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function onRefreshed(token: string) {
+  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers = [];
+}
+
 api.interceptors.response.use(
   (response) => response, // Directly return successful responses
   async (error: AxiosError) => {
-    const originalRequest = error.config as any; // 'any' to add a custom property
+    const originalRequest = error.config as any;
 
-    // Check if it's a 401 error and we haven't already retried the request
+    // Якщо отримали 401 на /auth/refresh — одразу логаут і стоп
+    if (
+      error.response?.status === 401 &&
+      originalRequest.url?.includes("/auth/refresh")
+    ) {
+      useAuthStore.getState().logout();
+      toast.error("Your session has expired. Please log in again.");
+      return Promise.reject(error);
+    }
+
+    // Якщо 401 і ще не пробували refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Mark that we've retried this request
+      if (isRefreshing) {
+        // Якщо refresh вже йде — чекаємо його завершення
+        return new Promise((resolve, reject) => {
+          refreshSubscribers.push((token) => {
+            originalRequest.headers["Authorization"] = `Bearer ${token}`;
+            resolve(api(originalRequest));
+          });
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
-        const { refresh, token } = useAuthStore.getState();
-        await refresh(); // Attempt to refresh the token
-
-        // After refresh, the new token will be in the store.
-        // The request interceptor will automatically add it to the header.
-        if (useAuthStore.getState().token !== token) {
-          return api(originalRequest); // Retry the original request with the new token
+        await useAuthStore.getState().refresh();
+        isRefreshing = false;
+        const newToken = useAuthStore.getState().token;
+        if (newToken) {
+          onRefreshed(newToken);
+          originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
         }
+        return api(originalRequest);
       } catch (refreshError) {
-        // If refresh fails, log the user out
+        isRefreshing = false;
         useAuthStore.getState().logout();
         toast.error("Your session has expired. Please log in again.");
         return Promise.reject(refreshError);
