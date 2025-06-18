@@ -34,7 +34,7 @@ const testimonials = [
 
 export const TestimonialsSection = () => {
   return (
-    <section className="relative py-32 bg-gradient-to-br from-background via-surface to-background overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center py-24 bg-gradient-to-br from-surface via-background to-surface overflow-hidden">
       {/* Subtle pattern/gradient for depth */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="w-full h-full bg-gradient-to-br from-primary-900/10 via-primary-700/5 to-transparent" />

@@ -57,14 +57,14 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img
-          src="/images/auth-bg.webp" // Назва вашого зображення
+          src="/images/hero-green.webp"
           alt="Abstract background"
-          className="w-full h-full object-cover blur-sm"
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-background/70" /> {/* Затемнення */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background/95" />
       </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}

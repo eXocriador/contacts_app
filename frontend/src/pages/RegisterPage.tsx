@@ -40,12 +40,23 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+      {/* Background Image & Overlay (як у HeroSection) */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/images/hero-green.webp"
+          alt="Abstract background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background/95" />
+      </div>
+      {/* Decorative blurred gradient */}
+      <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-96 h-32 bg-primary-500/20 rounded-full blur-3xl pointer-events-none z-0" />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative z-10"
       >
         <div className="bg-surface border border-border rounded-xl shadow-lg p-8">
           <h2 className="text-center text-3xl font-extrabold text-text-default mb-6">

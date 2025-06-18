@@ -12,6 +12,7 @@ import RegisterPage from "./pages/RegisterPage";
 import ContactsPage from "./pages/ContactsPage";
 import ProfilePage from "./pages/ProfilePage";
 import PrivateRoute from "./components/PrivateRoute";
+import ChatWidget from "./components/ChatWidget";
 
 const App = () => {
   const location = useLocation();
@@ -55,6 +56,7 @@ const App = () => {
           }
         }}
       />
+      <ChatWidget />
     </div>
   );
 };
