@@ -24,14 +24,14 @@ const CallToActionSection = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/register"
-              className="inline-flex items-center justify-center px-8 py-3 bg-white text-primary-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-3 bg-surface text-text-default font-semibold rounded-lg hover:bg-surface-hover transition-colors"
             >
               Get Started Free
               <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link
               to="/contacts"
-              className="inline-flex items-center justify-center px-8 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-primary-600 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-surface hover:text-text-default transition-colors"
             >
               View Demo
             </Link>
