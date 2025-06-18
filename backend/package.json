@@ -15,8 +15,8 @@
     "preview-docs": "redocly preview-docs",
     "test": "echo \"No tests specified yet\" && exit 0",
     "audit": "yarn audit --audit-level moderate",
-    "check-prod": "node ../scripts/check-production-readiness.js",
-    "generate-secrets": "node ../scripts/generate-secrets.js"
+    "check-prod": "node ../scripts/check-production-readiness.cjs",
+    "generate-secrets": "node ../scripts/generate-secrets.cjs"
   },
   "repository": {
     "type": "git",

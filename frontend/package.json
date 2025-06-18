@@ -11,7 +11,7 @@
     "start": "vite preview --host",
     "test": "echo \"No tests specified yet\" && exit 0",
     "audit": "yarn audit --audit-level moderate",
-    "check-prod": "node ../scripts/check-production-readiness.js"
+    "check-prod": "node ../scripts/check-production-readiness.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",

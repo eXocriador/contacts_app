@@ -2,24 +2,13 @@ import pino from 'pino';
 import { config } from './config';
 
 // Create structured logger for production
-const logger = pino({
+const loggerConfig: any = {
   level: config.NODE_ENV === 'production' ? 'info' : 'debug',
-  transport:
-    config.NODE_ENV === 'production'
-      ? undefined
-      : {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-            ignore: 'pid,hostname',
-          },
-        },
   formatters: {
-    level: label => {
+    level: (label: string) => {
       return { level: label };
     },
-    log: object => {
+    log: (object: any) => {
       return object;
     },
   },
@@ -28,7 +17,21 @@ const logger = pino({
     env: config.NODE_ENV,
     pid: process.pid,
   },
-});
+};
+
+// Add transport only for development
+if (config.NODE_ENV !== 'production') {
+  loggerConfig.transport = {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+      translateTime: 'SYS:standard',
+      ignore: 'pid,hostname',
+    },
+  };
+}
+
+const logger = pino(loggerConfig);
 
 // Production-safe logging functions
 export const logInfo = (message: string, data?: any) => {
