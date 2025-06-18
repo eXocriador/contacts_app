@@ -2,7 +2,12 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { User, LoginRequest, RegisterRequest, AuthData } from "../types/api";
+import type {
+  User,
+  LoginRequest,
+  RegisterRequest,
+  AuthData
+} from "../types/api";
 import { authApi } from "../api/auth";
 
 interface AuthState {
@@ -74,8 +79,10 @@ export const useAuthStore = create<AuthState>()(
         try {
           await authApi.logout();
         } catch (error) {
-          console.error("Logout failed but clearing session anyway.", error);
-        } finally {
+          // Remove console.error for production
+          // console.error("Logout failed but clearing session anyway.", error);
+
+          // Clear session even if logout fails
           get().clearAuth();
         }
       },

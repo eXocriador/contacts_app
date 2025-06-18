@@ -15,26 +15,32 @@ const Navbar = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-surface border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50 backdrop-blur-md">
+      <div className="container-custom">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="text-2xl font-bold text-text-default">
+          <Link
+            to="/"
+            className="text-2xl font-bold text-gradient hover:scale-105 transition-transform"
+          >
             ContactsApp
           </Link>
 
           <div className="flex items-center space-x-2">
             {user ? (
               <>
-                <Link to="/contacts" className="nav-link">
-                  <BookUser className="w-5 h-5" />
+                <Link to="/contacts" className="nav-link group">
+                  <BookUser className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   <span>Contacts</span>
                 </Link>
-                <Link to="/profile" className="nav-link">
-                  <UserIcon className="w-5 h-5" />
+                <Link to="/profile" className="nav-link group">
+                  <UserIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   <span>Profile</span>
                 </Link>
-                <button onClick={handleLogout} className="nav-link">
-                  <LogOut className="w-5 h-5" />
+                <button
+                  onClick={handleLogout}
+                  className="nav-link group text-danger-500 hover:text-danger-400"
+                >
+                  <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   <span>Logout</span>
                 </button>
               </>
@@ -43,7 +49,7 @@ const Navbar = () => {
                 <Link to="/login" className="nav-link">
                   Login
                 </Link>
-                <Link to="/register" className="btn btn-primary">
+                <Link to="/register" className="btn-primary">
                   Register
                 </Link>
               </>

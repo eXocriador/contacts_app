@@ -18,15 +18,9 @@ const HomePage = () => {
     <div className="min-h-screen">
       <HeroSection scrollToHowItWorks={scrollToHowItWorks} />
       <HowItWorksSection />
-
-      {/* Цей div потрібен для правильного відображення фону секцій */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <FeaturesSection />
-      </div>
+      <FeaturesSection />
       <TestimonialsSection />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <CallToActionSection />
-      </div>
+      <CallToActionSection />
     </div>
   );
 };

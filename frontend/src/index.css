@@ -4,51 +4,107 @@
 
 @layer base {
   html {
-    @apply antialiased;
+    @apply antialiased scroll-smooth;
   }
 
   body {
-    @apply bg-background text-text-default;
+    @apply bg-background text-text-default font-sans;
   }
 
-  /* Universal transition for better UX */
+  /* Smooth transitions for better UX */
   * {
-    @apply transition-colors duration-200;
+    @apply transition-all duration-300 ease-out;
+  }
+
+  /* Better focus styles */
+  *:focus {
+    @apply outline-none;
+  }
+
+  /* Improved scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full hover:bg-primary-500/50;
   }
 }
 
 @layer components {
-  /* Redefined component styles for the new design system */
+  /* Modern button system */
   .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200;
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-out transform hover:scale-105 active:scale-95;
   }
 
   .btn-primary {
-    @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500;
+    @apply btn bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg hover:shadow-xl hover:from-primary-600 hover:to-primary-700 focus:ring-primary-500;
   }
 
   .btn-secondary {
-    @apply btn bg-surface text-text-default hover:bg-border border border-border focus:ring-primary-500;
+    @apply btn bg-surface text-text-default hover:bg-border border border-border shadow-sm hover:shadow-md focus:ring-primary-500;
   }
 
   .btn-danger {
-    @apply btn bg-danger-500 text-white hover:opacity-90 focus:ring-danger-500;
+    @apply btn bg-gradient-to-r from-danger-500 to-danger-600 text-white shadow-lg hover:shadow-xl hover:from-danger-600 hover:to-danger-700 focus:ring-danger-500;
   }
 
+  .btn-ghost {
+    @apply btn bg-transparent text-text-secondary hover:text-text-default hover:bg-surface/50 border border-transparent hover:border-border;
+  }
+
+  /* Modern input system */
   .input {
-    @apply block w-full px-4 py-2 rounded-lg border border-border bg-background text-text-default placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+    @apply block w-full px-4 py-3 rounded-xl border border-border bg-surface text-text-default placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 shadow-sm hover:shadow-md;
   }
 
   .label {
-    @apply block text-sm font-medium text-text-secondary mb-2;
+    @apply block text-sm font-semibold text-text-secondary mb-2;
   }
 
   .error {
-    @apply text-danger-500 text-sm mt-1;
+    @apply text-danger-500 text-sm mt-2 font-medium;
   }
 
-  /* Consistent navigation links for header */
+  /* Enhanced navigation */
   .nav-link {
-    @apply flex items-center gap-2 text-text-secondary hover:text-text-default font-medium px-3 py-2 rounded-md hover:bg-border;
+    @apply flex items-center gap-2 text-text-secondary hover:text-text-default font-medium px-4 py-2 rounded-lg hover:bg-surface transition-all duration-300;
+  }
+
+  /* Card system */
+  .card {
+    @apply bg-surface border border-border rounded-xl shadow-sm hover:shadow-lg transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply card hover:border-primary-500/50 hover:shadow-xl;
+  }
+
+  /* Section system */
+  .section {
+    @apply py-24;
+  }
+
+  .section-alt {
+    @apply section bg-gradient-to-b from-surface to-background;
+  }
+
+  /* Container system */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Text gradients */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent;
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-surface/80 backdrop-blur-sm border border-border/50;
   }
 }

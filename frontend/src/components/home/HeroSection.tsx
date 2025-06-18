@@ -10,50 +10,118 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   scrollToHowItWorks
 }) => {
   return (
-    <section className="relative min-h-[calc(80vh)] flex items-center justify-center p-4 text-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center p-4 text-center overflow-hidden">
       {/* Background Image & Overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/images/hero-green.webp" // 👈 Add your image to the /public folder
+          src="/images/hero-green.webp"
           alt="Abstract background"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-background/70"></div>{" "}
-        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background/95"></div>
       </div>
 
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background z-10" />
+      {/* Floating elements for modern look */}
+      <div className="absolute inset-0 z-10">
+        <motion.div
+          animate={{
+            y: [0, -20, 0],
+            opacity: [0.3, 0.6, 0.3]
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-20 left-10 w-32 h-32 bg-primary-500/10 rounded-full blur-xl"
+        />
+        <motion.div
+          animate={{
+            y: [0, 20, 0],
+            opacity: [0.2, 0.5, 0.2]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+          className="absolute bottom-20 right-10 w-40 h-40 bg-primary-600/10 rounded-full blur-xl"
+        />
+      </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative z-20 max-w-4xl w-full"
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative z-20 max-w-5xl w-full"
       >
-        {/* ... rest of the component is unchanged ... */}
-        <h1 className="text-5xl md:text-7xl font-bold mb-6">
-          <span className="text-text-default">The Future of </span>
-          <span className="bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
-            Contact Management
-          </span>
-        </h1>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-8"
+        >
+          <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight">
+            <span className="text-text-default">The Future of </span>
+            <span className="text-gradient">Contact Management</span>
+          </h1>
+        </motion.div>
 
-        <p className="text-lg md:text-xl text-text-secondary mb-10 max-w-2xl mx-auto">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="text-xl md:text-2xl text-text-secondary mb-12 max-w-3xl mx-auto leading-relaxed"
+        >
           Seamlessly organize, access, and manage your contacts from anywhere.
           Secure, intuitive, and built for modern connections.
-        </p>
+        </motion.p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/register" className="btn-primary px-8 py-3 text-lg">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+        >
+          <Link to="/register" className="btn-primary text-lg px-10 py-4">
             Get Started for Free
           </Link>
           <button
             onClick={scrollToHowItWorks}
-            className="btn-secondary px-8 py-3 text-lg"
+            className="btn-ghost text-lg px-10 py-4 group"
           >
-            Learn More
+            <span>Learn More</span>
+            <motion.div
+              animate={{ x: [0, 5, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="ml-2"
+            >
+              →
+            </motion.div>
           </button>
-        </div>
+        </motion.div>
+
+        {/* Trust indicators */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="mt-16 flex flex-wrap justify-center items-center gap-8 text-text-secondary"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+            <span className="text-sm font-medium">10,000+ Users</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+            <span className="text-sm font-medium">99.9% Uptime</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+            <span className="text-sm font-medium">Bank-level Security</span>
+          </div>
+        </motion.div>
       </motion.div>
     </section>
   );

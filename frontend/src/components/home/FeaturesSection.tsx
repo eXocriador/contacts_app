@@ -1,10 +1,11 @@
 // frontend/src/components/home/FeaturesSection.tsx
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Shield, Smartphone, Zap, Users, Lock, Cloud } from "lucide-react";
 
 const FeaturesSection = () => {
+  const shouldReduceMotion = useReducedMotion();
   const features = [
     {
       icon: Shield,
@@ -45,13 +46,13 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section id="features" className="py-20 bg-surface">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-text-default mb-4">
+    <section id="features" className="section-alt">
+      <div className="container-custom">
+        <div className="text-center mb-20">
+          <h2 className="text-5xl font-bold text-text-default mb-6">
             Everything you need to manage contacts
           </h2>
-          <p className="text-text-secondary text-xl max-w-3xl mx-auto">
+          <p className="text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
             Powerful features designed to make contact management simple,
             secure, and efficient.
           </p>
@@ -61,16 +62,21 @@ const FeaturesSection = () => {
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-background p-6 rounded-xl border border-border hover:border-primary-500 transition-colors"
+              initial={shouldReduceMotion ? false : { opacity: 0 }}
+              whileInView={shouldReduceMotion ? {} : { opacity: 1 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.5 }}
+              className="card-hover p-8 group"
             >
-              <feature.icon className="w-12 h-12 text-primary-500 mb-4" />
-              <h3 className="text-xl font-semibold text-text-default mb-2">
+              <div className="bg-gradient-to-br from-primary-500/10 to-primary-600/10 p-4 rounded-2xl w-fit mb-6 group-hover:from-primary-500/20 group-hover:to-primary-600/20 transition-all duration-300">
+                <feature.icon className="w-10 h-10 text-primary-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-default mb-4">
                 {feature.title}
               </h3>
-              <p className="text-text-secondary">{feature.description}</p>
+              <p className="text-text-secondary leading-relaxed">
+                {feature.description}
+              </p>
             </motion.div>
           ))}
         </div>
