@@ -51,8 +51,7 @@ const CallToActionSection = () => {
       <div className="container-custom relative z-10 flex flex-col items-center">
         <motion.div
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.2 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.7 }}
           className="glass w-full max-w-7xl mx-auto px-2 md:px-8 py-8 md:py-10 rounded-3xl shadow-xl border-2 border-primary-500/20 bg-gradient-to-br from-white/10 via-primary-900/10 to-background/80 flex flex-col items-center text-center relative will-change-[opacity]"
         >

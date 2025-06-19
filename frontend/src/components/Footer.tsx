@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
   return (
     <footer
       id="footer"
-      className="relative bg-gradient-to-br from-[#10151c] via-[#1a2531] to-[#14291e] pt-16 pb-8 mt-auto"
+      className="relative z-20 bg-[#10151c] bg-gradient-to-br from-[#10151c] via-[#1a2531] to-[#14291e] pt-16 pb-8"
     >
       {/* Glowing top border */}
       <div

@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -15,6 +14,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import ChatWidget from "./components/ChatWidget";
 import DynamicBackground from "./components/home/DynamicBackground";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import MiniFooter from "./components/MiniFooter";
 
 const App = () => {
   const location = useLocation();
@@ -22,36 +22,35 @@ const App = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background text-text-default">
       <Navbar />
-      <div className="fixed inset-0 z-0 w-full h-full pointer-events-none">
+      <main className="flex-grow pt-16 relative z-10">
         <DynamicBackground />
-      </div>
-      <main className="flex-grow pt-16">
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route
-              path="/contacts"
-              element={
-                <PrivateRoute>
-                  <ContactsPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <PrivateRoute>
-                  <ProfilePage />
-                </PrivateRoute>
-              }
-            />
-          </Routes>
-        </AnimatePresence>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route
+            path="/contacts"
+            element={
+              <PrivateRoute>
+                <ContactsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <ProfilePage />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
       </main>
       {location.pathname === "/" && <Footer />}
+      {["/login", "/register", "/reset-password"].includes(
+        location.pathname
+      ) && <MiniFooter />}
       <Toaster
         position="top-right"
         toastOptions={{

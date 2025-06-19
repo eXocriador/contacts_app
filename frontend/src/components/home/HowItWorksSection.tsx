@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { UserPlus, Search, Share, Sparkles } from "lucide-react";
 
@@ -30,11 +30,10 @@ const steps = [
 ];
 
 export const HowItWorksSection = () => {
-  const shouldReduceMotion = useReducedMotion();
   return (
     <section
       id="how-it-works"
-      className="relative min-h-screen flex items-center justify-center py-24"
+      className="relative z-10 min-h-screen flex items-center justify-center py-24"
     >
       <div className="container-custom relative z-10 flex flex-col justify-center items-center w-full">
         <div className="text-center mb-20">
@@ -47,12 +46,8 @@ export const HowItWorksSection = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 w-full">
           {steps.map((step, index) => (
-            <motion.div
+            <div
               key={step.title}
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 40 }}
-              whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
               className="relative bg-white/5 backdrop-blur-lg rounded-2xl shadow-lg border border-primary-500/10 p-10 flex flex-col items-center min-h-[340px] group hover:scale-105 transition-transform duration-300"
             >
               {/* Step number badge in top-left */}
@@ -75,7 +70,7 @@ export const HowItWorksSection = () => {
               <p className="text-text-secondary leading-relaxed max-w-xs mx-auto">
                 {step.description}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

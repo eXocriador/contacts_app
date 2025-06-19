@@ -13,7 +13,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   return (
     <section className="relative min-h-screen flex items-center justify-center p-4 text-center overflow-hidden">
       {/* Background Image & Overlay */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 bg-[#10151c]">
         <img
           src="/images/hero-green.webp"
           alt="Abstract background"
@@ -90,7 +90,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </Link>
           <motion.button
             onClick={scrollToHowItWorks}
-            className="relative flex items-center gap-2 btn-ghost text-lg px-10 py-4 group focus:outline-none overflow-hidden"
+            className="relative flex items-center gap-2 btn-ghost text-lg px-10 py-4 group focus:outline-none overflow-hidden border border-cyan-400"
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.97 }}
           >

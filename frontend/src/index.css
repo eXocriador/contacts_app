@@ -7,6 +7,7 @@
     @apply antialiased scroll-smooth;
     min-height: 100vh;
     background-color: #10151c;
+    overscroll-behavior: contain;
   }
 
   body {
@@ -22,6 +23,7 @@
     );
     animation: aurora-gradient-move 60s ease-in-out infinite alternate;
     background-size: 200% 200%;
+    overscroll-behavior: contain;
   }
 
   @keyframes aurora-gradient-move {
