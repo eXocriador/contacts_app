@@ -58,9 +58,7 @@
   }
 
   /* Smooth transitions for better UX */
-  * {
-    @apply transition-all duration-300 ease-out;
-  }
+  /* (Removed global * selector applying transition-all for performance and visual bug fixes) */
 
   /* Better focus styles */
   *:focus {

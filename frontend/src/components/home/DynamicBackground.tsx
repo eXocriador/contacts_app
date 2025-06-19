@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { motion, useTransform } from "framer-motion";
+import React from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 /**
  * DynamicBackground creates a "Liquid Aurora" animated background with:
@@ -15,19 +15,14 @@ const auroraColors = [
 ];
 
 const DynamicBackground: React.FC = () => {
-  // Track scroll position for parallax
-  const [scrollY, setScrollY] = useState(0);
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // Use Framer Motion's useScroll for performant scroll tracking
+  const { scrollY } = useScroll();
 
   // Parallax transforms for each aurora shape
-  const y1 = scrollY * 0.08;
-  const y2 = scrollY * -0.12;
-  const y3 = scrollY * 0.06;
-  const y4 = scrollY * -0.09;
+  const y1 = useTransform(scrollY, [0, 1000], [0, 80]); // 0.08x
+  const y2 = useTransform(scrollY, [0, 1000], [0, -120]); // -0.12x
+  const y3 = useTransform(scrollY, [0, 1000], [0, 60]); // 0.06x
+  const y4 = useTransform(scrollY, [0, 1000], [0, -90]); // -0.09x
 
   return (
     <div

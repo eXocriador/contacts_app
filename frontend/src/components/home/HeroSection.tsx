@@ -90,19 +90,29 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </Link>
           <motion.button
             onClick={scrollToHowItWorks}
-            className="relative flex items-center gap-2 btn-ghost text-lg px-10 py-4 group focus:outline-none"
+            className="relative flex items-center gap-2 btn-ghost text-lg px-10 py-4 group focus:outline-none overflow-hidden"
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.97 }}
-            animate={{
-              boxShadow: [
-                "0 0 0 0 rgba(34,211,238,0.15)",
-                "0 0 0 8px rgba(34,211,238,0.10)",
-                "0 0 0 0 rgba(34,211,238,0.15)"
-              ]
-            }}
-            transition={{ duration: 1.8, repeat: Infinity, repeatType: "loop" }}
           >
-            <span className="font-semibold">Learn More</span>
+            {/* Animated glow using a pseudo-element for performance */}
+            <motion.span
+              aria-hidden
+              initial={{ scale: 0.9, opacity: 0.7 }}
+              animate={{ scale: [0.9, 1.15, 0.9], opacity: [0.7, 1, 0.7] }}
+              transition={{
+                duration: 1.8,
+                repeat: Infinity,
+                repeatType: "loop"
+              }}
+              className="absolute inset-0 z-0 pointer-events-none"
+              style={{
+                borderRadius: "inherit",
+                background:
+                  "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(34,211,238,0.18) 0%, transparent 100%)",
+                filter: "blur(8px)"
+              }}
+            />
+            <span className="font-semibold relative z-10">Learn More</span>
             <motion.span
               animate={{ y: [0, 8, 0] }}
               transition={{
@@ -110,7 +120,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-              className="ml-2 flex items-center"
+              className="ml-2 flex items-center relative z-10"
             >
               <ChevronDown className="w-6 h-6 text-primary-500 group-hover:text-primary-600 transition-colors drop-shadow" />
             </motion.span>
