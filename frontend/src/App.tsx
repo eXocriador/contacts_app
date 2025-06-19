@@ -49,7 +49,7 @@ const App = () => {
           </Routes>
         </AnimatePresence>
       </main>
-      <Footer />
+      {location.pathname === "/" && <Footer />}
       <Toaster
         position="top-right"
         toastOptions={{
