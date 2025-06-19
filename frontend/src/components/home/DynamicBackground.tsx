@@ -8,8 +8,8 @@ import { motion, useTransform } from "framer-motion";
  * - Fully responsive and performant
  */
 const auroraColors = [
-  "#34d399", // emerald-400
-  "#60a5fa", // blue-400
+  "#60a5fa", // blue-400 (now first)
+  "#34d399", // emerald-400 (now second)
   "#f472b6", // pink-400
   "#fbbf24" // yellow-400
 ];
@@ -38,30 +38,34 @@ const DynamicBackground: React.FC = () => {
       <motion.div
         style={{
           y: y1,
-          background: `radial-gradient(ellipse 60% 40% at 20% 30%, ${auroraColors[0]}99 60%, transparent 100%)`
+          background: `radial-gradient(ellipse 60% 40% at 20% 30%, ${auroraColors[0]}99 60%, transparent 100%)`,
+          willChange: "transform, opacity"
         }}
         className="absolute w-[60vw] h-[40vh] top-0 left-0 blur-[100px] opacity-60"
       />
       <motion.div
         style={{
           y: y2,
-          background: `radial-gradient(ellipse 50% 60% at 80% 20%, ${auroraColors[1]}99 60%, transparent 100%)`
+          background: `radial-gradient(ellipse 50% 60% at 80% 20%, ${auroraColors[1]}99 60%, transparent 100%)`,
+          willChange: "transform, opacity"
         }}
         className="absolute w-[50vw] h-[50vh] top-0 right-0 blur-[100px] opacity-50"
       />
       <motion.div
         style={{
           y: y3,
-          background: `radial-gradient(ellipse 60% 40% at 70% 80%, ${auroraColors[2]}99 60%, transparent 100%)`
+          background: `radial-gradient(ellipse 60% 40% at 70% 80%, ${auroraColors[2]}99 60%, transparent 100%)`,
+          willChange: "transform, opacity"
         }}
         className="absolute w-[60vw] h-[40vh] bottom-0 right-0 blur-[100px] opacity-50"
       />
       <motion.div
         style={{
           y: y4,
-          background: `radial-gradient(ellipse 40% 60% at 10% 90%, ${auroraColors[3]}99 60%, transparent 100%)`
+          background: `radial-gradient(ellipse 40% 60% at 10% 90%, ${auroraColors[3]}99 60%, transparent 100%)`,
+          willChange: "transform, opacity"
         }}
-        className="absolute w-[40vw] h-[60vh] bottom-0 left-0 blur-[100px] opacity-40"
+        className="absolute w-[40vw] h-[60vh] bottom-[-20vh] left-0 blur-[100px] opacity-40"
       />
     </div>
   );

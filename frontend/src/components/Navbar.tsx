@@ -1,29 +1,39 @@
 // frontend/src/components/Navbar.tsx
 
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
 import { LogOut, User as UserIcon, BookUser } from "lucide-react";
 
 const Navbar = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     await logout();
     navigate("/login");
   };
 
+  const handleLogoClick = () => {
+    if (location.pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50 backdrop-blur-md">
       <div className="container-custom">
         <div className="flex justify-between items-center h-16">
-          <Link
-            to="/"
+          <button
+            onClick={handleLogoClick}
             className="text-2xl font-bold text-gradient hover:scale-105 transition-transform"
+            type="button"
           >
             ContactsApp
-          </Link>
+          </button>
 
           <div className="flex items-center space-x-2">
             {user ? (

@@ -102,12 +102,22 @@ export const SuccessStoriesSection = () => {
       (story) => story.id === activeStory.id
     );
 
-    if (e.key === "ArrowUp") {
+    if (
+      e.key === "ArrowUp" ||
+      e.key === "ArrowLeft" ||
+      e.key === "a" ||
+      e.key === "A"
+    ) {
       e.preventDefault();
       const prevIndex =
         currentIndex > 0 ? currentIndex - 1 : successStories.length - 1;
       setActiveStory(successStories[prevIndex]);
-    } else if (e.key === "ArrowDown") {
+    } else if (
+      e.key === "ArrowDown" ||
+      e.key === "ArrowRight" ||
+      e.key === "d" ||
+      e.key === "D"
+    ) {
       e.preventDefault();
       const nextIndex =
         currentIndex < successStories.length - 1 ? currentIndex + 1 : 0;
@@ -139,7 +149,7 @@ export const SuccessStoriesSection = () => {
               onClick={() => setActiveStory(story)}
               className={`
                 relative group flex items-center gap-3 px-6 py-4 rounded-xl
-                transition-all duration-300
+                transition-colors transition-shadow duration-300
                 ${
                   activeStory.id === story.id
                     ? "bg-[#1a2531] shadow-lg border border-primary-500/20"

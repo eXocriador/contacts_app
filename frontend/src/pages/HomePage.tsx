@@ -3,9 +3,10 @@ import {
   HeroSection,
   HowItWorksSection,
   FeaturesSection,
-  TestimonialsSection,
+  SuccessStoriesSection,
   CallToActionSection
 } from "../components/home";
+import SectionDivider from "../components/home/SectionDivider";
 import DynamicBackground from "../components/home/DynamicBackground";
 
 const sectionIds = [
@@ -48,11 +49,17 @@ const HomePage = () => {
       });
       if (keysDown.includes(e.key)) {
         e.preventDefault();
-        const nextIdx = Math.min(
-          currentIdx + 1,
-          sectionRefs.current.length - 1
-        );
-        sectionRefs.current[nextIdx]?.scrollIntoView({ behavior: "smooth" });
+        if (currentIdx === sectionRefs.current.length - 1) {
+          document
+            .getElementById("footer")
+            ?.scrollIntoView({ behavior: "smooth" });
+        } else {
+          const nextIdx = Math.min(
+            currentIdx + 1,
+            sectionRefs.current.length - 1
+          );
+          sectionRefs.current[nextIdx]?.scrollIntoView({ behavior: "smooth" });
+        }
       } else if (keysUp.includes(e.key)) {
         e.preventDefault();
         const prevIdx = Math.max(currentIdx - 1, 0);
@@ -74,15 +81,19 @@ const HomePage = () => {
       <div id="hero-section" className="relative z-10">
         <HeroSection scrollToHowItWorks={scrollToHowItWorks} />
       </div>
+      <SectionDivider />
       <div id="how-it-works">
         <HowItWorksSection />
       </div>
+      <SectionDivider />
       <div id="features">
         <FeaturesSection />
       </div>
+      <SectionDivider />
       <div id="testimonials">
-        <TestimonialsSection />
+        <SuccessStoriesSection />
       </div>
+      <SectionDivider />
       <div id="call-to-action">
         <CallToActionSection />
       </div>

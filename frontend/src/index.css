@@ -153,4 +153,8 @@
   .glass {
     @apply bg-surface/80 backdrop-blur-sm border border-border/50;
   }
+
+  .section-divider-glow {
+    box-shadow: 0 0 16px 4px rgba(34, 197, 94, 0.25);
+  }
 }

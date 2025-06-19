@@ -20,7 +20,10 @@ import {
  */
 const Footer: React.FC = () => {
   return (
-    <footer className="relative bg-gradient-to-br from-[#10151c] via-[#1a2531] to-[#14291e] pt-16 pb-8 mt-24">
+    <footer
+      id="footer"
+      className="relative bg-gradient-to-br from-[#10151c] via-[#1a2531] to-[#14291e] pt-16 pb-8 mt-auto"
+    >
       {/* Glowing top border */}
       <div
         className="absolute top-0 left-0 w-full"
