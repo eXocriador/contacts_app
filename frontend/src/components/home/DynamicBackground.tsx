@@ -22,23 +22,8 @@ const DynamicBackground: React.FC = () => {
   const y3 = useTransform(scrollY, [0, 1000], [0, 80]);
   const y4 = useTransform(scrollY, [0, 1000], [0, -60]);
 
-  // Mouse-following glow
-  const glowRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (glowRef.current) {
-        const x = e.clientX;
-        const y = e.clientY;
-        glowRef.current.style.setProperty("--mouse-x", `${x}px`);
-        glowRef.current.style.setProperty("--mouse-y", `${y}px`);
-      }
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
   return (
-    <div className="pointer-events-none fixed inset-0 -z-10 w-full h-full overflow-hidden">
+    <div className="pointer-events-none absolute inset-0 z-0 w-full min-h-screen h-full overflow-hidden">
       {/* Aurora gradients */}
       <motion.div
         style={{
@@ -67,21 +52,6 @@ const DynamicBackground: React.FC = () => {
           background: `radial-gradient(ellipse 40% 60% at 10% 90%, ${auroraColors[3]}99 60%, transparent 100%)`
         }}
         className="absolute w-[40vw] h-[60vh] bottom-0 left-0 blur-[100px] opacity-40"
-      />
-      {/* Mouse-following glow */}
-      <div
-        ref={glowRef}
-        style={{
-          position: "fixed",
-          left: 0,
-          top: 0,
-          width: "100vw",
-          height: "100vh",
-          pointerEvents: "none",
-          zIndex: 10,
-          background:
-            "radial-gradient(300px circle at var(--mouse-x, 50vw) var(--mouse-y, 50vh), rgba(255,255,255,0.10) 0%, transparent 80%)"
-        }}
       />
     </div>
   );

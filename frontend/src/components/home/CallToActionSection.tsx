@@ -47,7 +47,7 @@ const faqs = [
 
 const CallToActionSection = () => {
   return (
-    <section className="min-h-screen flex items-center justify-center pt-20 relative overflow-hidden">
+    <section className="min-h-screen flex items-center justify-center pt-20 pb-8 relative overflow-hidden">
       <div className="container-custom relative z-10 flex flex-col items-center">
         <motion.div
           initial={{ opacity: 0 }}

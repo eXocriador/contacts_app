@@ -13,6 +13,7 @@ import ContactsPage from "./pages/ContactsPage";
 import ProfilePage from "./pages/ProfilePage";
 import PrivateRoute from "./components/PrivateRoute";
 import ChatWidget from "./components/ChatWidget";
+import DynamicBackground from "./components/home/DynamicBackground";
 
 const App = () => {
   const location = useLocation();
@@ -20,6 +21,9 @@ const App = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background text-text-default">
       <Navbar />
+      <div className="fixed inset-0 z-0 w-full h-full pointer-events-none">
+        <DynamicBackground />
+      </div>
       <main className="flex-grow pt-16">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>

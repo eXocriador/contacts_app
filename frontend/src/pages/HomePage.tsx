@@ -70,56 +70,23 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden">
-      <DynamicBackground />
-      <div
-        id="hero-section"
-        className="relative"
-        style={{
-          WebkitMaskImage:
-            "linear-gradient(to bottom, black 90%, transparent 100%)",
-          maskImage: "linear-gradient(to bottom, black 90%, transparent 100%)"
-        }}
-      >
+    <>
+      <div id="hero-section" className="relative z-10">
         <HeroSection scrollToHowItWorks={scrollToHowItWorks} />
       </div>
-      <div
-        id="how-it-works"
-        className="relative"
-        style={{
-          WebkitMaskImage:
-            "linear-gradient(to bottom, black 90%, transparent 100%)",
-          maskImage: "linear-gradient(to bottom, black 90%, transparent 100%)"
-        }}
-      >
+      <div id="how-it-works">
         <HowItWorksSection />
       </div>
-      <div
-        id="features"
-        className="relative"
-        style={{
-          WebkitMaskImage:
-            "linear-gradient(to bottom, black 90%, transparent 100%)",
-          maskImage: "linear-gradient(to bottom, black 90%, transparent 100%)"
-        }}
-      >
+      <div id="features">
         <FeaturesSection />
       </div>
-      <div
-        id="testimonials"
-        className="relative"
-        style={{
-          WebkitMaskImage:
-            "linear-gradient(to bottom, black 90%, transparent 100%)",
-          maskImage: "linear-gradient(to bottom, black 90%, transparent 100%)"
-        }}
-      >
+      <div id="testimonials">
         <TestimonialsSection />
       </div>
-      <div id="call-to-action" className="relative">
+      <div id="call-to-action">
         <CallToActionSection />
       </div>
-    </div>
+    </>
   );
 };
 

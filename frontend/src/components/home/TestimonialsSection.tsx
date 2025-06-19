@@ -16,8 +16,8 @@ const successStories = [
     id: "enterprise",
     title: "Enterprise",
     icon: Building2,
+    accentColor: "#3b82f6",
     color: "from-blue-500/20 to-blue-600/20",
-    activeColor: "from-blue-500/20 to-blue-600/20",
     stats: [
       { label: "Team members", value: "5,000+" },
       { label: "Contacts managed", value: "1M+" },
@@ -41,8 +41,8 @@ const successStories = [
     id: "startup",
     title: "Startup",
     icon: Zap,
+    accentColor: "#8b5cf6",
     color: "from-purple-500/20 to-purple-600/20",
-    activeColor: "from-purple-500/20 to-purple-600/20",
     stats: [
       { label: "Growth rate", value: "200%" },
       { label: "Response time", value: "-65%" },
@@ -66,8 +66,8 @@ const successStories = [
     id: "freelance",
     title: "Freelance",
     icon: Briefcase,
+    accentColor: "#10b981",
     color: "from-emerald-500/20 to-emerald-600/20",
-    activeColor: "from-emerald-500/20 to-emerald-600/20",
     stats: [
       { label: "Client retention", value: "+45%" },
       { label: "Hours saved", value: "10h/week" },
@@ -89,6 +89,11 @@ const successStories = [
   }
 ];
 
+/**
+ * SuccessStoriesSection displays customer stories with brand-cohesive accent colors.
+ * - Each story uses its accentColor for the active card's border, glow, and icons.
+ * - The active tab underline/glow uses the brand's primary-500 color.
+ */
 export const SuccessStoriesSection = () => {
   const [activeStory, setActiveStory] = useState(successStories[0]);
 
@@ -141,6 +146,14 @@ export const SuccessStoriesSection = () => {
                     : "hover:bg-[#1a2531]/50"
                 }
               `}
+              style={
+                activeStory.id === story.id
+                  ? {
+                      boxShadow: `0 2px 16px 0 ${story.accentColor}33`,
+                      borderColor: story.accentColor
+                    }
+                  : undefined
+              }
             >
               <story.icon
                 className={`
@@ -167,7 +180,11 @@ export const SuccessStoriesSection = () => {
               {activeStory.id === story.id && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 border border-primary-500/20 rounded-xl"
+                  className="absolute left-0 right-0 bottom-0 h-1 rounded-b-xl"
+                  style={{
+                    background: `linear-gradient(90deg, var(--tw-gradient-stops), ${story.accentColor} 60%, #6366f1 100%)`,
+                    boxShadow: `0 0 12px 2px ${story.accentColor}66`
+                  }}
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
@@ -202,98 +219,58 @@ export const SuccessStoriesSection = () => {
                     <div className="text-2xl font-bold text-white mb-1">
                       {stat.value}
                     </div>
-                    <div className="text-sm text-white/70">{stat.label}</div>
+                    <div className="text-sm text-text-secondary">
+                      {stat.label}
+                    </div>
                   </motion.div>
                 ))}
               </div>
-
               {/* Features */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-white mb-4">
-                  Key Benefits
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {activeStory.features.map((feature, idx) => (
-                    <motion.div
-                      key={feature}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="flex items-center gap-3"
-                    >
-                      <CheckCircle2 className="w-5 h-5 text-primary-400 flex-shrink-0" />
-                      <span className="text-white/80">{feature}</span>
-                    </motion.div>
-                  ))}
+              <ul className="space-y-4 mt-8">
+                {activeStory.features.map((feature, idx) => (
+                  <li key={feature} className="flex items-center gap-3">
+                    <CheckCircle2
+                      className="w-5 h-5"
+                      style={{ color: activeStory.accentColor }}
+                    />
+                    <span className="text-white/90 text-lg">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* Right column - Quote */}
+            <div
+              className="relative rounded-2xl p-8 bg-gradient-to-br h-full flex flex-col"
+              style={{
+                boxShadow: `0 0 25px -5px ${activeStory.accentColor}99`,
+                border: `2px solid ${activeStory.accentColor}`,
+                background: `linear-gradient(135deg, ${activeStory.accentColor}11 0%, #1a2531 100%)`
+              }}
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <img
+                  src={activeStory.quote.avatar}
+                  alt={activeStory.quote.author}
+                  className="w-14 h-14 rounded-full object-cover border-2 border-white/20"
+                />
+                <div>
+                  <div className="text-lg font-semibold text-white">
+                    {activeStory.quote.author}
+                  </div>
+                  <div className="text-text-secondary text-sm">
+                    {activeStory.quote.role}
+                  </div>
                 </div>
               </div>
-
-              {/* CTA */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="flex items-center gap-4"
-              >
-                <button className="btn-primary text-base px-6 py-3 flex items-center gap-2">
-                  Get Started <ArrowRight className="w-4 h-4" />
-                </button>
-                <button className="btn-ghost text-base px-6 py-3">
-                  Learn More
-                </button>
-              </motion.div>
-            </div>
-
-            {/* Right column - Quote card */}
-            <div className="lg:pl-8 h-full">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className={`
-                  relative rounded-2xl p-8
-                  bg-gradient-to-br ${activeStory.activeColor}
-                  shadow-2xl h-full flex flex-col
-                `}
-              >
-                <div className="mb-8">
-                  <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className="w-5 h-5 text-white"
-                        fill="currentColor"
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex-grow mb-6">
-                  <p className="text-xl text-white leading-relaxed italic">
-                    "{activeStory.quote.text}"
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <img
-                    src={activeStory.quote.avatar}
-                    alt={activeStory.quote.author}
-                    className="w-14 h-14 rounded-full border-2 border-white/20"
-                  />
-                  <div>
-                    <div className="font-semibold text-white">
-                      {activeStory.quote.author}
-                    </div>
-                    <div className="text-white/80 text-sm">
-                      {activeStory.quote.role}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Decorative elements */}
-                <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
-                <div className="absolute -top-4 -left-4 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-              </motion.div>
+              <blockquote className="text-xl text-white/90 italic mb-6 flex-1">
+                “{activeStory.quote.text}”
+              </blockquote>
+              <div className="flex items-center gap-2 mt-auto">
+                <Star className="w-5 h-5 text-primary-400" />
+                <span className="text-primary-400 font-semibold">
+                  Verified Success
+                </span>
+              </div>
             </div>
           </motion.div>
         </AnimatePresence>
