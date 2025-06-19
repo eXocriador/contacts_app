@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
+import { motion, useTransform } from "framer-motion";
 
 /**
  * DynamicBackground creates a "Liquid Aurora" animated background with:
@@ -15,15 +15,25 @@ const auroraColors = [
 ];
 
 const DynamicBackground: React.FC = () => {
-  const { scrollY } = useScroll();
+  // Track scroll position for parallax
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   // Parallax transforms for each aurora shape
-  const y1 = useTransform(scrollY, [0, 1000], [0, 100]);
-  const y2 = useTransform(scrollY, [0, 1000], [0, -120]);
-  const y3 = useTransform(scrollY, [0, 1000], [0, 80]);
-  const y4 = useTransform(scrollY, [0, 1000], [0, -60]);
+  const y1 = scrollY * 0.08;
+  const y2 = scrollY * -0.12;
+  const y3 = scrollY * 0.06;
+  const y4 = scrollY * -0.09;
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-0 w-full min-h-screen h-full overflow-hidden">
+    <div
+      className="pointer-events-none w-full h-full overflow-hidden"
+      style={{ background: "#10151c", position: "fixed", inset: 0, zIndex: 0 }}
+    >
       {/* Aurora gradients */}
       <motion.div
         style={{
