@@ -77,4 +77,5 @@ const ContactCard: React.FC<ContactCardProps> = ({
   );
 };
 
-export default ContactCard;
+// Memoize to prevent unnecessary re-renders unless props change
+export default React.memo(ContactCard);

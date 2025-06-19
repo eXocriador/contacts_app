@@ -38,11 +38,25 @@ const Navbar = () => {
           <div className="flex items-center space-x-2">
             {user ? (
               <>
-                <Link to="/contacts" className="nav-link group">
+                <Link
+                  to="/contacts"
+                  className={`nav-link group ${
+                    location.pathname.startsWith("/contacts")
+                      ? "text-primary-500 bg-primary-100/30"
+                      : ""
+                  }`}
+                >
                   <BookUser className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   <span>Contacts</span>
                 </Link>
-                <Link to="/profile" className="nav-link group">
+                <Link
+                  to="/profile"
+                  className={`nav-link group ${
+                    location.pathname.startsWith("/profile")
+                      ? "text-primary-500 bg-primary-100/30"
+                      : ""
+                  }`}
+                >
                   <UserIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   <span>Profile</span>
                 </Link>

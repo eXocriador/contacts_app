@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, AlertTriangle } from "lucide-react";
+import Spinner from "../Spinner";
 
 interface ConfirmDeleteModalProps {
   isOpen: boolean;
@@ -62,10 +63,11 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
             <div className="bg-background/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-2xl">
               <button
                 type="button"
-                className="btn-danger w-full sm:w-auto sm:ml-3"
+                className="btn-danger w-full sm:w-auto sm:ml-3 flex items-center justify-center gap-2 min-w-[110px]"
                 onClick={onConfirm}
                 disabled={isDeleting}
               >
+                {isDeleting && <Spinner size={18} />}
                 {isDeleting ? "Deleting..." : "Delete"}
               </button>
               <button

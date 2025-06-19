@@ -9,6 +9,7 @@ import type {
 } from "../../types/api";
 import { typeList } from "../../constants/contacts";
 import { toast } from "react-hot-toast";
+import Spinner from "../Spinner";
 
 interface ContactFormModalProps {
   isOpen: boolean;
@@ -38,7 +39,8 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       if (contact) {
-        reset(contact);
+        const { name, email, phoneNumber, isFavourite, contactType } = contact;
+        reset({ name, email, phoneNumber, isFavourite, contactType });
         setPreviewUrl(contact.photo || null);
       } else {
         reset({
@@ -245,10 +247,13 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-primary"
+                  className="btn-primary min-w-[140px] flex items-center justify-center gap-2"
                 >
+                  {isSubmitting && <Spinner size={18} />}
                   {isSubmitting
-                    ? "Saving..."
+                    ? contact
+                      ? "Saving..."
+                      : "Creating..."
                     : contact
                     ? "Save Changes"
                     : "Create Contact"}
