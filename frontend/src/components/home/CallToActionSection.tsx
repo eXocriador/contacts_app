@@ -47,12 +47,8 @@ const faqs = [
 
 const CallToActionSection = () => {
   return (
-    <section className="pt-20 bg-gradient-to-b from-background via-background to-[#0a0d12] relative overflow-hidden">
-      {/* Subtle green blobs for depth */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary-700/15 rounded-full blur-3xl z-0" />
-      <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary-600/10 rounded-full blur-2xl z-0" />
+    <section className="min-h-screen flex items-center justify-center pt-20 relative overflow-hidden">
       <div className="container-custom relative z-10 flex flex-col items-center">
-        {/* Floating CTA card */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

@@ -48,10 +48,8 @@ const FeaturesSection = () => {
   return (
     <section
       id="features"
-      className="relative min-h-screen flex items-center justify-center py-24 bg-gradient-to-br from-background via-surface to-background overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center py-24"
     >
-      {/* Decorative blurred gradient */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60vw] h-64 bg-primary-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="container-custom relative z-10">
         <div className="text-center mb-20">
           <h2 className="text-5xl font-bold text-text-default mb-6">
@@ -62,7 +60,6 @@ const FeaturesSection = () => {
             secure, and efficient.
           </p>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <motion.div

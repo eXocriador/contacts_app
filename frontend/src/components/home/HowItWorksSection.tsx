@@ -34,15 +34,8 @@ export const HowItWorksSection = () => {
   return (
     <section
       id="how-it-works"
-      className="relative min-h-screen flex items-center justify-center py-24 bg-gradient-to-br from-[#181f29] via-background to-[#181f29] overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center py-24"
     >
-      {/* Decorative blurred gradient circles */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary-700/10 rounded-full blur-2xl pointer-events-none" />
-      {/* Subtle pattern overlay */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="w-full h-full bg-gradient-to-br from-primary-900/5 via-primary-500/5 to-transparent" />
-      </div>
       <div className="container-custom relative z-10 flex flex-col justify-center items-center w-full">
         <div className="text-center mb-20">
           <h2 className="text-5xl font-bold text-text-default mb-6">
@@ -52,7 +45,7 @@ export const HowItWorksSection = () => {
             Get started in minutes with our simple four-step process
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 w-full max-w-6xl">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 w-full">
           {steps.map((step, index) => (
             <motion.div
               key={step.title}
@@ -85,38 +78,6 @@ export const HowItWorksSection = () => {
             </motion.div>
           ))}
         </div>
-      </div>
-      {/* Decorative element bottom center */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-0 opacity-60">
-        <svg
-          width="180"
-          height="32"
-          viewBox="0 0 180 32"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <ellipse
-            cx="90"
-            cy="16"
-            rx="90"
-            ry="16"
-            fill="url(#paint0_radial)"
-            fillOpacity="0.3"
-          />
-          <defs>
-            <radialGradient
-              id="paint0_radial"
-              cx="0"
-              cy="0"
-              r="1"
-              gradientTransform="translate(90 16) scale(90 16)"
-              gradientUnits="userSpaceOnUse"
-            >
-              <stop stopColor="#22d3ee" />
-              <stop offset="1" stopColor="#22d3ee" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-        </svg>
       </div>
     </section>
   );

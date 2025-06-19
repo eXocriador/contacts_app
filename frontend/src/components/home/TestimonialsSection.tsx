@@ -1,317 +1,305 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Users,
+  Building2,
+  Briefcase,
+  Star,
+  ArrowRight,
+  CheckCircle2,
+  BarChart3,
+  Zap
+} from "lucide-react";
 
-const testimonials = [
+const successStories = [
   {
-    name: "Sarah Johnson",
-    role: "Marketing Manager",
-    quote:
-      "This contacts app has completely transformed how I manage my professional network. The interface is intuitive and the search is lightning fast!",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-    rating: 5
+    id: "enterprise",
+    title: "Enterprise",
+    icon: Building2,
+    color: "from-blue-500/20 to-blue-600/20",
+    activeColor: "from-blue-500/20 to-blue-600/20",
+    stats: [
+      { label: "Team members", value: "5,000+" },
+      { label: "Contacts managed", value: "1M+" },
+      { label: "Time saved", value: "30%" }
+    ],
+    features: [
+      "Centralized contact management",
+      "Advanced team collaboration",
+      "Custom integrations",
+      "Enterprise-grade security"
+    ],
+    quote: {
+      text: "ContactsApp has transformed how our global teams manage relationships. The ROI has been incredible.",
+      author: "Sarah Chen",
+      role: "VP of Operations at TechCorp",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face"
+    }
   },
   {
-    name: "Michael Chen",
-    role: "Software Developer",
-    quote:
-      "Finally, a contacts app that's both beautiful and functional. The dark mode is a lifesaver for my eyes!",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-    rating: 5
+    id: "startup",
+    title: "Startup",
+    icon: Zap,
+    color: "from-purple-500/20 to-purple-600/20",
+    activeColor: "from-purple-500/20 to-purple-600/20",
+    stats: [
+      { label: "Growth rate", value: "200%" },
+      { label: "Response time", value: "-65%" },
+      { label: "New leads", value: "+85%" }
+    ],
+    features: [
+      "Quick setup & onboarding",
+      "Automated lead management",
+      "Smart categorization",
+      "Growth analytics"
+    ],
+    quote: {
+      text: "As a fast-growing startup, we needed a solution that could scale with us. ContactsApp delivered beyond expectations.",
+      author: "Mike Ross",
+      role: "CEO at GrowthMate",
+      avatar:
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+    }
   },
   {
-    name: "Emily Rodriguez",
-    role: "Business Owner",
-    quote:
-      "I've tried many contact managers, but this one stands out. It's secure, fast, and the organization features are exactly what I needed.",
-    avatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-    rating: 5
-  },
-  {
-    name: "Liam Smith",
-    role: "Product Designer",
-    quote:
-      "The UI is so clean and modern. I love the smooth transitions and the attention to detail!",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    rating: 5
-  },
-  {
-    name: "Olivia Brown",
-    role: "HR Specialist",
-    quote:
-      "Managing contacts for our team has never been easier. The cloud sync is a game changer!",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    rating: 5
-  },
-  {
-    name: "Noah Wilson",
-    role: "Freelancer",
-    quote:
-      "I use this app daily to keep track of my clients. The mobile experience is just as good as desktop!",
-    avatar: "https://randomuser.me/api/portraits/men/65.jpg",
-    rating: 5
-  },
-  {
-    name: "Sophia Lee",
-    role: "Startup Founder",
-    quote:
-      "The best part is the security and privacy. I trust this app with my most important contacts.",
-    avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-    rating: 5
-  },
-  {
-    name: "James Miller",
-    role: "Sales Lead",
-    quote:
-      "Our sales team boosted productivity by 30% after switching to this app. Highly recommend!",
-    avatar: "https://randomuser.me/api/portraits/men/77.jpg",
-    rating: 5
+    id: "freelance",
+    title: "Freelance",
+    icon: Briefcase,
+    color: "from-emerald-500/20 to-emerald-600/20",
+    activeColor: "from-emerald-500/20 to-emerald-600/20",
+    stats: [
+      { label: "Client retention", value: "+45%" },
+      { label: "Hours saved", value: "10h/week" },
+      { label: "Revenue increase", value: "25%" }
+    ],
+    features: [
+      "Client relationship tracking",
+      "Project-based organization",
+      "Invoice & payment tracking",
+      "Automated follow-ups"
+    ],
+    quote: {
+      text: "The perfect tool for managing my freelance business. It's like having a personal assistant for client relationships.",
+      author: "Emma Wilson",
+      role: "Independent Designer",
+      avatar:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+    }
   }
 ];
 
-const CARD_WIDTH = 384;
-const CARD_HEIGHT = 320;
-const CARD_WIDTH_MD = 420;
-const CARD_HEIGHT_MD = 340;
-const AUTOPLAY_INTERVAL = 6000;
+export const SuccessStoriesSection = () => {
+  const [activeStory, setActiveStory] = useState(successStories[0]);
 
-export const TestimonialsSection = () => {
-  const [index, setIndex] = useState(0);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [direction, setDirection] = useState(1); // 1: next, -1: prev
-  const total = testimonials.length;
-  const autoplayRef = useRef<NodeJS.Timeout | null>(null);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-  const isMobile = windowWidth < 768;
-
-  useEffect(() => {
-    if (autoplayRef.current) clearInterval(autoplayRef.current);
-    autoplayRef.current = setInterval(() => {
-      handleNext();
-    }, AUTOPLAY_INTERVAL);
-    return () => {
-      if (autoplayRef.current) clearInterval(autoplayRef.current);
-    };
-  }, [index]);
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") handlePrev();
-      else if (e.key === "ArrowRight") handleNext();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  });
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName || ""))
-        return;
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        scrollToSection("down");
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        scrollToSection("up");
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
-
-  const scrollToSection = (dir: "up" | "down") => {
-    const allSections = Array.from(
-      document.querySelectorAll("section, main > section")
+  const handleKeyNavigation = (e: KeyboardEvent) => {
+    const currentIndex = successStories.findIndex(
+      (story) => story.id === activeStory.id
     );
-    const current = sectionRef.current;
-    if (!current) return;
-    const idx = allSections.findIndex((el) => el === current);
-    let target: Element | null = null;
-    if (dir === "down" && idx < allSections.length - 1)
-      target = allSections[idx + 1];
-    if (dir === "up" && idx > 0) target = allSections[idx - 1];
-    if (target) (target as HTMLElement).scrollIntoView({ behavior: "smooth" });
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const prevIndex =
+        currentIndex > 0 ? currentIndex - 1 : successStories.length - 1;
+      setActiveStory(successStories[prevIndex]);
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const nextIndex =
+        currentIndex < successStories.length - 1 ? currentIndex + 1 : 0;
+      setActiveStory(successStories[nextIndex]);
+    }
   };
 
-  const handlePrev = useCallback(() => {
-    setDirection(-1);
-    setIndex((i) => (i - 1 + total) % total);
-  }, [total]);
-  const handleNext = useCallback(() => {
-    setDirection(1);
-    setIndex((i) => (i + 1) % total);
-  }, [total]);
-
-  const prevIdx = (index - 1 + total) % total;
-  const nextIdx = (index + 1) % total;
-  const active = testimonials[index];
-  const prevT = testimonials[prevIdx];
-  const nextT = testimonials[nextIdx];
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyNavigation);
+    return () => window.removeEventListener("keydown", handleKeyNavigation);
+  }, [activeStory]); // Dependency on activeStory to ensure we always have the current state
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative min-h-screen flex items-center justify-center py-0 bg-gradient-to-br from-[#181f29] via-background to-[#181f29] overflow-hidden"
-    >
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="w-full h-full bg-gradient-to-br from-primary-900/10 via-primary-700/5 to-transparent" />
-      </div>
-      <div className="container-custom max-w-screen-xl relative z-10 flex flex-col items-center justify-center min-h-screen">
-        <div className="text-center mb-16 mt-12 md:mt-0">
-          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight drop-shadow-lg">
-            What our users say
+    <section className="relative min-h-screen flex items-center justify-center py-24">
+      <div className="container-custom max-w-screen-xl relative z-10">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
+            Success Stories
           </h2>
-          <p className="text-2xl md:text-2xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
-            Join thousands of satisfied users who trust our platform
+          <p className="text-xl md:text-2xl text-text-secondary max-w-3xl mx-auto">
+            See how different teams achieve more with ContactsApp
           </p>
         </div>
-        <div className="relative w-full flex items-center justify-center min-h-[420px]">
-          {/* Стрілки по краях контейнера */}
-          <button
-            onClick={handlePrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 bg-background/80 p-4 md:p-6 rounded-full shadow-lg border-2 border-primary-500/20 hover:bg-primary-500/10 transition-colors z-20 ring-2 ring-primary-500/20"
-            aria-label="Previous testimonial"
-            tabIndex={0}
-            style={{ boxShadow: "0 0 24px 4px #22d3ee33" }}
-          >
-            <ChevronLeft className="w-8 h-8 md:w-10 md:h-10 text-primary-400" />
-          </button>
-          <div className="flex flex-1 justify-center items-end gap-6 md:gap-10 w-full min-h-[420px] relative mx-0 md:mx-12">
-            {/* Left preview */}
-            {!isMobile && (
-              <div className="bg-surface border border-primary-500/10 rounded-2xl shadow-lg w-96 h-80 md:w-[420px] md:h-[340px] flex flex-col justify-between items-end px-6 py-8 text-center select-none z-0 overflow-hidden">
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(prevT.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400" />
-                  ))}
-                </div>
-                <div className="flex-1 flex items-center justify-center">
-                  <p className="italic font-medium text-text-default text-base md:text-lg line-clamp-5 overflow-hidden">
-                    {prevT.quote}
-                  </p>
-                </div>
-                <div className="flex flex-col items-center mt-4">
-                  <img
-                    src={prevT.avatar}
-                    alt={prevT.name}
-                    className="w-12 h-12 rounded-full border-2 border-primary-400 shadow object-cover"
-                    loading="lazy"
-                  />
-                  <div className="font-bold text-text-default text-base mt-1">
-                    {prevT.name}
-                  </div>
-                  <div className="text-xs text-text-secondary">
-                    {prevT.role}
-                  </div>
-                </div>
-              </div>
-            )}
-            {/* Central motion card */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active.name}
-                initial={{ x: direction > 0 ? 80 : -80, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: direction > 0 ? -80 : 80, opacity: 0 }}
-                transition={{ duration: 0.45, ease: "easeInOut" }}
-                className="bg-surface border border-primary-500/20 rounded-2xl shadow-xl w-96 h-80 md:w-[420px] md:h-[340px] flex flex-col justify-between items-center px-8 py-10 text-center select-none z-10 overflow-hidden"
-                style={{ boxShadow: "0 8px 32px 0 rgba(0,0,0,0.14)" }}
-              >
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(active.rating)].map((_, i) => (
-                    <Star key={i} className="w-6 h-6 text-yellow-400" />
-                  ))}
-                </div>
-                <div className="flex-1 flex items-center justify-center">
-                  <p className="italic font-semibold text-text-default text-lg md:text-xl leading-relaxed line-clamp-5 overflow-hidden">
-                    {active.quote}
-                  </p>
-                </div>
-                <div className="flex flex-col items-center mt-4">
-                  <img
-                    src={active.avatar}
-                    alt={active.name}
-                    className="w-14 h-14 rounded-full border-2 border-primary-400 shadow object-cover"
-                    loading="lazy"
-                  />
-                  <div className="font-bold text-text-default text-lg mt-2">
-                    {active.name}
-                  </div>
-                  <div className="text-xs text-text-secondary">
-                    {active.role}
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-            {/* Right preview */}
-            {!isMobile && (
-              <div className="bg-surface border border-primary-500/10 rounded-2xl shadow-lg w-96 h-80 md:w-[420px] md:h-[340px] flex flex-col justify-between items-start px-6 py-8 text-center select-none z-0 overflow-hidden">
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(nextT.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400" />
-                  ))}
-                </div>
-                <div className="flex-1 flex items-center justify-center">
-                  <p className="italic font-medium text-text-default text-base md:text-lg line-clamp-5 overflow-hidden">
-                    {nextT.quote}
-                  </p>
-                </div>
-                <div className="flex flex-col items-center mt-4">
-                  <img
-                    src={nextT.avatar}
-                    alt={nextT.name}
-                    className="w-12 h-12 rounded-full border-2 border-primary-400 shadow object-cover"
-                    loading="lazy"
-                  />
-                  <div className="font-bold text-text-default text-base mt-1">
-                    {nextT.name}
-                  </div>
-                  <div className="text-xs text-text-secondary">
-                    {nextT.role}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-          {/* Стрілка справа */}
-          <button
-            onClick={handleNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 bg-background/80 p-4 md:p-6 rounded-full shadow-lg border-2 border-primary-500/20 hover:bg-primary-500/10 transition-colors z-20 ring-2 ring-primary-500/20"
-            aria-label="Next testimonial"
-            tabIndex={0}
-            style={{ boxShadow: "0 0 24px 4px #22d3ee33" }}
-          >
-            <ChevronRight className="w-8 h-8 md:w-10 md:h-10 text-primary-400" />
-          </button>
-        </div>
-        {/* Dots */}
-        <div className="flex gap-3 mt-8 justify-center">
-          {testimonials.map((_, i) => (
+        {/* Story selector tabs */}
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
+          {successStories.map((story) => (
             <button
-              key={i}
-              onClick={() => {
-                setDirection(i > index ? 1 : -1);
-                setIndex(i);
-              }}
-              className={`w-3.5 h-3.5 rounded-full transition-all duration-200 border-2 border-primary-500/30 ${
-                i === index ? "bg-primary-500" : "bg-white/20"
-              }`}
-              aria-label={`Go to testimonial ${i + 1}`}
-            />
+              key={story.id}
+              onClick={() => setActiveStory(story)}
+              className={`
+                relative group flex items-center gap-3 px-6 py-4 rounded-xl
+                transition-all duration-300
+                ${
+                  activeStory.id === story.id
+                    ? "bg-[#1a2531] shadow-lg border border-primary-500/20"
+                    : "hover:bg-[#1a2531]/50"
+                }
+              `}
+            >
+              <story.icon
+                className={`
+                w-5 h-5 transition-colors duration-300
+                ${
+                  activeStory.id === story.id
+                    ? "text-primary-400"
+                    : "text-primary-500/60 group-hover:text-primary-400"
+                }
+              `}
+              />
+              <span
+                className={`
+                font-semibold transition-colors duration-300
+                ${
+                  activeStory.id === story.id
+                    ? "text-white"
+                    : "text-white/60 group-hover:text-white/90"
+                }
+              `}
+              >
+                {story.title}
+              </span>
+              {activeStory.id === story.id && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute inset-0 border border-primary-500/20 rounded-xl"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+            </button>
           ))}
         </div>
+        {/* Active story content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeStory.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch"
+          >
+            {/* Left column - Stats & Features */}
+            <div className="space-y-8">
+              {/* Stats */}
+              <div className="grid grid-cols-3 gap-4">
+                {activeStory.stats.map((stat, idx) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                    className={`
+                      p-4 rounded-xl bg-gradient-to-br ${activeStory.color}
+                      border border-white/5 backdrop-blur-sm
+                    `}
+                  >
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {stat.value}
+                    </div>
+                    <div className="text-sm text-white/70">{stat.label}</div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Features */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-white mb-4">
+                  Key Benefits
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {activeStory.features.map((feature, idx) => (
+                    <motion.div
+                      key={feature}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="flex items-center gap-3"
+                    >
+                      <CheckCircle2 className="w-5 h-5 text-primary-400 flex-shrink-0" />
+                      <span className="text-white/80">{feature}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* CTA */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="flex items-center gap-4"
+              >
+                <button className="btn-primary text-base px-6 py-3 flex items-center gap-2">
+                  Get Started <ArrowRight className="w-4 h-4" />
+                </button>
+                <button className="btn-ghost text-base px-6 py-3">
+                  Learn More
+                </button>
+              </motion.div>
+            </div>
+
+            {/* Right column - Quote card */}
+            <div className="lg:pl-8 h-full">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className={`
+                  relative rounded-2xl p-8
+                  bg-gradient-to-br ${activeStory.activeColor}
+                  shadow-2xl h-full flex flex-col
+                `}
+              >
+                <div className="mb-8">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className="w-5 h-5 text-white"
+                        fill="currentColor"
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex-grow mb-6">
+                  <p className="text-xl text-white leading-relaxed italic">
+                    "{activeStory.quote.text}"
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <img
+                    src={activeStory.quote.avatar}
+                    alt={activeStory.quote.author}
+                    className="w-14 h-14 rounded-full border-2 border-white/20"
+                  />
+                  <div>
+                    <div className="font-semibold text-white">
+                      {activeStory.quote.author}
+                    </div>
+                    <div className="text-white/80 text-sm">
+                      {activeStory.quote.role}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Decorative elements */}
+                <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
+                <div className="absolute -top-4 -left-4 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+              </motion.div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   );
 };
 
-export default TestimonialsSection;
+export default SuccessStoriesSection;
