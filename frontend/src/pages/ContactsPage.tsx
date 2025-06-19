@@ -10,6 +10,7 @@ import ContactFormModal from "../components/contacts/ContactFormModal";
 import ConfirmDeleteModal from "../components/contacts/ConfirmDeleteModal";
 import ContactCardSkeleton from "../components/contacts/ContactCardSkeleton";
 import { PlusCircle } from "lucide-react";
+import MiniFooter from "../components/MiniFooter";
 
 const PER_PAGE = 9;
 
@@ -83,86 +84,91 @@ const ContactsPage = () => {
   const contacts = data?.data.data || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-text-default">Your Contacts</h1>
-        <button
-          onClick={() => {
-            setEditingContact(null);
-            setModalOpen(true);
-          }}
-          className="btn-primary flex items-center gap-2"
-        >
-          <PlusCircle size={20} />
-          Add Contact
-        </button>
-      </div>
-
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: PER_PAGE }).map((_, i) => (
-            <ContactCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : isError ? (
-        <div className="text-center py-16 bg-surface rounded-lg">
-          <h3 className="text-xl text-danger">
-            Error: {(error as Error).message || "Failed to load contacts"}
-          </h3>
-        </div>
-      ) : !data || contacts.length === 0 ? (
-        <div className="text-center py-16 bg-surface rounded-lg">
-          <p className="text-text-secondary text-lg">No contacts found.</p>
+    <>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold text-text-default">
+            Your Contacts
+          </h1>
           <button
-            onClick={() => setModalOpen(true)}
-            className="mt-4 text-primary-500 font-semibold hover:underline"
+            onClick={() => {
+              setEditingContact(null);
+              setModalOpen(true);
+            }}
+            className="btn-primary flex items-center gap-2"
           >
-            Add your first contact
+            <PlusCircle size={20} />
+            Add Contact
           </button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {contacts.map((contact) => (
-            <ContactCard
-              key={contact.id}
-              contact={contact}
-              onEdit={(c) => {
-                setEditingContact(c);
-                setModalOpen(true);
-              }}
-              onDelete={(c) => {
-                setDeletingContact(c);
-                setDeleteModalOpen(true);
-              }}
-            />
-          ))}
-        </div>
-      )}
 
-      {totalPages > 1 && (
-        <div className="flex justify-center mt-10 space-x-2">
-          {/* Pagination can be added here */}
-        </div>
-      )}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: PER_PAGE }).map((_, i) => (
+              <ContactCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : isError ? (
+          <div className="text-center py-16 bg-surface rounded-lg">
+            <h3 className="text-xl text-danger">
+              Error: {(error as Error).message || "Failed to load contacts"}
+            </h3>
+          </div>
+        ) : !data || contacts.length === 0 ? (
+          <div className="text-center py-16 bg-surface rounded-lg">
+            <p className="text-text-secondary text-lg">No contacts found.</p>
+            <button
+              onClick={() => setModalOpen(true)}
+              className="mt-4 text-primary-500 font-semibold hover:underline"
+            >
+              Add your first contact
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {contacts.map((contact) => (
+              <ContactCard
+                key={contact.id}
+                contact={contact}
+                onEdit={(c) => {
+                  setEditingContact(c);
+                  setModalOpen(true);
+                }}
+                onDelete={(c) => {
+                  setDeletingContact(c);
+                  setDeleteModalOpen(true);
+                }}
+              />
+            ))}
+          </div>
+        )}
 
-      <ContactFormModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleSaveContact}
-        contact={editingContact}
-        isSubmitting={createMutation.isPending || updateMutation.isPending}
-      />
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-10 space-x-2">
+            {/* Pagination can be added here */}
+          </div>
+        )}
 
-      {deletingContact && (
-        <ConfirmDeleteModal
-          isOpen={deleteModalOpen}
-          onClose={() => setDeleteModalOpen(false)}
-          onConfirm={() => deleteMutation.mutate(deletingContact.id)}
-          contactName={deletingContact.name}
-          isDeleting={deleteMutation.isPending}
+        <ContactFormModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSubmit={handleSaveContact}
+          contact={editingContact}
+          isSubmitting={createMutation.isPending || updateMutation.isPending}
         />
-      )}
-    </div>
+
+        {deletingContact && (
+          <ConfirmDeleteModal
+            isOpen={deleteModalOpen}
+            onClose={() => setDeleteModalOpen(false)}
+            onConfirm={() => deleteMutation.mutate(deletingContact.id)}
+            contactName={deletingContact.name}
+            isDeleting={deleteMutation.isPending}
+          />
+        )}
+      </div>
+      <MiniFooter />
+    </>
   );
 };
 

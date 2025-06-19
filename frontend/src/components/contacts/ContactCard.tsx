@@ -21,7 +21,7 @@ const ContactCard: React.FC<ContactCardProps> = ({
       exit={{ opacity: 0 }}
       whileHover={{ y: -5, boxShadow: "0 0 15px 0 rgba(34, 197, 94, 0.3)" }} // Using raw shadow for glow
       transition={{ duration: 0.2 }}
-      className="bg-surface rounded-xl border border-border overflow-hidden flex flex-col h-full"
+      className="bg-surface rounded-xl border border-border flex flex-col h-full"
     >
       <div className="p-6 flex-grow">
         <div className="flex items-start justify-between mb-4">

@@ -9,6 +9,7 @@ import { useAuthStore } from "../store/auth";
 import { authApi } from "../api/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { Edit2 } from "lucide-react";
+import MiniFooter from "../components/MiniFooter";
 
 // Schemas for validation
 const profileSchema = z.object({
@@ -130,186 +131,189 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <motion.h1
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-4xl font-bold text-text-default mb-8"
-      >
-        Account Settings
-      </motion.h1>
-
-      <div className="border-b border-border mb-8">
-        <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-          <button
-            onClick={() => setActiveTab("profile")}
-            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg ${
-              activeTab === "profile"
-                ? "border-primary-500 text-primary-500"
-                : "border-transparent text-text-secondary hover:text-text-default hover:border-border"
-            }`}
-          >
-            Profile
-          </button>
-          <button
-            onClick={() => setActiveTab("security")}
-            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg ${
-              activeTab === "security"
-                ? "border-primary-500 text-primary-500"
-                : "border-transparent text-text-secondary hover:text-text-default hover:border-border"
-            }`}
-          >
-            Security
-          </button>
-        </nav>
-      </div>
-
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -10, opacity: 0 }}
-          transition={{ duration: 0.2 }}
+    <>
+      <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 pb-24">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-4xl font-bold text-text-default mb-8"
         >
-          {activeTab === "profile" && (
-            <div className="bg-surface border border-border rounded-xl shadow-lg p-8">
-              <h3 className="text-2xl font-semibold text-text-default mb-6">
-                Profile Information
-              </h3>
-              <form
-                onSubmit={handleProfileSubmit(onProfileSubmit)}
-                className="space-y-6"
-              >
-                <div className="flex flex-col items-center">
-                  <div className="relative group w-32 h-32 mb-4">
-                    <img
-                      src={photoPreview || ""}
-                      alt="Profile"
-                      className="w-full h-full rounded-full object-cover border-2 border-border"
-                      crossOrigin="anonymous" // 👈 ADD THIS ATTRIBUTE
-                    />
-                    <label
-                      htmlFor="photo-upload"
-                      className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
-                    >
-                      <Edit2 size={24} />
+          Account Settings
+        </motion.h1>
+
+        <div className="border-b border-border mb-8">
+          <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab("profile")}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg ${
+                activeTab === "profile"
+                  ? "border-primary-500 text-primary-500"
+                  : "border-transparent text-text-secondary hover:text-text-default hover:border-border"
+              }`}
+            >
+              Profile
+            </button>
+            <button
+              onClick={() => setActiveTab("security")}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg ${
+                activeTab === "security"
+                  ? "border-primary-500 text-primary-500"
+                  : "border-transparent text-text-secondary hover:text-text-default hover:border-border"
+              }`}
+            >
+              Security
+            </button>
+          </nav>
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -10, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {activeTab === "profile" && (
+              <div className="bg-surface border border-border rounded-xl shadow-lg p-8">
+                <h3 className="text-2xl font-semibold text-text-default mb-6">
+                  Profile Information
+                </h3>
+                <form
+                  onSubmit={handleProfileSubmit(onProfileSubmit)}
+                  className="space-y-6"
+                >
+                  <div className="flex flex-col items-center">
+                    <div className="relative group w-32 h-32 mb-4">
+                      <img
+                        src={photoPreview || ""}
+                        alt="Profile"
+                        className="w-full h-full rounded-full object-cover border-2 border-border"
+                        crossOrigin="anonymous" // 👈 ADD THIS ATTRIBUTE
+                      />
+                      <label
+                        htmlFor="photo-upload"
+                        className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+                      >
+                        <Edit2 size={24} />
+                      </label>
+                      <input
+                        id="photo-upload"
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handlePhotoChange}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="name" className="label">
+                      Name
                     </label>
                     <input
-                      id="photo-upload"
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handlePhotoChange}
+                      id="name"
+                      type="text"
+                      {...registerProfile("name")}
+                      className="input"
                     />
+                    {profileErrors.name && (
+                      <p className="error">{profileErrors.name.message}</p>
+                    )}
                   </div>
-                </div>
-                <div>
-                  <label htmlFor="name" className="label">
-                    Name
-                  </label>
-                  <input
-                    id="name"
-                    type="text"
-                    {...registerProfile("name")}
-                    className="input"
-                  />
-                  {profileErrors.name && (
-                    <p className="error">{profileErrors.name.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="email" className="label">
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    {...registerProfile("email")}
-                    className="input"
-                  />
-                  {profileErrors.email && (
-                    <p className="error">{profileErrors.email.message}</p>
-                  )}
-                </div>
-                <div className="text-right pt-4">
-                  <button
-                    type="submit"
-                    disabled={
-                      isUpdatingProfile || (!isProfileDirty && !photoFile)
-                    }
-                    className="btn-primary"
-                  >
-                    {isUpdatingProfile ? "Saving..." : "Save Changes"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
+                  <div>
+                    <label htmlFor="email" className="label">
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      {...registerProfile("email")}
+                      className="input"
+                    />
+                    {profileErrors.email && (
+                      <p className="error">{profileErrors.email.message}</p>
+                    )}
+                  </div>
+                  <div className="text-right pt-4">
+                    <button
+                      type="submit"
+                      disabled={
+                        isUpdatingProfile || (!isProfileDirty && !photoFile)
+                      }
+                      className="btn-primary"
+                    >
+                      {isUpdatingProfile ? "Saving..." : "Save Changes"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
 
-          {activeTab === "security" && (
-            <div className="bg-surface border border-border rounded-xl shadow-lg p-8">
-              <h3 className="text-2xl font-semibold text-text-default mb-6">
-                Change Password
-              </h3>
-              <form
-                onSubmit={handlePasswordSubmit(onPasswordSubmit)}
-                className="space-y-6"
-              >
-                <div>
-                  <label className="label">Current Password</label>
-                  <input
-                    type="password"
-                    {...registerPassword("currentPassword")}
-                    className="input"
-                  />
-                  {passwordErrors.currentPassword && (
-                    <p className="error">
-                      {passwordErrors.currentPassword.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="label">New Password</label>
-                  <input
-                    type="password"
-                    {...registerPassword("newPassword")}
-                    className="input"
-                  />
-                  {passwordErrors.newPassword && (
-                    <p className="error">
-                      {passwordErrors.newPassword.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="label">Confirm New Password</label>
-                  <input
-                    type="password"
-                    {...registerPassword("confirmPassword")}
-                    className="input"
-                  />
-                  {passwordErrors.confirmPassword && (
-                    <p className="error">
-                      {passwordErrors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
-                <div className="text-right pt-4">
-                  <button
-                    type="submit"
-                    disabled={isUpdatingPassword}
-                    className="btn-primary"
-                  >
-                    {isUpdatingPassword ? "Updating..." : "Update Password"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
-    </div>
+            {activeTab === "security" && (
+              <div className="bg-surface border border-border rounded-xl shadow-lg p-8">
+                <h3 className="text-2xl font-semibold text-text-default mb-6">
+                  Change Password
+                </h3>
+                <form
+                  onSubmit={handlePasswordSubmit(onPasswordSubmit)}
+                  className="space-y-6"
+                >
+                  <div>
+                    <label className="label">Current Password</label>
+                    <input
+                      type="password"
+                      {...registerPassword("currentPassword")}
+                      className="input"
+                    />
+                    {passwordErrors.currentPassword && (
+                      <p className="error">
+                        {passwordErrors.currentPassword.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="label">New Password</label>
+                    <input
+                      type="password"
+                      {...registerPassword("newPassword")}
+                      className="input"
+                    />
+                    {passwordErrors.newPassword && (
+                      <p className="error">
+                        {passwordErrors.newPassword.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="label">Confirm New Password</label>
+                    <input
+                      type="password"
+                      {...registerPassword("confirmPassword")}
+                      className="input"
+                    />
+                    {passwordErrors.confirmPassword && (
+                      <p className="error">
+                        {passwordErrors.confirmPassword.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right pt-4">
+                    <button
+                      type="submit"
+                      disabled={isUpdatingPassword}
+                      className="btn-primary"
+                    >
+                      {isUpdatingPassword ? "Updating..." : "Update Password"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      <MiniFooter />
+    </>
   );
 };
 

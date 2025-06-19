@@ -7,7 +7,7 @@ const ContactCardSkeleton = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="bg-surface rounded-xl border border-border overflow-hidden animate-pulse flex flex-col"
+      className="bg-surface rounded-xl border border-border animate-pulse flex flex-col"
     >
       <div className="p-6 flex-grow">
         <div className="flex items-start justify-between mb-4">
