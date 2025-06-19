@@ -25,7 +25,9 @@ export const authApi = {
   },
 
   refresh: async (): Promise<{ data: { accessToken: string } }> => {
-    const response = await api.post<{ data: { accessToken: string } }>("/auth/refresh");
+    const response = await api.post<{ data: { accessToken: string } }>(
+      "/auth/refresh"
+    );
     return response.data;
   },
 
@@ -34,14 +36,17 @@ export const authApi = {
     return response.data.data;
   },
 
-  updateProfile: async (data: UpdateProfileRequest): Promise<{ data: { user: User } }> => {
+  updateProfile: async (
+    data: UpdateProfileRequest
+  ): Promise<{ data: { user: User } }> => {
     const formData = new FormData();
 
-    if (data.name) formData.append('name', data.name);
-    if (data.email) formData.append('email', data.email);
-    if (data.currentPassword) formData.append('currentPassword', data.currentPassword);
-    if (data.newPassword) formData.append('newPassword', data.newPassword);
-    if (data.photo) formData.append('photo', data.photo);
+    if (data.name) formData.append("name", data.name);
+    if (data.email) formData.append("email", data.email);
+    if (data.currentPassword)
+      formData.append("currentPassword", data.currentPassword);
+    if (data.newPassword) formData.append("newPassword", data.newPassword);
+    if (data.photo) formData.append("photo", data.photo);
 
     const response = await api.patch<{ data: { user: User } }>(
       "/auth/profile",
@@ -55,7 +60,9 @@ export const authApi = {
     return response.data;
   },
 
-  updateProfileWithPhoto: async (formData: FormData): Promise<{ data: { user: User } }> => {
+  updateProfileWithPhoto: async (
+    formData: FormData
+  ): Promise<{ data: { user: User } }> => {
     const response = await api.patch<{ data: { user: User } }>(
       "/auth/profile",
       formData,
@@ -69,12 +76,25 @@ export const authApi = {
   },
 
   getGoogleOAuthUrl: async (): Promise<{ data: { url: string } }> => {
-    const response = await api.get<{ data: { url: string } }>("/auth/google/url");
+    const response = await api.get<{ data: { url: string } }>(
+      "/auth/google/url"
+    );
     return response.data;
   },
 
   loginWithGoogle: async (code: string): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>("/auth/google", { code });
+    return response.data;
+  },
+
+  updatePassword: async (data: {
+    currentPassword: string;
+    newPassword: string;
+  }): Promise<{ message: string }> => {
+    const response = await api.patch<{ message: string }>(
+      "/auth/change-password",
+      data
+    );
     return response.data;
   }
 };

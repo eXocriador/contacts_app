@@ -19,7 +19,7 @@ export const hashPassword = async (password: string): Promise<string> => {
 
 export const comparePassword = async (
   password: string,
-  hashedPassword: string
+  hashedPassword: string,
 ): Promise<boolean> => {
   return compare(password, hashedPassword);
 };
@@ -46,7 +46,7 @@ export const verifyToken = async (token: string) => {
 export const register = async (
   name: string,
   email: string,
-  password: string
+  password: string,
 ): Promise<IUser> => {
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -65,7 +65,7 @@ export const register = async (
 
 export const login = async (
   email: string,
-  password: string
+  password: string,
 ): Promise<ISession> => {
   const user = await User.findOne({ email });
   if (!user) {
@@ -81,7 +81,9 @@ export const login = async (
   const refreshToken = randomBytes(40).toString('hex');
   const now = new Date();
   const accessTokenValidUntil = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const refreshTokenValidUntil = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const refreshTokenValidUntil = new Date(
+    now.getTime() + 7 * 24 * 60 * 60 * 1000,
+  );
 
   const session = await Session.create({
     userId: user._id,
@@ -95,7 +97,7 @@ export const login = async (
 };
 
 export const loginOrSignupWithGoogle = async (
-  code: string
+  code: string,
 ): Promise<{ user: IUser; accessToken: string; refreshToken: string }> => {
   const ticket = await validateCode(code);
   const payload = ticket.getPayload();
@@ -118,7 +120,9 @@ export const loginOrSignupWithGoogle = async (
   const refreshToken = randomBytes(40).toString('hex');
   const now = new Date();
   const accessTokenValidUntil = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const refreshTokenValidUntil = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const refreshTokenValidUntil = new Date(
+    now.getTime() + 7 * 24 * 60 * 60 * 1000,
+  );
 
   await Session.create({
     userId: user._id,
@@ -139,10 +143,16 @@ export const refreshTokens = async (refreshToken: string) => {
 
   const now = new Date();
   const accessTokenValidUntil = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const refreshTokenValidUntil = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const refreshTokenValidUntil = new Date(
+    now.getTime() + 7 * 24 * 60 * 60 * 1000,
+  );
 
-  const newAccessToken = jwt.sign({ id: session.userId }, JWT_SECRET, { expiresIn: '1d' });
-  const newRefreshToken = jwt.sign({ id: session.userId }, JWT_SECRET, { expiresIn: '7d' });
+  const newAccessToken = jwt.sign({ id: session.userId }, JWT_SECRET, {
+    expiresIn: '1d',
+  });
+  const newRefreshToken = jwt.sign({ id: session.userId }, JWT_SECRET, {
+    expiresIn: '7d',
+  });
 
   await Session.findOneAndUpdate(
     { refreshToken },
@@ -151,7 +161,7 @@ export const refreshTokens = async (refreshToken: string) => {
       refreshToken: newRefreshToken,
       accessTokenValidUntil,
       refreshTokenValidUntil,
-    }
+    },
   );
 
   return { accessToken: newAccessToken, refreshToken: newRefreshToken };
@@ -163,4 +173,21 @@ export const invalidateSession = async (refreshToken: string) => {
 
 export const invalidateAllSessions = async (userId: string) => {
   await Session.deleteMany({ userId });
+};
+
+export const changeUserPassword = async (
+  userId: string,
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw createHttpError(404, 'User not found');
+  }
+  const isPasswordValid = await comparePassword(currentPassword, user.password);
+  if (!isPasswordValid) {
+    throw createHttpError(401, 'Current password is incorrect');
+  }
+  user.password = await hashPassword(newPassword);
+  await user.save();
 };

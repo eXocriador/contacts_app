@@ -1,4 +1,5 @@
 import { Document } from 'mongoose';
+import { typeList, ContactType } from '../constants/contacts';
 
 export interface IUser extends Document {
   name: string;
@@ -27,7 +28,7 @@ export interface IContact extends Document {
   isFavourite: boolean;
   owner: IUser['_id'];
   photo?: string;
-  contactType: boolean | 'personal';
+  contactType: ContactType;
 }
 
 export interface AuthRequest {

@@ -8,6 +8,7 @@ import {
   requestResetEmailSchema,
   resetPasswordSchema,
   updateProfileSchema,
+  changePasswordSchema,
 } from '../validation/auth';
 import {
   register,
@@ -20,6 +21,7 @@ import {
   getGoogleOAuthUrlController,
   loginWithGoogleController,
   updateProfileController,
+  changePassword,
 } from '../controllers/auth';
 import { ctrlWrapper } from '../utils/ctrlWrapper';
 import { upload } from '../middlewares/upload';
@@ -53,6 +55,12 @@ router.patch(
   upload.single('photo'),
   validateBody(updateProfileSchema),
   ctrlWrapper(updateProfileController),
+);
+router.patch(
+  '/change-password',
+  authenticate,
+  validateBody(changePasswordSchema),
+  ctrlWrapper(changePassword),
 );
 
 export default router;

@@ -9,8 +9,16 @@ import User from '../db/models/user';
 import Session from '../db/models/session';
 import { IUser } from '../types/models';
 import { TEMPLATES_DIR } from '../constants';
-import { authSchema, loginSchema } from '../validation/auth';
-import { hashPassword, comparePassword } from '../services/auth';
+import {
+  authSchema,
+  loginSchema,
+  changePasswordSchema,
+} from '../validation/auth';
+import {
+  hashPassword,
+  comparePassword,
+  changeUserPassword,
+} from '../services/auth';
 import {
   generateAuthTokens,
   setupSession,
@@ -66,7 +74,7 @@ export const register = async (
       },
     });
   } catch (error) {
-    next(error);
+    next(error instanceof Error ? error : new Error(String(error)));
   }
 };
 
@@ -110,7 +118,7 @@ export const login = async (
       },
     });
   } catch (error) {
-    next(error);
+    next(error instanceof Error ? error : new Error(String(error)));
   }
 };
 
@@ -127,7 +135,7 @@ export const logout = async (
     res.clearCookie('refreshToken');
     res.status(204).send();
   } catch (error) {
-    next(error);
+    next(error instanceof Error ? error : new Error(String(error)));
   }
 };
 
@@ -146,7 +154,7 @@ export const getCurrentUser = async (
       data: user,
     });
   } catch (error) {
-    next(error);
+    next(error instanceof Error ? error : new Error(String(error)));
   }
 };
 
@@ -180,7 +188,7 @@ export const refresh = async (
       data: { accessToken },
     });
   } catch (error) {
-    next(error);
+    next(error instanceof Error ? error : new Error(String(error)));
   }
 };
 
@@ -231,7 +239,7 @@ export const sendResetEmail = async (
         'If an account with this email exists, a password reset email has been sent.',
     });
   } catch (error) {
-    return next(error);
+    return next(error instanceof Error ? error : new Error(String(error)));
   }
 };
 
@@ -266,7 +274,7 @@ export const handleResetPassword = async (
       message: 'Password has been successfully reset.',
     });
   } catch (error) {
-    next(error);
+    next(error instanceof Error ? error : new Error(String(error)));
   }
 };
 
@@ -282,7 +290,7 @@ export const getGoogleOAuthUrlController = async (
       data: { url },
     });
   } catch (error) {
-    next(error);
+    next(error instanceof Error ? error : new Error(String(error)));
   }
 };
 
@@ -306,7 +314,7 @@ export const loginWithGoogleController = async (
       },
     });
   } catch (error) {
-    next(error);
+    next(error instanceof Error ? error : new Error(String(error)));
   }
 };
 
@@ -368,6 +376,32 @@ export const updateProfileController = async (
       },
     });
   } catch (error) {
+    next(error instanceof Error ? error : new Error(String(error)));
+  }
+};
+
+export const changePassword = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { error } = changePasswordSchema.validate(req.body);
+    if (error) {
+      throw createHttpError(400, String(error.message));
+    }
+    const { currentPassword, newPassword } = req.body;
+    await changeUserPassword(
+      String(req.user!._id),
+      currentPassword,
+      newPassword,
+    );
+    res.status(200).json({
+      status: 200,
+      message: 'Password changed successfully',
+    });
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     next(error);
   }
 };
