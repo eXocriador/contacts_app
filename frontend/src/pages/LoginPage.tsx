@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
@@ -9,6 +9,7 @@ import { FcGoogle } from "react-icons/fc";
 import { authApi } from "../api/auth";
 import MiniFooter from "../components/MiniFooter";
 import DynamicBackground from "../components/home/DynamicBackground";
+import ForgotPasswordModal from "../components/ForgotPasswordModal";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const LoginPage = () => {
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm<LoginRequest>();
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   useEffect(() => {
     const code = searchParams.get("code");
@@ -121,6 +123,15 @@ const LoginPage = () => {
                 {errors.password && (
                   <p className="error">{errors.password.message}</p>
                 )}
+                <div className="text-right mt-2">
+                  <button
+                    type="button"
+                    className="text-primary-500 hover:underline text-sm font-medium"
+                    onClick={() => setForgotOpen(true)}
+                  >
+                    Forgot password?
+                  </button>
+                </div>
               </div>
 
               <button
@@ -166,6 +177,9 @@ const LoginPage = () => {
         </motion.div>
       </main>
       <MiniFooter />
+      {forgotOpen && (
+        <ForgotPasswordModal onClose={() => setForgotOpen(false)} />
+      )}
     </div>
   );
 };

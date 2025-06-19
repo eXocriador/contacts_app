@@ -14,6 +14,7 @@ import ProfilePage from "./pages/ProfilePage";
 import PrivateRoute from "./components/PrivateRoute";
 import ChatWidget from "./components/ChatWidget";
 import DynamicBackground from "./components/home/DynamicBackground";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const App = () => {
   const location = useLocation();
@@ -30,6 +31,7 @@ const App = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route
               path="/contacts"
               element={

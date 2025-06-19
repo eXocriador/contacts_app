@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
@@ -9,6 +9,7 @@ import { FcGoogle } from "react-icons/fc";
 import { authApi } from "../api/auth";
 import MiniFooter from "../components/MiniFooter";
 import DynamicBackground from "../components/home/DynamicBackground";
+import ForgotPasswordModal from "../components/ForgotPasswordModal";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const RegisterPage = () => {
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm<RegisterRequest>();
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   const onSubmit = async (data: RegisterRequest) => {
     try {
@@ -143,6 +145,15 @@ const RegisterPage = () => {
                 {errors.password && (
                   <p className="error">{errors.password.message}</p>
                 )}
+                <div className="text-right mt-2">
+                  <button
+                    type="button"
+                    className="text-primary-500 hover:underline text-xs font-medium"
+                    onClick={() => setForgotOpen(true)}
+                  >
+                    Forgot password?
+                  </button>
+                </div>
               </div>
 
               <button
@@ -189,6 +200,9 @@ const RegisterPage = () => {
         </motion.div>
       </main>
       <MiniFooter />
+      {forgotOpen && (
+        <ForgotPasswordModal onClose={() => setForgotOpen(false)} />
+      )}
     </div>
   );
 };
