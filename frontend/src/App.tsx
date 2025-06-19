@@ -60,7 +60,7 @@ const App = () => {
           }
         }}
       />
-      <ChatWidget />
+      <ChatWidget offsetY={location.pathname === "/" ? 24 : 112} />
     </div>
   );
 };

@@ -7,6 +7,8 @@ import type { RegisterRequest } from "../types/api";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { authApi } from "../api/auth";
+import MiniFooter from "../components/MiniFooter";
+import DynamicBackground from "../components/home/DynamicBackground";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -40,150 +42,153 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
-      {/* Background Image & Overlay (як у HeroSection) */}
-      <div className="absolute inset-0 z-0">
+    <div className="h-screen flex flex-col overflow-hidden">
+      <div className="fixed inset-0 -z-10">
         <img
           src="/images/hero-green.webp"
           alt="Abstract background"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background/95" />
+        <DynamicBackground />
       </div>
-      {/* Decorative blurred gradient */}
-      <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-96 h-32 bg-primary-500/20 rounded-full blur-3xl pointer-events-none z-0" />
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md relative z-10"
-      >
-        <div className="bg-surface border border-border rounded-xl shadow-lg p-8">
-          <h2 className="text-center text-3xl font-extrabold text-text-default mb-6">
-            Create your account
-          </h2>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div>
-              <label htmlFor="name" className="label">
-                Full name
-              </label>
-              <input
-                id="name"
-                type="text"
-                autoComplete="name"
-                {...register("name", {
-                  required: "Name is required",
-                  minLength: {
-                    value: 2,
-                    message: "Name must be at least 2 characters"
-                  },
-                  maxLength: {
-                    value: 50,
-                    message: "Name must not exceed 50 characters"
-                  }
-                })}
-                className="input"
-                placeholder="Your Name"
-              />
-              {errors.name && <p className="error">{errors.name.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="email" className="label">
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                {...register("email", {
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                    message: "Invalid email address"
-                  }
-                })}
-                className="input"
-                placeholder="you@example.com"
-              />
-              {errors.email && <p className="error">{errors.email.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="password" className="label">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 8,
-                    message: "Password must be at least 8 characters"
-                  },
-                  maxLength: {
-                    value: 100,
-                    message: "Password must not exceed 100 characters"
-                  },
-                  pattern: {
-                    value:
-                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                    message:
-                      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
-                  }
-                })}
-                className="input"
-                placeholder="••••••••"
-              />
-              {errors.password && (
-                <p className="error">{errors.password.message}</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="btn-primary w-full"
-            >
-              {isSubmitting ? "Creating account..." : "Create Account"}
-            </button>
-          </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
+      <main className="flex-1 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md relative z-10"
+        >
+          <div className="bg-surface border border-border rounded-xl shadow-lg p-8">
+            <h2 className="text-center text-3xl font-extrabold text-text-default mb-6">
+              Create your account
+            </h2>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div>
+                <label htmlFor="name" className="label">
+                  Full name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  autoComplete="name"
+                  {...register("name", {
+                    required: "Name is required",
+                    minLength: {
+                      value: 2,
+                      message: "Name must be at least 2 characters"
+                    },
+                    maxLength: {
+                      value: 50,
+                      message: "Name must not exceed 50 characters"
+                    }
+                  })}
+                  className="input"
+                  placeholder="Your Name"
+                />
+                {errors.name && <p className="error">{errors.name.message}</p>}
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-surface text-text-secondary">
-                  Or continue with
-                </span>
+
+              <div>
+                <label htmlFor="email" className="label">
+                  Email address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                      message: "Invalid email address"
+                    }
+                  })}
+                  className="input"
+                  placeholder="you@example.com"
+                />
+                {errors.email && (
+                  <p className="error">{errors.email.message}</p>
+                )}
               </div>
-            </div>
-            <div className="mt-6">
+
+              <div>
+                <label htmlFor="password" className="label">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  autoComplete="new-password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 8,
+                      message: "Password must be at least 8 characters"
+                    },
+                    maxLength: {
+                      value: 100,
+                      message: "Password must not exceed 100 characters"
+                    },
+                    pattern: {
+                      value:
+                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                      message:
+                        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+                    }
+                  })}
+                  className="input"
+                  placeholder="••••••••"
+                />
+                {errors.password && (
+                  <p className="error">{errors.password.message}</p>
+                )}
+              </div>
+
               <button
-                onClick={handleGoogleLogin}
-                className="w-full btn-secondary"
+                type="submit"
+                disabled={isSubmitting}
+                className="btn-primary w-full"
               >
-                <FcGoogle className="w-5 h-5 mr-2" />
-                Sign up with Google
+                {isSubmitting ? "Creating account..." : "Create Account"}
               </button>
-            </div>
-          </div>
+            </form>
 
-          <p className="mt-8 text-center text-sm text-text-secondary">
-            Already a member?{" "}
-            <Link
-              to="/login"
-              className="font-medium text-primary-500 hover:text-primary-400"
-            >
-              Sign in
-            </Link>
-          </p>
-        </div>
-      </motion.div>
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-surface text-text-secondary">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+              <div className="mt-6">
+                <button
+                  onClick={handleGoogleLogin}
+                  className="w-full btn-secondary"
+                >
+                  <FcGoogle className="w-5 h-5 mr-2" />
+                  Sign up with Google
+                </button>
+              </div>
+            </div>
+
+            <p className="mt-8 text-center text-sm text-text-secondary">
+              Already a member?{" "}
+              <Link
+                to="/login"
+                className="font-medium text-primary-500 hover:text-primary-400"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </motion.div>
+      </main>
+      <MiniFooter />
     </div>
   );
 };

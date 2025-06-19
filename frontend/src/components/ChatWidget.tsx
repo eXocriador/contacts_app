@@ -2,6 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send } from "lucide-react";
 
+interface ChatWidgetProps {
+  offsetY?: number;
+}
+
 const initialMessages = [
   {
     from: "support",
@@ -9,7 +13,7 @@ const initialMessages = [
   }
 ];
 
-const ChatWidget: React.FC = () => {
+const ChatWidget: React.FC<ChatWidgetProps> = ({ offsetY = 24 }) => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState("");
@@ -39,10 +43,10 @@ const ChatWidget: React.FC = () => {
     <>
       {/* Chat button */}
       <button
-        className="fixed bottom-6 right-6 z-50 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-xl w-16 h-16 flex items-center justify-center text-3xl focus:outline-none focus:ring-4 focus:ring-primary-400/40 transition-all"
+        className={`fixed right-6 z-50 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-xl w-16 h-16 flex items-center justify-center text-3xl focus:outline-none focus:ring-4 focus:ring-primary-400/40 transition-all`}
+        style={{ bottom: offsetY }}
         onClick={() => setOpen(true)}
         aria-label="Open chat support"
-        style={{ boxShadow: "0 8px 32px 0 rgba(34,211,238,0.25)" }}
         tabIndex={0}
       >
         <MessageCircle className="w-8 h-8" />
@@ -55,8 +59,8 @@ const ChatWidget: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
             transition={{ duration: 0.25 }}
-            className="fixed bottom-28 right-6 z-50 w-[400px] max-w-[95vw] h-[520px] bg-surface border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-            style={{ boxShadow: "0 8px 32px 0 rgba(34,211,238,0.25)" }}
+            className="fixed right-6 z-50 w-[400px] max-w-[95vw] h-[520px] bg-surface border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            style={{ bottom: offsetY + 88 }}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 bg-primary-500/90 text-white">
