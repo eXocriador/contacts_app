@@ -36,12 +36,13 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 const ProfilePage = () => {
-  const { user, updateUser, login } = useAuthStore();
+  const { user, updateUser, login, token } = useAuthStore();
   const [activeTab, setActiveTab] = useState("profile");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [loading, setLoading] = useState({ profile: false, password: false });
   const navigate = useNavigate();
+  const [userError, setUserError] = useState<string | null>(null);
 
   const {
     register: registerProfile,
@@ -86,6 +87,27 @@ const ProfilePage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+
+  // Діагностика user/token
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log("ProfilePage user:", user, "token:", token);
+  }, [user, token]);
+
+  // Автозавантаження user, якщо є token, але user === null
+  useEffect(() => {
+    if (!user && token) {
+      authApi
+        .getCurrentUser()
+        .then((u) => {
+          updateUser(u);
+          setUserError(null);
+        })
+        .catch((err) => {
+          setUserError("Failed to load user. Please re-login.");
+        });
+    }
+  }, [user, token, updateUser]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -157,6 +179,13 @@ const ProfilePage = () => {
   };
 
   if (!user) {
+    if (userError) {
+      return (
+        <div className="flex h-screen items-center justify-center">
+          <div className="text-danger text-xl">{userError}</div>
+        </div>
+      );
+    }
     return (
       <div className="flex h-screen items-center justify-center">
         <Spinner size={40} />

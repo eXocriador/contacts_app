@@ -13,6 +13,8 @@ import { PlusCircle } from "lucide-react";
 import { useContactFilters } from "../hooks/useContactFilters";
 import { useDebounce } from "../hooks/useDebounce";
 import Pagination from "../components/Pagination";
+import { useAuthStore } from "../store/auth";
+import { authApi } from "../api/auth";
 
 const PER_PAGE = 9;
 
@@ -25,6 +27,7 @@ const ContactsPage = () => {
   const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
   const filterState = useContactFilters();
   const debouncedSearch = useDebounce(filterState.search, 400);
+  const { user, token, updateUser } = useAuthStore();
 
   const { data, isLoading, isError, error } = useQuery<ContactsResponse, Error>(
     {
@@ -252,6 +255,23 @@ const ContactsPage = () => {
   // Debug log
   console.log({ data, isLoading, isError, error, contacts });
 
+  // Діагностика user/token
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log("ContactsPage user:", user, "token:", token);
+    if (!user && token) {
+      authApi
+        .getCurrentUser()
+        .then((u) => {
+          updateUser(u);
+        })
+        .catch((err) => {
+          // eslint-disable-next-line no-console
+          console.error("Failed to load user in ContactsPage:", err);
+        });
+    }
+  }, [user, token, updateUser]);
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -354,112 +374,24 @@ const ContactsPage = () => {
               className={`w-4 h-4 transition-transform ${
                 filterState.sortOrder === "desc" ? "rotate-180" : ""
               }`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
             >
               <path
+                d="M15.5 14.5L12 11l-3.5 3.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
+              />
+              <path
+                d="M12 11L8.5 14.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
           </button>
         </div>
-
-        <div className="flex-grow overflow-y-auto min-h-0">
-          {validContacts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {validContacts.map((contact) => (
-                <ContactCard
-                  key={contact.id}
-                  contact={contact}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20 bg-surface rounded-lg shadow-inner">
-              {/* SVG Illustration + empty state */}
-              <svg
-                width="96"
-                height="96"
-                fill="none"
-                viewBox="0 0 96 96"
-                className="mb-6"
-              >
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="46"
-                  stroke="#34d399"
-                  strokeWidth="4"
-                  fill="#10151c"
-                />
-                <rect
-                  x="28"
-                  y="38"
-                  width="40"
-                  height="28"
-                  rx="6"
-                  fill="#60a5fa"
-                />
-                <rect x="36" y="46" width="24" height="4" rx="2" fill="#fff" />
-                <rect x="36" y="54" width="16" height="4" rx="2" fill="#fff" />
-                <circle
-                  cx="48"
-                  cy="32"
-                  r="8"
-                  fill="#f472b6"
-                  stroke="#fff"
-                  strokeWidth="2"
-                />
-              </svg>
-              <h2 className="text-2xl font-bold text-text-default mb-2">
-                Your contact list is empty
-              </h2>
-              <p className="text-text-secondary mb-6">
-                Start building your network by adding your first contact.
-              </p>
-              <button
-                onClick={() => setModalOpen(true)}
-                className="btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl"
-              >
-                <span className="font-semibold">Add your first contact</span>
-              </button>
-            </div>
-          )}
-        </div>
-
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-10 space-x-2">
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={setPage}
-            />
-          </div>
-        )}
-
-        <ContactFormModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onSubmit={handleSaveContact}
-          contact={editingContact}
-          isSubmitting={createMutation.isPending || updateMutation.isPending}
-        />
-
-        {deletingContact && (
-          <ConfirmDeleteModal
-            isOpen={deleteModalOpen}
-            onClose={() => setDeleteModalOpen(false)}
-            onConfirm={() => deleteMutation.mutate(deletingContact.id)}
-            contactName={deletingContact.name}
-            isDeleting={deleteMutation.isPending}
-          />
-        )}
       </div>
     </div>
   );
