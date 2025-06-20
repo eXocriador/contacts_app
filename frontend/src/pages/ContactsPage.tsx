@@ -229,6 +229,26 @@ const ContactsPage = () => {
   const totalPages = data?.data?.totalPages || 0;
   const contacts = data?.data?.data || [];
 
+  // Фільтрація валідних контактів
+  const validContacts = contacts.filter(
+    (c) =>
+      c &&
+      typeof c.name === "string" &&
+      typeof c.email === "string" &&
+      typeof c.phoneNumber === "string"
+  );
+  const invalidContacts = contacts.filter(
+    (c) =>
+      !c ||
+      typeof c.name !== "string" ||
+      typeof c.email !== "string" ||
+      typeof c.phoneNumber !== "string"
+  );
+  if (invalidContacts.length > 0) {
+    // eslint-disable-next-line no-console
+    console.warn("Invalid contacts detected:", invalidContacts);
+  }
+
   // Debug log
   console.log({ data, isLoading, isError, error, contacts });
 
@@ -349,9 +369,9 @@ const ContactsPage = () => {
         </div>
 
         <div className="flex-grow overflow-y-auto min-h-0">
-          {contacts.length > 0 ? (
+          {validContacts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {contacts.map((contact) => (
+              {validContacts.map((contact) => (
                 <ContactCard
                   key={contact.id}
                   contact={contact}

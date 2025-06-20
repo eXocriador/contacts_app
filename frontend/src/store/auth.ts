@@ -97,6 +97,9 @@ export const useAuthStore = create<AuthState>()(
             token: response.data.accessToken,
             isAuthenticated: true
           });
+          // Fetch and update user after refreshing token
+          const user = await authApi.getCurrentUser();
+          set({ user });
         } catch (error) {
           get().clearAuth();
           throw error;

@@ -14,6 +14,12 @@ const ContactCard: React.FC<ContactCardProps> = ({
   onEdit,
   onDelete
 }) => {
+  // Захист від невалідних контактів
+  if (!contact || !contact.name || !contact.email || !contact.phoneNumber) {
+    // eslint-disable-next-line no-console
+    console.warn("Skipping invalid contact in ContactCard:", contact);
+    return null;
+  }
   const prefersReducedMotion = useReducedMotion();
   return (
     <motion.div
