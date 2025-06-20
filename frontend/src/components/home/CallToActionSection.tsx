@@ -47,95 +47,90 @@ const faqs = [
 
 const CallToActionSection = () => {
   return (
-    <section className="min-h-screen flex items-center justify-center pt-20 pb-8 relative overflow-hidden">
+    <section className="min-h-screen flex items-center justify-center pt-20 pb-8 relative overflow-hidden bg-gradient-to-br from-primary-900/80 via-primary-700/60 to-background/90">
+      {/* Decorative abstract SVG background */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, ease: "easeOut" }}
+        className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
+        aria-hidden="true"
+      >
+        <svg
+          width="900"
+          height="600"
+          viewBox="0 0 900 600"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-full max-w-5xl opacity-40 blur-2xl"
+        >
+          <ellipse
+            cx="450"
+            cy="300"
+            rx="400"
+            ry="180"
+            fill="#22d3ee"
+            fillOpacity="0.12"
+          />
+          <ellipse
+            cx="600"
+            cy="400"
+            rx="200"
+            ry="80"
+            fill="#16a34a"
+            fillOpacity="0.10"
+          />
+          <ellipse
+            cx="300"
+            cy="200"
+            rx="180"
+            ry="60"
+            fill="#f472b6"
+            fillOpacity="0.10"
+          />
+        </svg>
+      </motion.div>
       <div className="container-custom relative z-10 flex flex-col items-center">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="glass w-full max-w-7xl mx-auto px-2 md:px-8 py-8 md:py-10 rounded-3xl shadow-xl border-2 border-primary-500/20 bg-gradient-to-br from-white/10 via-primary-900/10 to-background/80 flex flex-col items-center text-center relative will-change-[opacity]"
+          className="w-full max-w-xl mx-auto px-4 py-12 md:py-16 rounded-3xl shadow-2xl border border-primary-500/20 bg-white/10 backdrop-blur-xl flex flex-col items-center text-center relative"
         >
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-primary-500/20">
-            <Sparkles className="w-5 h-5 text-primary-400" />
-            <span className="text-primary-100 font-medium">
-              Join 10,000+ users
-            </span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white leading-tight">
-            Ready to get started?
-          </h2>
-          <p className="text-lg mb-8 max-w-2xl mx-auto text-text-secondary leading-relaxed">
-            Join thousands of users who are already managing their contacts more
-            efficiently. Start your free trial today — no credit card required.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center mb-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+            className="text-4xl md:text-5xl font-extrabold mb-6 text-white drop-shadow-lg"
+          >
+            Unleash Your Network's Potential
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, duration: 0.6, ease: "easeOut" }}
+            className="text-lg md:text-xl mb-8 max-w-2xl mx-auto text-white/80 leading-relaxed"
+          >
+            Stop losing contacts and opportunities. Join thousands of
+            professionals who organize their network with precision and ease.
+            It's simple, secure, and powerful.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
+            className="w-full flex flex-col items-center"
+          >
             <Link
               to="/register"
-              className="btn-primary text-lg px-10 py-4 w-full sm:w-auto"
+              className="btn-primary text-lg px-10 py-4 w-full sm:w-auto shadow-xl mb-2"
             >
-              <span>Get Started Free</span>
-              <ArrowRight className="ml-2 w-5 h-5" />
+              Get Started for Free
             </Link>
-            <Link
-              to="/contacts"
-              className="btn bg-white text-primary-600 border-2 border-primary-500 hover:bg-primary-50 text-lg px-10 py-4 w-full sm:w-auto"
-            >
-              View Demo
-            </Link>
-          </div>
-          {/* Trusted by */}
-          <div className="flex flex-col items-center gap-2 mb-6 w-full">
-            <div className="text-xs text-text-secondary mb-1">
-              Trusted by teams at
-            </div>
-            <div className="flex flex-wrap justify-center gap-4">
-              {trustedBy.map((c) => (
-                <img
-                  key={c.name}
-                  src={c.logo}
-                  alt={c.name}
-                  className="h-7 w-auto grayscale opacity-80 hover:opacity-100 transition"
-                  loading="lazy"
-                  style={{ maxWidth: "90px" }}
-                />
-              ))}
-            </div>
-          </div>
-          {/* FAQ */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-            className="w-full bg-white/5 rounded-2xl p-4 md:p-6 mt-2 mb-2 border border-primary-500/10 flex flex-col items-center gap-4"
-          >
-            <Mail className="w-7 h-7 text-primary-500 mb-2" />
-            <div className="text-lg font-semibold text-text-default mb-2 text-center">
-              Still have questions?
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 w-full">
-              {faqs.map((f, i) => (
-                <div
-                  key={f.q}
-                  className="group bg-background/70 rounded-xl border border-primary-500/10 p-3 md:p-4 flex flex-col items-center text-center gap-2 hover:shadow-lg transition-all duration-200"
-                >
-                  <div className="flex flex-col items-center gap-2 mb-1">
-                    <HelpCircle className="w-5 h-5 text-primary-500" />
-                    <span className="font-semibold text-text-default text-base">
-                      {f.q}
-                    </span>
-                  </div>
-                  <div className="text-text-secondary text-sm">{f.a}</div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-2 flex justify-center w-full">
-              <a
-                href="mailto:support@contactsapp.com"
-                className="btn-secondary px-6 py-2 text-sm flex items-center gap-2"
-              >
-                <Mail className="w-4 h-4" /> Contact us
-              </a>
-            </div>
+            <span className="text-xs text-white/70 mt-1">
+              14-day trial, no credit card required
+            </span>
           </motion.div>
         </motion.div>
       </div>

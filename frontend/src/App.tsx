@@ -1,6 +1,6 @@
 // frontend/src/App.tsx
 
-import React, { Suspense } from "react";
+import React, { Suspense, useRef, useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
@@ -18,9 +18,28 @@ const ResetPasswordPage = React.lazy(() => import("./pages/ResetPasswordPage"));
 
 const App = () => {
   const location = useLocation();
+  const isHomePage = location.pathname === "/";
   const isAuthPage = ["/login", "/register", "/reset-password"].includes(
     location.pathname
   );
+
+  const footerRef = useRef<HTMLElement | null>(null);
+  const [footerHeight, setFooterHeight] = useState(0);
+
+  useEffect(() => {
+    if (!footerRef.current) return;
+    const handleResize = () => {
+      setFooterHeight(footerRef.current?.offsetHeight || 0);
+    };
+    handleResize();
+    const observer = new window.ResizeObserver(handleResize);
+    observer.observe(footerRef.current);
+    window.addEventListener("resize", handleResize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [footerRef.current]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-text-default">
@@ -58,10 +77,13 @@ const App = () => {
           </Routes>
         </Suspense>
       </main>
-      <Footer mode={isAuthPage ? "mini" : "full"} chatSlot={!isAuthPage}>
-        {!isAuthPage && (
-          <ChatWidget offsetY={location.pathname === "/" ? 24 : 112} />
-        )}
+      <Footer
+        ref={footerRef}
+        mode={isAuthPage ? "mini" : "full"}
+        chatSlot={!isAuthPage}
+        isFixed={!isHomePage}
+      >
+        {!isAuthPage && <ChatWidget offsetY={footerHeight + 24} />}
       </Footer>
       <Toaster
         position="top-right"

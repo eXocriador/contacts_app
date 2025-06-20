@@ -35,8 +35,12 @@ const ResetPasswordPage: React.FC = () => {
         token,
         password: data.password
       });
-      toast.success("Password reset successfully! Please log in.");
-      navigate("/login");
+      toast.success(
+        "Password has been reset successfully! You can now log in."
+      );
+      setTimeout(() => {
+        navigate("/login", { replace: true });
+      }, 1200);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to reset password.");
     }
@@ -122,7 +126,33 @@ const ResetPasswordPage: React.FC = () => {
                 disabled={isSubmitting}
                 className="btn-primary w-full"
               >
-                {isSubmitting ? "Resetting..." : "Reset Password"}
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      ></path>
+                    </svg>
+                    Resetting...
+                  </span>
+                ) : (
+                  "Reset Password"
+                )}
               </button>
             </form>
           </div>

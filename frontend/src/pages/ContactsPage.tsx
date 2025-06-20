@@ -154,7 +154,7 @@ const ContactsPage = () => {
         queryClient.setQueryData(contactsQueryKey, context.previousData);
       }
       toast.error(
-        err.response?.data?.message ||
+        (err as any)?.response?.data?.message ||
           "Failed to update contact. Changes reverted."
       );
     },
@@ -194,7 +194,7 @@ const ContactsPage = () => {
         queryClient.setQueryData(contactsQueryKey, context.previousData);
       }
       toast.error(
-        err.response?.data?.message ||
+        (err as any)?.response?.data?.message ||
           "Failed to delete contact. Changes reverted."
       );
     },
@@ -230,8 +230,8 @@ const ContactsPage = () => {
   const contacts = data?.data.data || [];
 
   return (
-    <>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
+    <div className="flex flex-col h-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 flex flex-col h-full">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4 md:gap-0">
           <h1 className="text-4xl font-bold text-text-default">
             Your Contacts
@@ -325,80 +325,82 @@ const ContactsPage = () => {
           </button>
         </div>
 
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: PER_PAGE }).map((_, i) => (
-              <ContactCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : isError ? (
-          <div className="text-center py-16 bg-surface rounded-lg">
-            <h3 className="text-xl text-danger">
-              Error: {(error as Error).message || "Failed to load contacts"}
-            </h3>
-          </div>
-        ) : !data || contacts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-surface rounded-lg shadow-inner">
-            {/* SVG Illustration */}
-            <svg
-              width="96"
-              height="96"
-              fill="none"
-              viewBox="0 0 96 96"
-              className="mb-6"
-            >
-              <circle
-                cx="48"
-                cy="48"
-                r="46"
-                stroke="#34d399"
-                strokeWidth="4"
-                fill="#10151c"
-              />
-              <rect
-                x="28"
-                y="38"
-                width="40"
-                height="28"
-                rx="6"
-                fill="#60a5fa"
-              />
-              <rect x="36" y="46" width="24" height="4" rx="2" fill="#fff" />
-              <rect x="36" y="54" width="16" height="4" rx="2" fill="#fff" />
-              <circle
-                cx="48"
-                cy="32"
-                r="8"
-                fill="#f472b6"
-                stroke="#fff"
-                strokeWidth="2"
-              />
-            </svg>
-            <h2 className="text-2xl font-bold text-text-default mb-2">
-              Your contact list is empty
-            </h2>
-            <p className="text-text-secondary mb-6">
-              Start building your network by adding your first contact.
-            </p>
-            <button
-              onClick={() => setModalOpen(true)}
-              className="btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl"
-            >
-              <span className="font-semibold">Add your first contact</span>
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {contacts.map((contact) => (
-              <ContactCard
-                key={contact.id}
-                contact={contact}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
-        )}
+        <div className="flex-grow overflow-y-auto min-h-0">
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: PER_PAGE }).map((_, i) => (
+                <ContactCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : isError ? (
+            <div className="text-center py-16 bg-surface rounded-lg">
+              <h3 className="text-xl text-danger">
+                Error: {(error as Error).message || "Failed to load contacts"}
+              </h3>
+            </div>
+          ) : !data || contacts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 bg-surface rounded-lg shadow-inner">
+              {/* SVG Illustration */}
+              <svg
+                width="96"
+                height="96"
+                fill="none"
+                viewBox="0 0 96 96"
+                className="mb-6"
+              >
+                <circle
+                  cx="48"
+                  cy="48"
+                  r="46"
+                  stroke="#34d399"
+                  strokeWidth="4"
+                  fill="#10151c"
+                />
+                <rect
+                  x="28"
+                  y="38"
+                  width="40"
+                  height="28"
+                  rx="6"
+                  fill="#60a5fa"
+                />
+                <rect x="36" y="46" width="24" height="4" rx="2" fill="#fff" />
+                <rect x="36" y="54" width="16" height="4" rx="2" fill="#fff" />
+                <circle
+                  cx="48"
+                  cy="32"
+                  r="8"
+                  fill="#f472b6"
+                  stroke="#fff"
+                  strokeWidth="2"
+                />
+              </svg>
+              <h2 className="text-2xl font-bold text-text-default mb-2">
+                Your contact list is empty
+              </h2>
+              <p className="text-text-secondary mb-6">
+                Start building your network by adding your first contact.
+              </p>
+              <button
+                onClick={() => setModalOpen(true)}
+                className="btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl"
+              >
+                <span className="font-semibold">Add your first contact</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {contacts.map((contact) => (
+                <ContactCard
+                  key={contact.id}
+                  contact={contact}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+          )}
+        </div>
 
         {totalPages > 1 && (
           <div className="flex justify-center mt-10 space-x-2">
@@ -428,7 +430,7 @@ const ContactsPage = () => {
           />
         )}
       </div>
-    </>
+    </div>
   );
 };
 

@@ -152,18 +152,11 @@ export const SuccessStoriesSection = () => {
                 transition-colors transition-shadow duration-300
                 ${
                   activeStory.id === story.id
-                    ? "bg-[#1a2531] shadow-lg border border-primary-500/20"
+                    ? "bg-primary-500/20 shadow-lg border border-primary-500"
                     : "hover:bg-[#1a2531]/50"
                 }
               `}
-              style={
-                activeStory.id === story.id
-                  ? {
-                      boxShadow: `0 2px 16px 0 ${story.accentColor}33`,
-                      borderColor: story.accentColor
-                    }
-                  : undefined
-              }
+              style={undefined}
             >
               <story.icon
                 className={`
@@ -192,10 +185,14 @@ export const SuccessStoriesSection = () => {
                   layoutId="activeTab"
                   className="absolute left-0 right-0 bottom-0 h-1 rounded-b-xl"
                   style={{
-                    background: `linear-gradient(90deg, var(--tw-gradient-stops), ${story.accentColor} 60%, #6366f1 100%)`,
-                    boxShadow: `0 0 12px 2px ${story.accentColor}66`
+                    background: `rgba(34,197,94,0.85)`,
+                    boxShadow: `0 0 12px 2px rgba(34,197,94,0.35)`
                   }}
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  transition={{
+                    type: "tween",
+                    ease: "easeInOut",
+                    duration: 0.4
+                  }}
                 />
               )}
             </button>

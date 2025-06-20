@@ -79,10 +79,13 @@ export const useAuthStore = create<AuthState>()(
         try {
           await authApi.logout();
         } catch (error) {
-          // Remove console.error for production
-          // console.error("Logout failed but clearing session anyway.", error);
-
-          // Clear session even if logout fails
+          // Log the error for debugging, but don't re-throw it.
+          console.error(
+            "Server-side logout failed, clearing client session anyway.",
+            error
+          );
+        } finally {
+          // This is the crucial part: clear auth state regardless of the API call result.
           get().clearAuth();
         }
       },

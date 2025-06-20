@@ -10,6 +10,7 @@ import { authApi } from "../api/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { Edit2 } from "lucide-react";
 import MiniFooter from "../components/MiniFooter";
+import { useNavigate } from "react-router-dom";
 
 // Schemas for validation
 const profileSchema = z.object({
@@ -38,8 +39,8 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [loading, setLoading] = useState({ profile: false, password: false });
+  const navigate = useNavigate();
 
   const {
     register: registerProfile,
@@ -69,6 +70,22 @@ const ProfilePage = () => {
     }
   }, [user, resetProfile]);
 
+  // Reset photo preview if tab switched or component unmounted
+  useEffect(() => {
+    if (activeTab === "profile") {
+      setPhotoPreview(
+        user?.photo ||
+          (user
+            ? `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                user.name
+              )}`
+            : null)
+      );
+      setPhotoFile(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -88,27 +105,36 @@ const ProfilePage = () => {
       toast("No changes to save.");
       return;
     }
-    setIsUpdatingProfile(true);
+    setLoading((l) => ({ ...l, profile: true }));
     try {
       const formData = new FormData();
       if (data.name !== user?.name) formData.append("name", data.name);
       if (data.email !== user?.email) formData.append("email", data.email);
       if (photoFile) formData.append("photo", photoFile);
 
-      // We need to use updateProfileWithPhoto from our api
       const response = await authApi.updateProfileWithPhoto(formData);
       updateUser(response.data.user);
       toast.success("Profile updated successfully!");
-      setPhotoFile(null); // Reset file after upload
+      setPhotoFile(null);
+      setPhotoPreview(
+        response.data.user.photo ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(
+            response.data.user.name
+          )}`
+      );
+      resetProfile({
+        name: response.data.user.name,
+        email: response.data.user.email
+      });
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to update profile.");
     } finally {
-      setIsUpdatingProfile(false);
+      setLoading((l) => ({ ...l, profile: false }));
     }
   };
 
   const onPasswordSubmit = async (data: PasswordFormValues) => {
-    setIsUpdatingPassword(true);
+    setLoading((l) => ({ ...l, password: true }));
     try {
       await authApi.updatePassword({
         currentPassword: data.currentPassword,
@@ -118,15 +144,14 @@ const ProfilePage = () => {
         "Password updated! Please log in again with your new password."
       );
       resetPassword();
-      // Force re-login after password change for security
       await authApi.logout();
-      window.location.href = "/login";
+      navigate("/login", { replace: true });
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || "Failed to update password."
       );
     } finally {
-      setIsUpdatingPassword(false);
+      setLoading((l) => ({ ...l, password: false }));
     }
   };
 
@@ -238,11 +263,11 @@ const ProfilePage = () => {
                     <button
                       type="submit"
                       disabled={
-                        isUpdatingProfile || (!isProfileDirty && !photoFile)
+                        loading.profile || (!isProfileDirty && !photoFile)
                       }
                       className="btn-primary"
                     >
-                      {isUpdatingProfile ? "Saving..." : "Save Changes"}
+                      {loading.profile ? "Saving..." : "Save Changes"}
                     </button>
                   </div>
                 </form>
@@ -300,10 +325,10 @@ const ProfilePage = () => {
                   <div className="text-right pt-4">
                     <button
                       type="submit"
-                      disabled={isUpdatingPassword}
+                      disabled={loading.password}
                       className="btn-primary"
                     >
-                      {isUpdatingPassword ? "Updating..." : "Update Password"}
+                      {loading.password ? "Updating..." : "Update Password"}
                     </button>
                   </div>
                 </form>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import {
   Github,
   Linkedin,
@@ -19,13 +19,17 @@ interface FooterProps {
   mode?: "mini" | "full";
   chatSlot?: boolean;
   children?: React.ReactNode;
+  isFixed?: boolean;
 }
 
-const Footer: React.FC<FooterProps> = React.memo(
-  ({ mode = "full", chatSlot = false, children }) => {
+const Footer = forwardRef<HTMLElement, FooterProps>(
+  ({ mode = "full", chatSlot = false, children, isFixed = true }, ref) => {
     return (
       <footer
-        className="fixed bottom-0 left-0 right-0 z-50 glass backdrop-blur-md px-0 py-2 md:py-3 border-t border-border/50 flex flex-col items-center justify-center"
+        ref={ref}
+        className={`${
+          isFixed ? "fixed bottom-0 left-0 right-0" : "relative mt-auto"
+        } z-50 glass backdrop-blur-md px-0 py-2 md:py-3 border-t border-border/50 flex flex-col items-center justify-center`}
         style={{ background: "rgba(16,21,28,0.92)" }}
       >
         <div className="w-full max-w-7xl flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0 px-4">
