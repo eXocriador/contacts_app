@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "../store/auth";
@@ -85,7 +85,7 @@ const ProfilePage = () => {
 
   const onProfileSubmit = async (data: ProfileFormValues) => {
     if (!isProfileDirty && !photoFile) {
-      toast.info("No changes to save.");
+      toast("No changes to save.");
       return;
     }
     setIsUpdatingProfile(true);

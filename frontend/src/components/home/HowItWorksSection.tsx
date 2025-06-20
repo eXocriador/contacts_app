@@ -30,6 +30,7 @@ const steps = [
 ];
 
 export const HowItWorksSection = () => {
+  const prefersReducedMotion = useReducedMotion();
   return (
     <section
       id="how-it-works"
@@ -48,7 +49,12 @@ export const HowItWorksSection = () => {
           {steps.map((step, index) => (
             <div
               key={step.title}
-              className="relative bg-white/5 backdrop-blur-lg rounded-2xl shadow-lg border border-primary-500/10 p-10 flex flex-col items-center min-h-[340px] group hover:scale-105 transition-transform duration-300"
+              className={
+                "relative bg-white/5 backdrop-blur-lg rounded-2xl shadow-lg border border-primary-500/10 p-10 flex flex-col items-center min-h-[340px] group" +
+                (!prefersReducedMotion
+                  ? " hover:scale-105 transition-transform duration-300"
+                  : "")
+              }
             >
               {/* Step number badge in top-left */}
               <div className="absolute left-5 top-5">
@@ -61,7 +67,14 @@ export const HowItWorksSection = () => {
                 <div className="hidden md:block absolute right-0 top-1/2 w-12 h-0.5 bg-primary-500/10 translate-y-1/2" />
               )}
               {/* Icon */}
-              <div className="glass bg-gradient-to-br from-primary-500/80 to-primary-600/80 w-16 h-16 rounded-xl flex items-center justify-center shadow-xl mb-6 mt-2 group-hover:scale-110 transition-transform duration-300">
+              <div
+                className={
+                  "glass bg-gradient-to-br from-primary-500/80 to-primary-600/80 w-16 h-16 rounded-xl flex items-center justify-center shadow-xl mb-6 mt-2" +
+                  (!prefersReducedMotion
+                    ? " group-hover:scale-110 transition-transform duration-300"
+                    : "")
+                }
+              >
                 <step.icon className="w-8 h-8 text-white drop-shadow-lg" />
               </div>
               <h3 className="text-2xl font-bold text-text-default mb-4 mt-2">

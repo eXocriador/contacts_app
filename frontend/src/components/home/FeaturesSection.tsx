@@ -44,6 +44,7 @@ const features = [
 ];
 
 const FeaturesSection = () => {
+  const prefersReducedMotion = useReducedMotion();
   return (
     <section
       id="features"
@@ -62,7 +63,14 @@ const FeaturesSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature) => (
             <div key={feature.title} className="card-hover p-8 group">
-              <div className="bg-gradient-to-br from-primary-500/10 to-primary-600/10 p-4 rounded-2xl w-fit mb-6 group-hover:from-primary-500/20 group-hover:to-primary-600/20 transition-all duration-300">
+              <div
+                className={
+                  "bg-gradient-to-br from-primary-500/10 to-primary-600/10 p-4 rounded-2xl w-fit mb-6" +
+                  (!prefersReducedMotion
+                    ? " group-hover:from-primary-500/20 group-hover:to-primary-600/20 transition-all duration-300"
+                    : "")
+                }
+              >
                 <feature.icon className="w-10 h-10 text-primary-500" />
               </div>
               <h3 className="text-2xl font-bold text-text-default mb-4">

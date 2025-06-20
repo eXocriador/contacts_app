@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Edit, Trash, Star, Mail, Phone } from "lucide-react";
 import type { Contact } from "../../types/api";
 
@@ -14,13 +14,18 @@ const ContactCard: React.FC<ContactCardProps> = ({
   onEdit,
   onDelete
 }) => {
+  const prefersReducedMotion = useReducedMotion();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
-      whileHover={{ y: -5, boxShadow: "0 0 15px 0 rgba(34, 197, 94, 0.3)" }} // Using raw shadow for glow
-      transition={{ duration: 0.2 }}
+      whileHover={
+        prefersReducedMotion
+          ? undefined
+          : { y: -5, boxShadow: "0 0 15px 0 rgba(34, 197, 94, 0.3)" }
+      }
+      transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
       className="bg-surface rounded-xl border border-border flex flex-col h-full"
     >
       <div className="p-6 flex-grow">
