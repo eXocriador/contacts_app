@@ -226,8 +226,31 @@ const ContactsPage = () => {
     setDeleteModalOpen(true);
   }, []);
 
-  const totalPages = data?.data.totalPages || 0;
-  const contacts = data?.data.data || [];
+  const totalPages = data?.data?.totalPages || 0;
+  const contacts = data?.data?.data || [];
+
+  // Debug log
+  console.log({ data, isLoading, isError, error, contacts });
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: PER_PAGE }).map((_, i) => (
+          <ContactCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="text-center py-16 bg-surface rounded-lg">
+        <h3 className="text-xl text-danger">
+          Error: {(error as Error).message || "Failed to load contacts"}
+        </h3>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -310,128 +333,4 @@ const ContactsPage = () => {
             <svg
               className={`w-4 h-4 transition-transform ${
                 filterState.sortOrder === "desc" ? "rotate-180" : ""
-              }`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <div className="flex-grow overflow-y-auto min-h-0">
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: PER_PAGE }).map((_, i) => (
-                <ContactCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : isError ? (
-            <div className="text-center py-16 bg-surface rounded-lg">
-              <h3 className="text-xl text-danger">
-                Error: {(error as Error).message || "Failed to load contacts"}
-              </h3>
-            </div>
-          ) : !data || contacts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-surface rounded-lg shadow-inner">
-              {/* SVG Illustration */}
-              <svg
-                width="96"
-                height="96"
-                fill="none"
-                viewBox="0 0 96 96"
-                className="mb-6"
-              >
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="46"
-                  stroke="#34d399"
-                  strokeWidth="4"
-                  fill="#10151c"
-                />
-                <rect
-                  x="28"
-                  y="38"
-                  width="40"
-                  height="28"
-                  rx="6"
-                  fill="#60a5fa"
-                />
-                <rect x="36" y="46" width="24" height="4" rx="2" fill="#fff" />
-                <rect x="36" y="54" width="16" height="4" rx="2" fill="#fff" />
-                <circle
-                  cx="48"
-                  cy="32"
-                  r="8"
-                  fill="#f472b6"
-                  stroke="#fff"
-                  strokeWidth="2"
-                />
-              </svg>
-              <h2 className="text-2xl font-bold text-text-default mb-2">
-                Your contact list is empty
-              </h2>
-              <p className="text-text-secondary mb-6">
-                Start building your network by adding your first contact.
-              </p>
-              <button
-                onClick={() => setModalOpen(true)}
-                className="btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl"
-              >
-                <span className="font-semibold">Add your first contact</span>
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {contacts.map((contact) => (
-                <ContactCard
-                  key={contact.id}
-                  contact={contact}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-10 space-x-2">
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={setPage}
-            />
-          </div>
-        )}
-
-        <ContactFormModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onSubmit={handleSaveContact}
-          contact={editingContact}
-          isSubmitting={createMutation.isPending || updateMutation.isPending}
-        />
-
-        {deletingContact && (
-          <ConfirmDeleteModal
-            isOpen={deleteModalOpen}
-            onClose={() => setDeleteModalOpen(false)}
-            onConfirm={() => deleteMutation.mutate(deletingContact.id)}
-            contactName={deletingContact.name}
-            isDeleting={deleteMutation.isPending}
-          />
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default ContactsPage;
+              }`

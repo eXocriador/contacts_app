@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Edit2 } from "lucide-react";
 import MiniFooter from "../components/MiniFooter";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../components/Spinner";
 
 // Schemas for validation
 const profileSchema = z.object({
@@ -154,6 +155,14 @@ const ProfilePage = () => {
       setLoading((l) => ({ ...l, password: false }));
     }
   };
+
+  if (!user) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner size={40} />
+      </div>
+    );
+  }
 
   return (
     <>

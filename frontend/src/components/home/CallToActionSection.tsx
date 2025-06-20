@@ -96,7 +96,12 @@ const CallToActionSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.6 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="w-full max-w-xl mx-auto px-4 py-12 md:py-16 rounded-3xl shadow-2xl border border-primary-500/20 bg-white/10 backdrop-blur-xl flex flex-col items-center text-center relative"
+          className="w-full max-w-xl mx-auto rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl shadow-primary-500/10 shadow-inner shadow-black/10 flex flex-col items-center text-center relative p-12 md:p-16"
+          style={{
+            background:
+              "radial-gradient(ellipse at top, rgba(34, 197, 94, 0.1), transparent 70%), radial-gradient(ellipse at bottom, rgba(96, 165, 250, 0.1), transparent 70%)",
+            backgroundColor: "rgba(16, 21, 28, 0.7)"
+          }}
         >
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -124,12 +129,12 @@ const CallToActionSection = () => {
           >
             <Link
               to="/register"
-              className="btn-primary text-lg px-10 py-4 w-full sm:w-auto shadow-xl mb-2"
+              className="btn-primary px-12 py-5 text-xl w-full sm:w-auto shadow-xl mb-2"
             >
               Get Started for Free
             </Link>
-            <span className="text-xs text-white/70 mt-1">
-              14-day trial, no credit card required
+            <span className="text-xs text-text-secondary mt-1">
+              14-day free trial. No credit card required. Cancel anytime.
             </span>
           </motion.div>
         </motion.div>
