@@ -50,9 +50,9 @@ const CallToActionSection = () => {
     <section className="min-h-screen flex items-center justify-center pt-20 pb-8 relative overflow-hidden">
       <div className="container-custom relative z-10 flex flex-col items-center">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7 }}
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
           className="glass w-full max-w-7xl mx-auto px-2 md:px-8 py-8 md:py-10 rounded-3xl shadow-xl border-2 border-primary-500/20 bg-gradient-to-br from-white/10 via-primary-900/10 to-background/80 flex flex-col items-center text-center relative will-change-[opacity]"
         >
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-primary-500/20">
@@ -102,7 +102,12 @@ const CallToActionSection = () => {
             </div>
           </div>
           {/* FAQ */}
-          <div className="w-full bg-white/5 rounded-2xl p-4 md:p-6 mt-2 mb-2 border border-primary-500/10 flex flex-col items-center gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+            className="w-full bg-white/5 rounded-2xl p-4 md:p-6 mt-2 mb-2 border border-primary-500/10 flex flex-col items-center gap-4"
+          >
             <Mail className="w-7 h-7 text-primary-500 mb-2" />
             <div className="text-lg font-semibold text-text-default mb-2 text-center">
               Still have questions?
@@ -131,7 +136,7 @@ const CallToActionSection = () => {
                 <Mail className="w-4 h-4" /> Contact us
               </a>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

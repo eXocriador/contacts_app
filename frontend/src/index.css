@@ -14,19 +14,19 @@
     @apply bg-background text-text-default font-sans;
     min-height: 100vh;
     background-color: #10151c;
-    background: radial-gradient(
+    /* background: radial-gradient(
       ellipse 80% 60% at 60% 40%,
       #34d399 0%,
       #60a5fa 40%,
       #f472b6 70%,
       #1a2531 100%
     );
-    animation: aurora-gradient-move 60s ease-in-out infinite alternate;
+    animation: aurora-gradient-move 60s ease-in-out infinite alternate; */
     background-size: 200% 200%;
     overscroll-behavior: contain;
   }
 
-  @keyframes aurora-gradient-move {
+  /* @keyframes aurora-gradient-move {
     0% {
       background-position: 60% 40%;
       background: radial-gradient(
@@ -57,7 +57,7 @@
         #1a2531 100%
       );
     }
-  }
+  } */
 
   /* Smooth transitions for better UX */
   /* (Removed global * selector applying transition-all for performance and visual bug fixes) */

@@ -39,7 +39,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background/95"></div>
         {/* Animated color gradient overlay */}
         <motion.div
-          animate={controls}
           style={{
             position: "absolute",
             inset: 0,
@@ -128,11 +127,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <motion.span
               aria-hidden
               initial={{ scale: 0.9, opacity: 0.7 }}
-              animate={{ scale: [0.9, 1.15, 0.9], opacity: [0.7, 1, 0.7] }}
+              animate={{ scale: 1, opacity: 1 }}
               transition={{
                 duration: 1.8,
-                repeat: Infinity,
-                repeatType: "loop"
+                repeat: 0
               }}
               className="absolute inset-0 z-0 pointer-events-none"
               style={{
@@ -144,11 +142,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             />
             <span className="font-semibold relative z-10">Learn More</span>
             <motion.span
-              animate={{ y: [0, 8, 0] }}
+              animate={{ y: 0 }}
               transition={{
                 duration: 1.5,
-                repeat: Infinity,
-                ease: "easeInOut"
+                repeat: 0
               }}
               className="ml-2 flex items-center relative z-10"
             >

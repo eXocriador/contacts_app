@@ -25,26 +25,6 @@ function isAuthPage() {
 const DynamicBackground: React.FC = () => {
   const authPage = isAuthPage();
 
-  // Hue-rotate animation for main pages
-  const controls = useAnimation();
-
-  React.useEffect(() => {
-    if (!authPage) {
-      controls.start({
-        filter: [
-          "blur(32px) hue-rotate(0deg)",
-          "blur(32px) hue-rotate(60deg)",
-          "blur(32px) hue-rotate(120deg)",
-          "blur(32px) hue-rotate(180deg)",
-          "blur(32px) hue-rotate(240deg)",
-          "blur(32px) hue-rotate(300deg)",
-          "blur(32px) hue-rotate(360deg)"
-        ],
-        transition: { duration: 40, repeat: Infinity, ease: "linear" }
-      });
-    }
-  }, [authPage, controls]);
-
   // For auth pages — only slow scale
   const scaleAnim = authPage
     ? {
@@ -59,7 +39,7 @@ const DynamicBackground: React.FC = () => {
       style={{ background: "#10151c" }}
     >
       <motion.div
-        animate={authPage ? scaleAnim : controls}
+        animate={authPage ? scaleAnim : undefined}
         style={{
           width: "100vw",
           height: "100vh",
@@ -70,7 +50,7 @@ const DynamicBackground: React.FC = () => {
             "linear-gradient(120deg, rgba(34,197,94,0.10) 0%, rgba(251,191,36,0.10) 30%, rgba(56,189,248,0.10) 65%, rgba(168,85,247,0.10) 100%)",
           zIndex: 0,
           pointerEvents: "none",
-          filter: authPage ? "blur(32px)" : undefined
+          filter: authPage ? "blur(32px)" : "blur(32px)"
         }}
         className="blur-[32px]"
       />

@@ -13,7 +13,7 @@ const initialMessages = [
   }
 ];
 
-const ChatWidget: React.FC<ChatWidgetProps> = ({ offsetY = 24 }) => {
+const ChatWidget: React.FC<ChatWidgetProps> = React.memo(({ offsetY = 24 }) => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState("");
@@ -123,6 +123,6 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ offsetY = 24 }) => {
       </AnimatePresence>
     </>
   );
-};
+});
 
 export default ChatWidget;

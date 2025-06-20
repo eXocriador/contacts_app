@@ -5,7 +5,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
 import { LogOut, User as UserIcon, BookUser } from "lucide-react";
 
-const Navbar = () => {
+const Navbar = React.memo(() => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -83,6 +83,6 @@ const Navbar = () => {
       </div>
     </header>
   );
-};
+});
 
 export default Navbar;
