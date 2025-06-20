@@ -3,160 +3,50 @@ import {
   Github,
   Linkedin,
   Twitter,
-  Mail,
+  Users,
+  Star,
+  Zap,
+  Building2,
+  ArrowRight,
   BookOpen,
   HelpCircle,
-  Users,
-  Briefcase,
-  Star,
-  ArrowRight,
-  Building2,
-  Zap,
-  Info
+  Mail,
+  Info,
+  Briefcase
 } from "lucide-react";
 
-/**
- * Modern, multi-column footer with brand gradient, glowing border, and social links.
- */
-const Footer: React.FC = () => {
+interface FooterProps {
+  mode?: "mini" | "full";
+  chatSlot?: boolean;
+  children?: React.ReactNode;
+}
+
+const Footer: React.FC<FooterProps> = ({
+  mode = "full",
+  chatSlot = false,
+  children
+}) => {
   return (
     <footer
-      id="footer"
-      className="relative z-20 bg-[#10151c] bg-gradient-to-br from-[#10151c] via-[#1a2531] to-[#14291e] pt-16 pb-8"
+      className="fixed bottom-0 left-0 right-0 z-50 glass backdrop-blur-md px-0 py-2 md:py-3 border-t border-border/50 flex flex-col items-center justify-center"
+      style={{ background: "rgba(16,21,28,0.92)" }}
     >
-      {/* Glowing top border */}
-      <div
-        className="absolute top-0 left-0 w-full"
-        style={{
-          height: "0.5px",
-          background:
-            "linear-gradient(90deg, #3b82f6cc 0%, #8b5cf688 50%, #10b98166 100%)",
-          boxShadow: "0 0 6px 0 #3b82f633",
-          opacity: 0.7
-        }}
-      />
-      <div className="container-custom grid grid-cols-1 md:grid-cols-4 gap-12 z-10 relative">
-        {/* Column 1: Logo & Tagline */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <Users className="w-7 h-7 text-primary-500" />
-            <span className="text-2xl font-bold text-white tracking-tight">
-              ContactsApp
-            </span>
-          </div>
-          <p className="text-text-secondary text-base max-w-xs">
-            Effortless contact management for teams, startups, and freelancers.
-            Connect. Organize. Grow.
-          </p>
+      <div className="w-full max-w-7xl flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0 px-4">
+        {/* Left: Slogan & Copyright (always visible) */}
+        <div className="flex flex-col items-center md:items-start text-xs text-text-secondary min-w-[180px]">
+          <span className="font-semibold text-sm text-text-default mb-1">
+            Effortless contact management for teams & freelancers.
+          </span>
+          <span>© {new Date().getFullYear()} ContactsApp</span>
         </div>
-        {/* Column 2: Product */}
-        <div>
-          <h4 className="text-lg font-semibold text-white mb-4">Product</h4>
-          <ul className="space-y-2">
-            <li>
-              <a
-                href="#features"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary-400 transition"
-              >
-                <Star className="w-4 h-4" /> Features
-              </a>
-            </li>
-            <li>
-              <a
-                href="#how-it-works"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary-400 transition"
-              >
-                <Zap className="w-4 h-4" /> How It Works
-              </a>
-            </li>
-            <li>
-              <a
-                href="#testimonials"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary-400 transition"
-              >
-                <Building2 className="w-4 h-4" /> Testimonials
-              </a>
-            </li>
-            <li>
-              <a
-                href="#call-to-action"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary-400 transition"
-              >
-                <ArrowRight className="w-4 h-4" /> Get Started
-              </a>
-            </li>
-          </ul>
-        </div>
-        {/* Column 3: Resources */}
-        <div>
-          <h4 className="text-lg font-semibold text-white mb-4">Resources</h4>
-          <ul className="space-y-2">
-            <li>
-              <a
-                href="/blog"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary-400 transition"
-              >
-                <BookOpen className="w-4 h-4" /> Blog
-              </a>
-            </li>
-            <li>
-              <a
-                href="/help"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary-400 transition"
-              >
-                <HelpCircle className="w-4 h-4" /> Help Center
-              </a>
-            </li>
-            <li>
-              <a
-                href="/api-docs"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary-400 transition"
-              >
-                <Mail className="w-4 h-4" /> API Docs
-              </a>
-            </li>
-          </ul>
-        </div>
-        {/* Column 4: Company */}
-        <div>
-          <h4 className="text-lg font-semibold text-white mb-4">Company</h4>
-          <ul className="space-y-2">
-            <li>
-              <a
-                href="/about"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary-400 transition"
-              >
-                <Info className="w-4 h-4" /> About Us
-              </a>
-            </li>
-            <li>
-              <a
-                href="/careers"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary-400 transition"
-              >
-                <Briefcase className="w-4 h-4" /> Careers
-              </a>
-            </li>
-            <li>
-              <a
-                href="/contact"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary-400 transition"
-              >
-                <Users className="w-4 h-4" /> Contact Us
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      {/* Bottom bar */}
-      <div className="mt-12 pt-8 border-t border-white/10 flex flex-col items-center gap-4">
-        <div className="flex gap-6 mb-2">
+        {/* Center: Socials (always visible) */}
+        <div className="flex gap-4 my-2 md:my-0">
           <a
             href="https://github.com/your-repo"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"
-            className="text-text-secondary hover:text-primary-400 transition"
+            className="hover:text-primary-400 transition text-text-secondary"
           >
             <Github className="w-5 h-5" />
           </a>
@@ -165,7 +55,7 @@ const Footer: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn"
-            className="text-text-secondary hover:text-primary-400 transition"
+            className="hover:text-primary-400 transition text-text-secondary"
           >
             <Linkedin className="w-5 h-5" />
           </a>
@@ -174,15 +64,105 @@ const Footer: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Twitter"
-            className="text-text-secondary hover:text-primary-400 transition"
+            className="hover:text-primary-400 transition text-text-secondary"
           >
             <Twitter className="w-5 h-5" />
           </a>
         </div>
-        <div className="text-text-secondary text-xs text-center">
-          © {new Date().getFullYear()} ContactsApp. All rights reserved.
+        {/* Right: Navigation, Extra Links, Chat Slot (only in full mode) */}
+        <div className="flex items-center gap-4 md:gap-8 min-w-[180px] justify-end">
+          {mode === "full" && (
+            <nav className="flex gap-6 text-xs md:text-sm text-text-secondary">
+              <a href="/" className="hover:text-primary-400 transition">
+                Home
+              </a>
+              <a href="/contacts" className="hover:text-primary-400 transition">
+                Contacts
+              </a>
+              <a href="/profile" className="hover:text-primary-400 transition">
+                Profile
+              </a>
+              <a href="/about" className="hover:text-primary-400 transition">
+                About
+              </a>
+            </nav>
+          )}
+          {chatSlot && (
+            <div className="relative flex items-center justify-center ml-2">
+              <div
+                className="absolute inset-0 rounded-full bg-primary-500/10 blur-[6px] animate-pulse"
+                style={{ zIndex: 0 }}
+              />
+              <div className="relative z-10">{children}</div>
+            </div>
+          )}
         </div>
       </div>
+      {/* Extra links row (only in full mode, visually blended) */}
+      {mode === "full" && (
+        <div className="w-full max-w-7xl flex flex-wrap items-center justify-center gap-6 mt-2 px-4 text-xs text-text-secondary opacity-80">
+          <a
+            href="#features"
+            className="flex items-center gap-1 hover:text-primary-400 transition"
+          >
+            <Star className="w-4 h-4" /> Features
+          </a>
+          <a
+            href="#how-it-works"
+            className="flex items-center gap-1 hover:text-primary-400 transition"
+          >
+            <Zap className="w-4 h-4" /> How It Works
+          </a>
+          <a
+            href="#testimonials"
+            className="flex items-center gap-1 hover:text-primary-400 transition"
+          >
+            <Building2 className="w-4 h-4" /> Testimonials
+          </a>
+          <a
+            href="#call-to-action"
+            className="flex items-center gap-1 hover:text-primary-400 transition"
+          >
+            <ArrowRight className="w-4 h-4" /> Get Started
+          </a>
+          <a
+            href="/blog"
+            className="flex items-center gap-1 hover:text-primary-400 transition"
+          >
+            <BookOpen className="w-4 h-4" /> Blog
+          </a>
+          <a
+            href="/help"
+            className="flex items-center gap-1 hover:text-primary-400 transition"
+          >
+            <HelpCircle className="w-4 h-4" /> Help Center
+          </a>
+          <a
+            href="/api-docs"
+            className="flex items-center gap-1 hover:text-primary-400 transition"
+          >
+            <Mail className="w-4 h-4" /> API Docs
+          </a>
+          <a
+            href="/about"
+            className="flex items-center gap-1 hover:text-primary-400 transition"
+          >
+            <Info className="w-4 h-4" /> About Us
+          </a>
+          <a
+            href="/careers"
+            className="flex items-center gap-1 hover:text-primary-400 transition"
+          >
+            <Briefcase className="w-4 h-4" /> Careers
+          </a>
+          <a
+            href="/contact"
+            className="flex items-center gap-1 hover:text-primary-400 transition"
+          >
+            <Users className="w-4 h-4" /> Contact Us
+          </a>
+        </div>
+      )}
     </footer>
   );
 };

@@ -14,10 +14,12 @@ import PrivateRoute from "./components/PrivateRoute";
 import ChatWidget from "./components/ChatWidget";
 import DynamicBackground from "./components/home/DynamicBackground";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import MiniFooter from "./components/MiniFooter";
 
 const App = () => {
   const location = useLocation();
+  const isAuthPage = ["/login", "/register", "/reset-password"].includes(
+    location.pathname
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-text-default">
@@ -47,10 +49,11 @@ const App = () => {
           />
         </Routes>
       </main>
-      {location.pathname === "/" && <Footer />}
-      {["/login", "/register", "/reset-password"].includes(
-        location.pathname
-      ) && <MiniFooter />}
+      <Footer mode={isAuthPage ? "mini" : "full"} chatSlot={!isAuthPage}>
+        {!isAuthPage && (
+          <ChatWidget offsetY={location.pathname === "/" ? 24 : 112} />
+        )}
+      </Footer>
       <Toaster
         position="top-right"
         toastOptions={{
@@ -61,7 +64,6 @@ const App = () => {
           }
         }}
       />
-      <ChatWidget offsetY={location.pathname === "/" ? 24 : 112} />
     </div>
   );
 };

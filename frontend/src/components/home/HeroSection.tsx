@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
 interface HeroSectionProps {
@@ -10,6 +10,23 @@ interface HeroSectionProps {
 export const HeroSection: React.FC<HeroSectionProps> = ({
   scrollToHowItWorks
 }) => {
+  // Subtle animated gradient overlay
+  const controls = useAnimation();
+  React.useEffect(() => {
+    controls.start({
+      filter: [
+        "blur(24px) hue-rotate(0deg)",
+        "blur(24px) hue-rotate(60deg)",
+        "blur(24px) hue-rotate(120deg)",
+        "blur(24px) hue-rotate(180deg)",
+        "blur(24px) hue-rotate(240deg)",
+        "blur(24px) hue-rotate(300deg)",
+        "blur(24px) hue-rotate(360deg)"
+      ],
+      transition: { duration: 36, repeat: Infinity, ease: "linear" }
+    });
+  }, [controls]);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center p-4 text-center overflow-hidden">
       {/* Background Image & Overlay */}
@@ -20,6 +37,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background/95"></div>
+        {/* Animated color gradient overlay */}
+        <motion.div
+          animate={controls}
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 2,
+            background:
+              "linear-gradient(120deg, rgba(34,197,94,0.10) 0%, rgba(251,191,36,0.10) 30%, rgba(56,189,248,0.10) 65%, rgba(168,85,247,0.10) 100%)",
+            pointerEvents: "none"
+          }}
+          className="w-full h-full blur-[24px]"
+        />
       </div>
 
       {/* Floating elements for modern look */}

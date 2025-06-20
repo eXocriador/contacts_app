@@ -10,7 +10,6 @@ import ContactFormModal from "../components/contacts/ContactFormModal";
 import ConfirmDeleteModal from "../components/contacts/ConfirmDeleteModal";
 import ContactCardSkeleton from "../components/contacts/ContactCardSkeleton";
 import { PlusCircle } from "lucide-react";
-import MiniFooter from "../components/MiniFooter";
 import { useContactFilters } from "../hooks/useContactFilters";
 import { useDebounce } from "../hooks/useDebounce";
 import Pagination from "../components/Pagination";
@@ -73,11 +72,20 @@ const ContactsPage = () => {
       await queryClient.cancelQueries({ queryKey: contactsQueryKey });
       const previousData =
         queryClient.getQueryData<ContactsResponse>(contactsQueryKey);
-      // Fake a new contact (id will be replaced by server)
+      // Prepare optimistic contact
+      let tempPhotoUrl: string | undefined = undefined;
+      const entries = Array.from(formData.entries());
       const newContact: any = {
-        id: "temp-" + Date.now(),
-        ...Object.fromEntries(formData.entries())
+        id: "temp-" + Date.now()
       };
+      for (const [key, value] of entries) {
+        if (key === "photo" && value instanceof File) {
+          tempPhotoUrl = URL.createObjectURL(value);
+          newContact.photo = tempPhotoUrl;
+        } else {
+          newContact[key] = value;
+        }
+      }
       queryClient.setQueryData<ContactsResponse>(contactsQueryKey, (old) => {
         if (!old) return old;
         return {
@@ -89,19 +97,25 @@ const ContactsPage = () => {
           }
         };
       });
-      return { previousData };
+      return { previousData, tempPhotoUrl };
     },
     onError: (err, _formData, context) => {
       // Rollback to previous state
       if (context?.previousData) {
         queryClient.setQueryData(contactsQueryKey, context.previousData);
       }
+      if (context?.tempPhotoUrl) {
+        URL.revokeObjectURL(context.tempPhotoUrl);
+      }
       toast.error(
-        err.response?.data?.message ||
+        (err as any)?.response?.data?.message ||
           "Failed to create contact. Changes reverted."
       );
     },
-    onSettled: () => {
+    onSettled: (_data, _error, _variables, context) => {
+      if (context?.tempPhotoUrl) {
+        URL.revokeObjectURL(context.tempPhotoUrl);
+      }
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
       setModalOpen(false);
       setEditingContact(null);
@@ -414,7 +428,6 @@ const ContactsPage = () => {
           />
         )}
       </div>
-      <MiniFooter />
     </>
   );
 };

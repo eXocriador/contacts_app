@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, AlertTriangle } from "lucide-react";
 import Spinner from "../Spinner";
@@ -18,6 +18,49 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   contactName,
   isDeleting
 }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!isOpen) return;
+    const focusableSelectors = [
+      "button",
+      "input",
+      "select",
+      "textarea",
+      '[tabindex]:not([tabindex="-1"])'
+    ];
+    const modal = modalRef.current;
+    if (!modal) return;
+    const focusableEls = modal.querySelectorAll<HTMLElement>(
+      focusableSelectors.join(",")
+    );
+    const firstEl = focusableEls[0];
+    const lastEl = focusableEls[focusableEls.length - 1];
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      } else if (e.key === "Tab") {
+        if (focusableEls.length === 0) return;
+        if (e.shiftKey) {
+          if (document.activeElement === firstEl) {
+            e.preventDefault();
+            lastEl.focus();
+          }
+        } else {
+          if (document.activeElement === lastEl) {
+            e.preventDefault();
+            firstEl.focus();
+          }
+        }
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    firstEl?.focus();
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -27,8 +70,12 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70"
           onClick={onClose}
+          aria-modal="true"
+          role="dialog"
+          aria-label="Delete Contact Confirmation Modal"
         >
           <motion.div
+            ref={modalRef}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}

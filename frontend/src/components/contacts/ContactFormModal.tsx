@@ -28,6 +28,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
 }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const {
     register,
@@ -54,6 +55,50 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
       }
     }
   }, [contact, isOpen, reset]);
+
+  // Focus trap and Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const focusableSelectors = [
+      "button",
+      "input",
+      "select",
+      "textarea",
+      '[tabindex]:not([tabindex="-1"])'
+    ];
+    const modal = modalRef.current;
+    if (!modal) return;
+    const focusableEls = modal.querySelectorAll<HTMLElement>(
+      focusableSelectors.join(",")
+    );
+    const firstEl = focusableEls[0];
+    const lastEl = focusableEls[focusableEls.length - 1];
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      } else if (e.key === "Tab") {
+        if (focusableEls.length === 0) return;
+        if (e.shiftKey) {
+          if (document.activeElement === firstEl) {
+            e.preventDefault();
+            lastEl.focus();
+          }
+        } else {
+          if (document.activeElement === lastEl) {
+            e.preventDefault();
+            firstEl.focus();
+          }
+        }
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    // Focus first element
+    firstEl?.focus();
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -113,8 +158,12 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70"
           onClick={onClose}
+          aria-modal="true"
+          role="dialog"
+          aria-label={contact ? "Edit Contact Modal" : "Add Contact Modal"}
         >
           <motion.div
+            ref={modalRef}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
@@ -122,12 +171,16 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-border">
-              <h2 className="text-lg font-semibold text-text-default">
+              <h2
+                className="text-lg font-semibold text-text-default"
+                id="contact-modal-title"
+              >
                 {contact ? "Edit Contact" : "Add New Contact"}
               </h2>
               <button
                 onClick={onClose}
                 className="p-1 rounded-full text-text-secondary hover:bg-border"
+                aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -138,7 +191,6 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
               onSubmit={handleSubmit(handleFormSubmit)}
               className="p-6 space-y-4"
             >
-              {/* ... решта форми без змін ... */}
               <div className="flex flex-col items-center">
                 <div
                   className="relative w-24 h-24 rounded-full bg-background cursor-pointer group"

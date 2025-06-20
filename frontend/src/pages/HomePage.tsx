@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   HeroSection,
   HowItWorksSection,
@@ -7,7 +7,6 @@ import {
   CallToActionSection
 } from "../components/home";
 import SectionDivider from "../components/home/SectionDivider";
-import DynamicBackground from "../components/home/DynamicBackground";
 
 const sectionIds = [
   "hero-section",
@@ -18,7 +17,19 @@ const sectionIds = [
 ];
 
 const HomePage = () => {
-  // Pure static page, no useEffect, no refs, no event listeners
+  const [footerVisible, setFooterVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const bottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
+      setFooterVisible(bottom);
+    };
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // check on mount
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const scrollToHowItWorks = () => {
     document
       .getElementById("how-it-works")

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
@@ -7,7 +7,6 @@ import type { RegisterRequest } from "../types/api";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { authApi } from "../api/auth";
-import MiniFooter from "../components/MiniFooter";
 import DynamicBackground from "../components/home/DynamicBackground";
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
 
@@ -20,6 +19,14 @@ const RegisterPage = () => {
     formState: { errors, isSubmitting }
   } = useForm<RegisterRequest>();
   const [forgotOpen, setForgotOpen] = useState(false);
+
+  useEffect(() => {
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, []);
 
   const onSubmit = async (data: RegisterRequest) => {
     try {
@@ -44,7 +51,16 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden"
+      }}
+    >
       <div className="fixed inset-0 -z-10">
         <img
           src="/images/hero-green.webp"
@@ -54,7 +70,14 @@ const RegisterPage = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background/95" />
         <DynamicBackground />
       </div>
-      <main className="flex-1 flex items-center justify-center">
+      <main
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -199,7 +222,6 @@ const RegisterPage = () => {
           </div>
         </motion.div>
       </main>
-      <MiniFooter />
       {forgotOpen && (
         <ForgotPasswordModal onClose={() => setForgotOpen(false)} />
       )}
