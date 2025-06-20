@@ -29,6 +29,7 @@ const ContactsPage = () => {
   const debouncedSearch = useDebounce(filterState.search, 400);
   const { user, token, updateUser } = useAuthStore();
 
+  const shouldFetchContacts = !!user;
   const { data, isLoading, isError, error } = useQuery<ContactsResponse, Error>(
     {
       queryKey: [
@@ -52,7 +53,8 @@ const ContactsPage = () => {
           isFavourite: filterState.isFavourite,
           sortBy: filterState.sortBy,
           sortOrder: filterState.sortOrder
-        })
+        }),
+      enabled: shouldFetchContacts
     }
   );
 

@@ -37,6 +37,7 @@ export const useAuthStore = create<AuthState>()(
       error: null,
 
       setAuth: (data: AuthData) => {
+        console.log("setAuth", data);
         set({
           user: data.user,
           token: data.accessToken,
@@ -46,6 +47,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       clearAuth: () => {
+        console.log("clearAuth");
         set({
           user: null,
           token: null,
@@ -55,6 +57,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       updateUser: (user: User) => {
+        console.log("updateUser", user);
         set((state) => ({
           ...state,
           user: { ...state.user, ...user }
@@ -79,13 +82,11 @@ export const useAuthStore = create<AuthState>()(
         try {
           await authApi.logout();
         } catch (error) {
-          // Log the error for debugging, but don't re-throw it.
           console.error(
             "Server-side logout failed, clearing client session anyway.",
             error
           );
         } finally {
-          // This is the crucial part: clear auth state regardless of the API call result.
           get().clearAuth();
         }
       },
@@ -93,6 +94,7 @@ export const useAuthStore = create<AuthState>()(
       refresh: async () => {
         try {
           const response = await authApi.refresh();
+          console.log("refresh", response.data.accessToken);
           set({
             token: response.data.accessToken,
             isAuthenticated: true
