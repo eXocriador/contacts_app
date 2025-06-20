@@ -32,13 +32,24 @@ const ContactCard: React.FC<ContactCardProps> = ({
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-4">
             <img
-              src={
-                contact.photo ||
-                `https://ui-avatars.com/api/?name=${contact.name.replace(
-                  " ",
-                  "+"
-                )}&background=161B22&color=e6edf3`
-              }
+              src={(() => {
+                if (
+                  contact.photo &&
+                  contact.photo.includes("res.cloudinary.com")
+                ) {
+                  return contact.photo.replace(
+                    "/upload/",
+                    "/upload/w_64,h_64,c_fill,q_auto,f_auto/"
+                  );
+                }
+                return (
+                  contact.photo ||
+                  `https://ui-avatars.com/api/?name=${contact.name.replace(
+                    " ",
+                    "+"
+                  )}&background=161B22&color=e6edf3`
+                );
+              })()}
               alt={contact.name}
               className="w-16 h-16 rounded-full object-cover border-2 border-border"
             />
