@@ -37,7 +37,6 @@ export const useAuthStore = create<AuthState>()(
       error: null,
 
       setAuth: (data: AuthData) => {
-        console.log("setAuth", data);
         set({
           user: data.user,
           token: data.accessToken,
@@ -47,7 +46,6 @@ export const useAuthStore = create<AuthState>()(
       },
 
       clearAuth: () => {
-        console.log("clearAuth");
         set({
           user: null,
           token: null,
@@ -57,7 +55,6 @@ export const useAuthStore = create<AuthState>()(
       },
 
       updateUser: (user: User) => {
-        console.log("updateUser", user);
         set((state) => ({
           ...state,
           user: { ...state.user, ...user }
@@ -65,27 +62,46 @@ export const useAuthStore = create<AuthState>()(
       },
 
       login: async (data) => {
-        set({ isLoading: true });
-        const response = await authApi.login(data);
-        get().setAuth(response.data);
-        set({ isLoading: false });
+        set({ isLoading: true, error: null });
+        try {
+          const response = await authApi.login(data);
+          get().setAuth(response.data);
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : "Login failed";
+          set({ error: errorMessage });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
       },
 
       register: async (data) => {
-        set({ isLoading: true });
-        const response = await authApi.register(data);
-        get().setAuth(response.data);
-        set({ isLoading: false });
+        set({ isLoading: true, error: null });
+        try {
+          const response = await authApi.register(data);
+          get().setAuth(response.data);
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : "Registration failed";
+          set({ error: errorMessage });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
       },
 
       logout: async () => {
         try {
           await authApi.logout();
         } catch (error) {
-          console.error(
-            "Server-side logout failed, clearing client session anyway.",
-            error
-          );
+          // Log error but don't throw - we want to clear local state anyway
+          if (process.env.NODE_ENV === "development") {
+            console.error(
+              "Server-side logout failed, clearing client session anyway.",
+              error
+            );
+          }
         } finally {
           get().clearAuth();
         }
@@ -94,7 +110,6 @@ export const useAuthStore = create<AuthState>()(
       refresh: async () => {
         try {
           const response = await authApi.refresh();
-          console.log("refresh", response.data.accessToken);
           set({
             token: response.data.accessToken,
             isAuthenticated: true
@@ -109,15 +124,31 @@ export const useAuthStore = create<AuthState>()(
       },
 
       updateProfile: async (data: FormData) => {
-        const response = await authApi.updateProfileWithPhoto(data);
-        get().updateUser(response.data.user);
+        set({ error: null });
+        try {
+          const response = await authApi.updateProfileWithPhoto(data);
+          get().updateUser(response.data.user);
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : "Profile update failed";
+          set({ error: errorMessage });
+          throw error;
+        }
       },
 
       loginWithGoogle: async (code: string) => {
-        set({ isLoading: true });
-        const response = await authApi.loginWithGoogle(code);
-        get().setAuth(response.data);
-        set({ isLoading: false });
+        set({ isLoading: true, error: null });
+        try {
+          const response = await authApi.loginWithGoogle(code);
+          get().setAuth(response.data);
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : "Google login failed";
+          set({ error: errorMessage });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
       }
     }),
     {

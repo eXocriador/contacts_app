@@ -1,30 +1,87 @@
 import pinoHttp from 'pino-http';
+import { Request, Response, NextFunction } from 'express';
 import { getEnvVar } from '../utils/getEnvVar';
-import { Request, Response } from 'express';
 
-const isDevelopment: boolean = getEnvVar('NODE_ENV') === 'development';
+const isDevelopment = getEnvVar('NODE_ENV') === 'development';
 
-export const logger = pinoHttp({
-  level: isDevelopment ? 'info' : 'warn',
-  transport: isDevelopment ? {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      levelFirst: true,
-      translateTime: 'HH:MM:ss',
-      ignore: 'pid,hostname',
-    },
-  } : undefined as any,
-  customLogLevel: (req: Request, res: Response, error?: Error): string => {
-    if (error) return 'error';
-    if (res.statusCode >= 400) return 'warn';
-    return 'silent'; // Не логуємо успішні запити
+// Create structured logger
+const logger = pinoHttp({
+  level: isDevelopment ? 'debug' : 'info',
+  customLogLevel: (req: Request, res: Response, err: Error) => {
+    if (res.statusCode >= 400 && res.statusCode < 500) {
+      return 'warn';
+    }
+    if (res.statusCode >= 500 || err) {
+      return 'error';
+    }
+    return 'info';
   },
-  customErrorMessage: (req: Request, res: Response, error: Error): string => {
-    return `${req.method} ${req.url} - ${error.message}`;
+  customSuccessMessage: (req: Request, res: Response) => {
+    return `${req.method} ${req.url} - ${res.statusCode}`;
   },
-  redact: {
-    paths: ['req.headers.authorization', 'req.headers.cookie', 'req.body.password'],
-    remove: true
-  }
+  customErrorMessage: (req: Request, res: Response, err: Error) => {
+    return `${req.method} ${req.url} - ${res.statusCode} - ${err.message}`;
+  },
+  serializers: {
+    req: (req: Request) => ({
+      method: req.method,
+      url: req.url,
+      headers: {
+        'user-agent': req.get('user-agent'),
+        'x-forwarded-for': req.get('x-forwarded-for'),
+      },
+      body: req.body,
+    }),
+    res: (res: Response) => ({
+      statusCode: res.statusCode,
+      headers: res.getHeaders(),
+    }),
+    err: (err: Error) => ({
+      message: err.message,
+      stack: err.stack,
+      name: err.name,
+    }),
+  },
+  customProps: (req: Request, res: Response) => ({
+    requestId: req.id,
+    userId: (req as any).user?.id,
+    ip: req.ip,
+    userAgent: req.get('user-agent'),
+    responseTime: res.getHeader('X-Response-Time'),
+  }),
 });
+
+export { logger };
+
+// Performance monitoring middleware
+export const performanceMonitor = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const start = Date.now();
+
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    const logData = {
+      method: req.method,
+      url: req.url,
+      statusCode: res.statusCode,
+      duration,
+      userId: (req as any).user?.id,
+      ip: req.ip,
+    };
+
+    // Log slow requests
+    if (duration > 1000) {
+      logger.logger.warn(logData, 'Slow request detected');
+    }
+
+    // Log errors
+    if (res.statusCode >= 400) {
+      logger.logger.error(logData, 'Request failed');
+    }
+  });
+
+  next();
+};

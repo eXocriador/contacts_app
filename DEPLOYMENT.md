@@ -1,215 +1,59 @@
-# Deployment Guide
+# 🚀 Deployment Guide
 
-This guide covers deployment options for the Contacts App on various platforms.
+## Production Deployment Checklist
 
-## 🚀 Quick Deployment Options
+### 1. Environment Setup
 
-### 1. Vercel (Frontend) + Railway (Backend) - Recommended
+#### Required Environment Variables
 
-#### Frontend on Vercel
+Create `.env` files for both backend and frontend:
 
-1. **Connect Repository**
-
-   - Go to [vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Select the `frontend` directory as root
-
-2. **Environment Variables**
-
-   ```env
-   VITE_API_URL=https://your-backend-url.railway.app
-   VITE_GOOGLE_CLIENT_ID=your-google-client-id
-   ```
-
-3. **Build Settings**
-   - Framework Preset: Vite
-   - Build Command: `yarn build`
-   - Output Directory: `dist`
-   - Install Command: `yarn install`
-
-#### Backend on Railway
-
-1. **Connect Repository**
-
-   - Go to [railway.app](https://railway.app)
-   - Deploy from GitHub repo
-   - Select the `backend` directory
-
-2. **Environment Variables**
-
-   ```env
-   NODE_ENV=production
-   PORT=3000
-   MONGODB_URI=your-mongodb-connection-string
-   JWT_SECRET=your-super-secret-jwt-key
-   JWT_REFRESH_SECRET=your-super-secret-refresh-key
-   CORS_ORIGIN=https://your-frontend-domain.vercel.app
-   ```
-
-3. **Add MongoDB**
-   - Add MongoDB plugin in Railway
-   - Use the provided connection string
-
-### 2. Docker Deployment
-
-#### Using Docker Compose
-
-```bash
-# Clone repository
-git clone <your-repo>
-cd contacts_app
-
-# Set environment variables
-cp backend/env.example backend/.env
-cp frontend/env.example frontend/.env
-# Edit .env files with your values
-
-# Start services
-docker-compose up -d
-
-# Check logs
-docker-compose logs -f
-```
-
-#### Manual Docker Build
-
-```bash
-# Build backend
-cd backend
-docker build -t contacts-backend .
-docker run -d -p 3000:3000 --env-file .env contacts-backend
-
-# Build frontend
-cd frontend
-docker build -t contacts-frontend .
-docker run -d -p 80:80 contacts-frontend
-```
-
-### 3. Self-Hosted Server
-
-#### Prerequisites
-
-- Ubuntu 20.04+ server
-- Docker & Docker Compose
-- Nginx
-- SSL certificate (Let's Encrypt)
-
-#### Setup Steps
-
-1. **Server Preparation**
-
-   ```bash
-   # Update system
-   sudo apt update && sudo apt upgrade -y
-
-   # Install Docker
-   curl -fsSL https://get.docker.com -o get-docker.sh
-   sudo sh get-docker.sh
-
-   # Install Docker Compose
-   sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-   sudo chmod +x /usr/local/bin/docker-compose
-   ```
-
-2. **Deploy Application**
-
-   ```bash
-   # Clone repository
-   git clone <your-repo>
-   cd contacts_app
-
-   # Configure environment
-   cp backend/env.example backend/.env
-   cp frontend/env.example frontend/.env
-   # Edit .env files
-
-   # Start services
-   docker-compose up -d
-   ```
-
-3. **Nginx Configuration**
-
-   ```nginx
-   server {
-       listen 80;
-       server_name your-domain.com;
-       return 301 https://$server_name$request_uri;
-   }
-
-   server {
-       listen 443 ssl http2;
-       server_name your-domain.com;
-
-       ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
-       ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
-
-       # Frontend
-       location / {
-           proxy_pass http://localhost:3001;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-           proxy_set_header X-Forwarded-Proto $scheme;
-       }
-
-       # Backend API
-       location /api/ {
-           proxy_pass http://localhost:3000/;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-           proxy_set_header X-Forwarded-Proto $scheme;
-       }
-   }
-   ```
-
-4. **SSL Certificate**
-
-   ```bash
-   # Install Certbot
-   sudo apt install certbot python3-certbot-nginx
-
-   # Get certificate
-   sudo certbot --nginx -d your-domain.com
-   ```
-
-## 🔧 Environment Configuration
-
-### Production Environment Variables
-
-#### Backend (.env)
+**Backend (.env)**
 
 ```env
-# Required
+# Server Configuration
 NODE_ENV=production
 PORT=3000
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/contacts_app
-JWT_SECRET=your-64-character-secret-key
-JWT_REFRESH_SECRET=your-64-character-refresh-secret
 
-# Security
+# Database
+MONGODB_URI=mongodb://your-mongodb-uri
+MONGO_ROOT_USERNAME=your-mongo-username
+MONGO_ROOT_PASSWORD=your-secure-mongo-password
+
+# JWT Configuration
+JWT_SECRET=your-super-secure-jwt-secret-key-here
+JWT_REFRESH_SECRET=your-super-secure-refresh-secret-key-here
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+
+# CORS Configuration
 CORS_ORIGIN=https://your-frontend-domain.com
+
+# Rate Limiting
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX=100
 
-# Optional: Email
+# Email Configuration
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASSWORD=your-app-password
 SMTP_FROM=noreply@yourdomain.com
 
-# Optional: Cloudinary
+# Cloudinary Configuration
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=your-api-key
 CLOUDINARY_API_SECRET=your-api-secret
 
-# Optional: Google OAuth
+# Google OAuth
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Security
+SESSION_SECRET=your-session-secret-key
 ```
 
-#### Frontend (.env)
+**Frontend (.env)**
 
 ```env
 VITE_API_URL=https://your-backend-domain.com
@@ -218,143 +62,279 @@ VITE_APP_NAME=Contacts App
 VITE_APP_VERSION=1.0.0
 ```
 
-## 🔒 Security Checklist
+### 2. Security Checklist
 
-- [ ] Change default JWT secrets
-- [ ] Set up HTTPS/SSL
+- [ ] Change all default passwords
+- [ ] Use strong, unique secrets for JWT
+- [ ] Enable HTTPS/SSL
 - [ ] Configure CORS properly
 - [ ] Set up rate limiting
-- [ ] Use environment variables for secrets
 - [ ] Enable security headers
+- [ ] Configure file upload restrictions
 - [ ] Set up monitoring and logging
-- [ ] Configure backup strategy
-- [ ] Set up error tracking
-- [ ] Test security measures
 
-## 📊 Monitoring & Logging
+### 3. Database Setup
 
-### Health Checks
+#### MongoDB Atlas (Recommended)
 
-- Backend: `GET /health`
-- Frontend: `GET /health`
+1. Create MongoDB Atlas cluster
+2. Set up database user with proper permissions
+3. Configure network access (IP whitelist)
+4. Get connection string
+5. Update `MONGODB_URI` in environment variables
 
-### Logging
-
-- Backend uses structured logging with Pino
-- Logs are available in Docker containers
-- Consider using external logging services (DataDog, Loggly, etc.)
-
-### Monitoring
-
-- Set up uptime monitoring (UptimeRobot, Pingdom)
-- Monitor application metrics
-- Set up alerts for critical issues
-
-## 🔄 CI/CD Pipeline
-
-The project includes GitHub Actions workflow that:
-
-1. Runs tests and linting
-2. Builds the application
-3. Runs security audits
-4. Deploys to staging/production
-
-### Manual Deployment
+#### Local MongoDB
 
 ```bash
-# Build and deploy
-yarn build
-docker-compose up -d
+# Install MongoDB
+sudo apt-get install mongodb
 
-# Rollback if needed
-docker-compose down
-docker-compose up -d --force-recreate
+# Start MongoDB service
+sudo systemctl start mongodb
+sudo systemctl enable mongodb
+
+# Create database user
+mongo
+use admin
+db.createUser({
+  user: "admin",
+  pwd: "secure-password",
+  roles: ["root"]
+})
 ```
 
-## 🚨 Troubleshooting
+### 4. Docker Deployment
 
-### Common Issues
+#### Production Build
+
+```bash
+# Build and start all services
+docker-compose up -d
+
+# Check service status
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+#### Environment Variables for Docker
+
+Create `.env` file in root directory:
+
+```env
+MONGO_ROOT_USERNAME=admin
+MONGO_ROOT_PASSWORD=your-secure-password
+```
+
+### 5. Manual Deployment
+
+#### Backend Deployment
+
+```bash
+# Install dependencies
+cd backend
+yarn install --production
+
+# Build application
+yarn build
+
+# Start production server
+yarn start:prod
+```
+
+#### Frontend Deployment
+
+```bash
+# Install dependencies
+cd frontend
+yarn install
+
+# Build for production
+yarn build
+
+# Serve with nginx or any static file server
+```
+
+### 6. Nginx Configuration
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com;
+
+    ssl_certificate /path/to/your/certificate.crt;
+    ssl_certificate_key /path/to/your/private.key;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
+    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
+
+    # Frontend
+    location / {
+        root /var/www/html;
+        try_files $uri $uri/ /index.html;
+
+        # Cache static assets
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+    }
+
+    # Backend API
+    location /api/ {
+        proxy_pass http://localhost:3000/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+### 7. SSL Certificate Setup
+
+#### Let's Encrypt (Free)
+
+```bash
+# Install Certbot
+sudo apt-get install certbot python3-certbot-nginx
+
+# Get certificate
+sudo certbot --nginx -d your-domain.com
+
+# Auto-renewal
+sudo crontab -e
+# Add: 0 12 * * * /usr/bin/certbot renew --quiet
+```
+
+### 8. Monitoring Setup
+
+#### Health Checks
+
+```bash
+# Backend health check
+curl https://your-domain.com/api/health
+
+# Frontend health check
+curl https://your-domain.com/
+```
+
+#### Log Monitoring
+
+```bash
+# View application logs
+docker-compose logs -f backend
+
+# View nginx logs
+sudo tail -f /var/log/nginx/access.log
+sudo tail -f /var/log/nginx/error.log
+```
+
+### 9. Backup Strategy
+
+#### Database Backup
+
+```bash
+# MongoDB backup
+mongodump --uri="mongodb://username:password@host:port/database" --out=/backup/path
+
+# Automated backup script
+#!/bin/bash
+DATE=$(date +%Y%m%d_%H%M%S)
+mongodump --uri="$MONGODB_URI" --out="/backups/$DATE"
+```
+
+#### File Backup
+
+```bash
+# Backup uploads directory
+tar -czf /backups/uploads_$(date +%Y%m%d).tar.gz /path/to/uploads
+```
+
+### 10. Troubleshooting
+
+#### Common Issues
 
 1. **CORS Errors**
 
    - Check CORS_ORIGIN configuration
    - Ensure frontend URL is included
 
-2. **Database Connection**
+2. **Database Connection Issues**
 
-   - Verify MongoDB connection string
+   - Verify MongoDB URI
    - Check network connectivity
-   - Ensure database is accessible
+   - Ensure proper authentication
 
-3. **Build Failures**
+3. **File Upload Failures**
 
-   - Check Node.js version (>=18)
-   - Clear node_modules and reinstall
-   - Check for TypeScript errors
+   - Check Cloudinary configuration
+   - Verify file size limits
+   - Check file type restrictions
 
-4. **Performance Issues**
-   - Monitor memory usage
-   - Check database indexes
-   - Optimize queries
+4. **JWT Token Issues**
+   - Verify JWT_SECRET is set
+   - Check token expiration settings
+   - Ensure proper token refresh flow
 
-### Debug Commands
+#### Performance Optimization
 
-```bash
-# Check container logs
-docker-compose logs -f [service-name]
+1. **Enable Gzip Compression**
+2. **Set up CDN for static assets**
+3. **Configure database indexes**
+4. **Implement caching strategy**
+5. **Monitor and optimize slow queries**
 
-# Check application health
-curl http://localhost:3000/health
+### 11. Maintenance
 
-# Check environment variables
-docker-compose exec backend env
+#### Regular Tasks
 
-# Access container shell
-docker-compose exec backend sh
-```
+- [ ] Monitor application logs
+- [ ] Check database performance
+- [ ] Update dependencies
+- [ ] Review security settings
+- [ ] Backup verification
+- [ ] SSL certificate renewal
 
-## 📈 Scaling
-
-### Horizontal Scaling
-
-- Use load balancer (nginx, HAProxy)
-- Deploy multiple backend instances
-- Use MongoDB Atlas for database scaling
-
-### Vertical Scaling
-
-- Increase container resources
-- Optimize application code
-- Use caching (Redis)
-
-## 🔄 Backup Strategy
-
-### Database Backup
+#### Update Process
 
 ```bash
-# MongoDB backup
-mongodump --uri="your-mongodb-uri" --out=/backup/$(date +%Y%m%d)
+# Pull latest changes
+git pull origin main
 
-# Restore
-mongorestore --uri="your-mongodb-uri" /backup/20231201/
+# Rebuild and restart
+docker-compose down
+docker-compose up -d --build
+
+# Verify deployment
+curl https://your-domain.com/api/health
 ```
-
-### Application Backup
-
-- Backup environment files
-- Backup SSL certificates
-- Backup nginx configuration
-
-## 📞 Support
-
-For deployment issues:
-
-1. Check the logs
-2. Verify environment variables
-3. Test locally first
-4. Check security settings
-5. Review monitoring data
 
 ---
 
-**Remember**: Always test deployment in a staging environment first!
+**⚠️ Important Notes:**
+
+1. Never commit `.env` files to version control
+2. Use strong, unique passwords for all services
+3. Regularly update dependencies for security patches
+4. Monitor application performance and logs
+5. Keep backups in multiple locations
+6. Test deployment process regularly
