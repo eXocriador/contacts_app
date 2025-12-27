@@ -20,15 +20,17 @@ const logger = pinoHttp({
     return `${req.method} ${req.url} - ${res.statusCode}`;
   },
   customErrorMessage: (req: Request, res: Response, err?: Error) => {
-    return `${req.method} ${req.url} - ${res.statusCode}${err ? ` - ${err.message}` : ''}`;
+    return `${req.method} ${req.url} - ${res.statusCode}${
+      err ? ` - ${err.message}` : ''
+    }`;
   },
   serializers: {
     req: (req: Request) => ({
       method: req.method,
       url: req.url,
       headers: {
-        'user-agent': req.get('user-agent'),
-        'x-forwarded-for': req.get('x-forwarded-for'),
+        'user-agent': req.headers['user-agent'],
+        'x-forwarded-for': req.headers['x-forwarded-for'],
       },
       body: req.body,
     }),
@@ -46,7 +48,7 @@ const logger = pinoHttp({
     requestId: req.id,
     userId: (req as any).user?.id,
     ip: req.ip,
-    userAgent: req.get('user-agent'),
+    userAgent: req.headers['user-agent'],
     responseTime: res.getHeader('X-Response-Time'),
   }),
 });

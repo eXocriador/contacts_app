@@ -8,7 +8,7 @@ export const errorHandler = (
   err: ErrorResponse,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void => {
   const status: number = err.status || 500;
   const message: string = err.message || 'Internal Server Error';
@@ -22,12 +22,12 @@ export const errorHandler = (
     method: req.method,
     timestamp: new Date().toISOString(),
     ip: req.ip,
-    userAgent: req.get('user-agent')
+    userAgent: req.headers['user-agent'],
   });
 
   // Send response
   res.status(status).json({
     message: isDevelopment ? message : 'Something went wrong',
-    ...(isDevelopment && { stack: err.stack })
+    ...(isDevelopment && { stack: err.stack }),
   });
 };
