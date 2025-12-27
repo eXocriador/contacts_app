@@ -9,6 +9,7 @@ const getCorsOrigins = (): string | string[] => {
   if (config.CORS_ORIGIN === '*') {
     return [
       'https://contacts.exocriador.art',
+      'https://contacts.exocriador.dev',
       'http://localhost:3000',
       'http://localhost:5173',
     ];
