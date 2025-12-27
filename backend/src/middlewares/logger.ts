@@ -36,7 +36,6 @@ const logger = pinoHttp({
     }),
     res: (res: Response) => ({
       statusCode: res.statusCode,
-      headers: res.getHeaders(),
     }),
     err: (err: Error) => ({
       message: err.message,
