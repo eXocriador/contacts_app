@@ -7,7 +7,7 @@ const isDevelopment = getEnvVar('NODE_ENV') === 'development';
 // Create structured logger
 const logger = pinoHttp({
   level: isDevelopment ? 'debug' : 'info',
-  customLogLevel: (req: Request, res: Response, err: Error) => {
+  customLogLevel: (req: Request, res: Response, err?: Error) => {
     if (res.statusCode >= 400 && res.statusCode < 500) {
       return 'warn';
     }
@@ -19,8 +19,8 @@ const logger = pinoHttp({
   customSuccessMessage: (req: Request, res: Response) => {
     return `${req.method} ${req.url} - ${res.statusCode}`;
   },
-  customErrorMessage: (req: Request, res: Response, err: Error) => {
-    return `${req.method} ${req.url} - ${res.statusCode} - ${err.message}`;
+  customErrorMessage: (req: Request, res: Response, err?: Error) => {
+    return `${req.method} ${req.url} - ${res.statusCode}${err ? ` - ${err.message}` : ''}`;
   },
   serializers: {
     req: (req: Request) => ({

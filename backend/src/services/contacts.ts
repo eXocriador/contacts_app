@@ -4,6 +4,22 @@ import { IUser } from '../types/models';
 import { uploadImage } from './cloudinary';
 import { Express } from 'express';
 
+// Format contact for response (remove sensitive data, transform _id to id)
+export const formatContactResponse = (contact: any) => {
+  const contactObj = contact.toObject ? contact.toObject() : contact;
+  return {
+    id: contactObj._id,
+    name: contactObj.name,
+    email: contactObj.email,
+    phoneNumber: contactObj.phoneNumber,
+    isFavourite: contactObj.isFavourite,
+    photo: contactObj.photo,
+    contactType: contactObj.contactType,
+    createdAt: contactObj.createdAt,
+    updatedAt: contactObj.updatedAt,
+  };
+};
+
 export interface ContactFilters {
   search?: string;
   contactType?: string;
