@@ -4,9 +4,8 @@ import { Request } from 'express';
 import { getEnvVar } from '../utils/getEnvVar';
 import { TEMP_UPLOAD_DIR } from '../constants';
 
-// File validation
 const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-const maxFileSize = 5 * 1024 * 1024; // 5MB
+const maxFileSize = 5 * 1024 * 1024;
 
 const storage = multer.memoryStorage();
 
@@ -15,7 +14,6 @@ const fileFilter = (
   file: Express.Multer.File,
   cb: multer.FileFilterCallback,
 ) => {
-  // Check file type
   if (!allowedMimeTypes.includes(file.mimetype)) {
     return cb(
       new Error(
@@ -24,7 +22,6 @@ const fileFilter = (
     );
   }
 
-  // Check file extension
   const ext = path.extname(file.originalname).toLowerCase();
   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
   if (!allowedExtensions.includes(ext)) {
@@ -35,7 +32,6 @@ const fileFilter = (
     );
   }
 
-  // Check for malicious file names
   const maliciousPatterns = /[<>:"/\\|?*\x00-\x1f]/;
   if (maliciousPatterns.test(file.originalname)) {
     return cb(new Error('Invalid file name.'));
@@ -49,6 +45,6 @@ export const upload = multer({
   fileFilter,
   limits: {
     fileSize: maxFileSize,
-    files: 1, // Only allow 1 file per request
+    files: 1,
   },
 });

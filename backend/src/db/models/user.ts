@@ -21,8 +21,8 @@ const userSchema = new Schema<IUser>(
 );
 
 userSchema.post('save', handeSaveError);
-userSchema.pre('findOneAndUpdate', setUpdateSettings);
-userSchema.post('findOneAndUpdate', handeSaveError);
+userSchema.pre('findOneAndUpdate' as any, setUpdateSettings);
+userSchema.post('findOneAndUpdate' as any, handeSaveError);
 
 const User = model<IUser>('User', userSchema);
 export default User;

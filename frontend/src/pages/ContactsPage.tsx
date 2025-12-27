@@ -1,5 +1,3 @@
-// frontend/src/pages/ContactsPage.tsx
-
 import React, { useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import type { Contact } from "../types/api";
@@ -59,7 +57,6 @@ const ContactsPage = () => {
     }
   );
 
-  // --- Optimistic Update Helpers ---
   const contactsQueryKey = [
     "contacts",
     page,
@@ -70,15 +67,12 @@ const ContactsPage = () => {
     filterState.sortOrder
   ];
 
-  // --- Create Contact Mutation ---
   const createMutation = useMutation({
     mutationFn: (formData: FormData) => contactsApi.createContact(formData),
-    // Optimistically add the new contact to the cache
     onMutate: async (formData) => {
       await queryClient.cancelQueries({ queryKey: contactsQueryKey });
       const previousData =
         queryClient.getQueryData<ContactsResponse>(contactsQueryKey);
-      // Prepare optimistic contact
       let tempPhotoUrl: string | undefined = undefined;
       const entries = Array.from(formData.entries());
       const newContact: Contact = {
@@ -122,7 +116,6 @@ const ContactsPage = () => {
       return { previousData, tempPhotoUrl };
     },
     onError: (err, _formData, context) => {
-      // Rollback to previous state
       if (context?.previousData) {
         queryClient.setQueryData(contactsQueryKey, context.previousData);
       }
@@ -149,11 +142,9 @@ const ContactsPage = () => {
     }
   });
 
-  // --- Update Contact Mutation ---
   const updateMutation = useMutation({
     mutationFn: ({ id, formData }: { id: string; formData: FormData }) =>
       contactsApi.updateContact(id, formData),
-    // Optimistically update the contact in the cache
     onMutate: async ({ id, formData }) => {
       await queryClient.cancelQueries({ queryKey: contactsQueryKey });
       const previousData =
@@ -194,10 +185,8 @@ const ContactsPage = () => {
     }
   });
 
-  // --- Delete Contact Mutation ---
   const deleteMutation = useMutation({
     mutationFn: (id: string) => contactsApi.deleteContact(id),
-    // Optimistically remove the contact from the cache
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: contactsQueryKey });
       const previousData =
@@ -257,7 +246,6 @@ const ContactsPage = () => {
   const totalPages = data?.data?.totalPages || 0;
   const contacts = data?.data?.data || [];
 
-  // Фільтрація валідних контактів
   const validContacts = contacts.filter(
     (c) =>
       c &&
@@ -266,7 +254,6 @@ const ContactsPage = () => {
       typeof c.phoneNumber === "string"
   );
 
-  // Діагностика user/token
   React.useEffect(() => {
     let isMounted = true;
     if (!user && token) {
@@ -277,9 +264,7 @@ const ContactsPage = () => {
             updateUser(u);
           }
         })
-        .catch(() => {
-          // Silently fail - error will be handled by auth store
-        });
+        .catch(() => {});
     }
     return () => {
       isMounted = false;

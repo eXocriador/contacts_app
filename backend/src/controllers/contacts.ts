@@ -119,7 +119,6 @@ export const updateContact = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    // ДОДАЄМО ПЕРЕВІРКУ: якщо немає ні полів, ні файлу, повертаємо помилку.
     const hasNoChanges = Object.keys(req.body).length === 0 && !req.file;
     if (hasNoChanges) {
       throw createHttpError(
@@ -143,7 +142,6 @@ export const updateContact = async (
         ...req.body,
         ...(photoUrl && { photo: photoUrl }),
       },
-      // Видаляємо upsert: true, оскільки PATCH не повинен створювати новий документ, якщо його не знайдено
       { new: true, runValidators: true },
     );
 

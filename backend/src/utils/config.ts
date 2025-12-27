@@ -19,14 +19,22 @@ const validateConfig = (): Config => {
   const config: Config = {
     NODE_ENV: getEnvVar('NODE_ENV', 'development'),
     PORT: Number(getEnvVar('PORT', '3000')),
-    JWT_SECRET: getEnvVar('JWT_SECRET'),
+    JWT_SECRET: getEnvVar(
+      'JWT_SECRET',
+      process.env.NODE_ENV === 'development'
+        ? 'dev-secret-key-change-in-production'
+        : undefined,
+    ),
     CORS_ORIGIN: getEnvVar('CORS_ORIGIN', '*'),
     RATE_LIMIT_WINDOW_MS: Number(getEnvVar('RATE_LIMIT_WINDOW_MS', '900000')),
     RATE_LIMIT_MAX: Number(getEnvVar('RATE_LIMIT_MAX', '100')),
   };
 
   try {
-    config.MONGODB_URI = getEnvVar('MONGODB_URI', 'mongodb://localhost:27017/contacts_app');
+    config.MONGODB_URI = getEnvVar(
+      'MONGODB_URI',
+      'mongodb://localhost:27017/contacts_app',
+    );
   } catch (error) {
     console.warn('MONGODB_URI not set, using default local connection');
   }
@@ -38,7 +46,9 @@ const validateConfig = (): Config => {
     config.SMTP_PASSWORD = getEnvVar('SMTP_PASSWORD');
     config.SMTP_FROM = getEnvVar('SMTP_FROM');
   } catch (error) {
-    console.warn('SMTP configuration not set, email functionality will be disabled');
+    console.warn(
+      'SMTP configuration not set, email functionality will be disabled',
+    );
   }
 
   const requiredFields: (keyof Config)[] = ['JWT_SECRET'];
@@ -49,10 +59,16 @@ const validateConfig = (): Config => {
     }
   }
 
-  const numericFields: (keyof Config)[] = ['PORT', 'RATE_LIMIT_WINDOW_MS', 'RATE_LIMIT_MAX'];
+  const numericFields: (keyof Config)[] = [
+    'PORT',
+    'RATE_LIMIT_WINDOW_MS',
+    'RATE_LIMIT_MAX',
+  ];
   for (const field of numericFields) {
     if (isNaN(config[field] as number)) {
-      throw new Error(`Invalid numeric value for environment variable: ${field}`);
+      throw new Error(
+        `Invalid numeric value for environment variable: ${field}`,
+      );
     }
   }
 

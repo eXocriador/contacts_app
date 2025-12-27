@@ -19,7 +19,13 @@ const getLocalIP = (): string => {
 export const startLogs = (): void => {
   const port = getEnvVar('PORT', '3000');
   const mode = getEnvVar('NODE_ENV', 'development');
-  const db = getEnvVar('MONGODB_DB', 'contacts_db');
+  const mongoUri = getEnvVar(
+    'MONGODB_URI',
+    'mongodb://localhost:27017/contacts_app',
+  );
+  // Extract database name from URI
+  const dbMatch = mongoUri.match(/\/([^/?]+)(\?|$)/);
+  const db = dbMatch ? dbMatch[1] : 'contacts_app';
   const localIP = getLocalIP();
 
   const mongoStatus =

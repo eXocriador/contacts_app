@@ -1,5 +1,3 @@
-// frontend/src/App.tsx
-
 import React, { Suspense, useRef, useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";

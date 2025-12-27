@@ -37,7 +37,6 @@ export const serverSetup = (): Express => {
   app.use(cookieParser());
   app.use(logger);
 
-  // Handle preflight requests
   app.options('*', cors(corsOptions));
 
   app.use(router);

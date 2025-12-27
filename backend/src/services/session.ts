@@ -5,7 +5,14 @@ import { getEnvVar } from '../utils/getEnvVar';
 import createHttpError from 'http-errors';
 import { Response } from 'express';
 
-const JWT_SECRET = getEnvVar('JWT_SECRET');
+const getJwtSecret = (): string => {
+  return getEnvVar(
+    'JWT_SECRET',
+    process.env.NODE_ENV === 'development'
+      ? 'dev-secret-key-change-in-production'
+      : undefined,
+  );
+};
 
 interface Tokens {
   accessToken: string;
@@ -14,8 +21,8 @@ interface Tokens {
 
 export const generateAuthTokens = (user: IUser): Tokens => {
   const payload = { id: user._id };
-  const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' });
-  const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '30d' });
+  const accessToken = jwt.sign(payload, getJwtSecret(), { expiresIn: '15m' });
+  const refreshToken = jwt.sign(payload, getJwtSecret(), { expiresIn: '30d' });
   return { accessToken, refreshToken };
 };
 

@@ -1,5 +1,3 @@
-// frontend/src/api/index.ts
-
 import axios, { AxiosError } from "axios";
 import { useAuthStore } from "../store/auth";
 import { toast } from "react-hot-toast";
@@ -34,7 +32,7 @@ function onRefreshed(token: string) {
 }
 
 api.interceptors.response.use(
-  (response) => response, // Directly return successful responses
+  (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as {
       url?: string;
@@ -42,7 +40,6 @@ api.interceptors.response.use(
       headers?: Record<string, string>;
     };
 
-    // Якщо отримали 401 на /auth/refresh — одразу логаут і стоп
     if (
       error.response?.status === 401 &&
       originalRequest.url?.includes("/auth/refresh")
@@ -52,10 +49,8 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Якщо 401 і ще не пробували refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        // Якщо refresh вже йде — чекаємо його завершення
         return new Promise((resolve) => {
           refreshSubscribers.push((token) => {
             if (originalRequest.headers) {
@@ -86,7 +81,6 @@ api.interceptors.response.use(
       }
     }
 
-    // For all other errors, just reject the promise
     return Promise.reject(error);
   }
 );

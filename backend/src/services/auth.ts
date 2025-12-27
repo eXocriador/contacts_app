@@ -10,7 +10,15 @@ import { IUser } from '../types/models';
 import { getEnvVar } from '../utils/getEnvVar';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = getEnvVar('JWT_SECRET');
+const getJwtSecret = (): string => {
+  return getEnvVar(
+    'JWT_SECRET',
+    process.env.NODE_ENV === 'development'
+      ? 'dev-secret-key-change-in-production'
+      : undefined,
+  );
+};
+
 const SALT_ROUNDS = 10;
 
 export const hashPassword = async (password: string): Promise<string> => {
@@ -27,12 +35,12 @@ export const comparePassword = async (
 export const generateToken = (user: IUser): string => {
   const payload = { id: user._id };
   const options: SignOptions = { expiresIn: '1d' };
-  return sign(payload, JWT_SECRET, options);
+  return sign(payload, getJwtSecret(), options);
 };
 
 export const verifyToken = async (token: string) => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+    const decoded = jwt.verify(token, getJwtSecret()) as { id: string };
     const user = await User.findById(decoded.id);
     if (!user) {
       throw createHttpError(404, 'User not found');
@@ -147,10 +155,10 @@ export const refreshTokens = async (refreshToken: string) => {
     now.getTime() + 7 * 24 * 60 * 60 * 1000,
   );
 
-  const newAccessToken = jwt.sign({ id: session.userId }, JWT_SECRET, {
+  const newAccessToken = jwt.sign({ id: session.userId }, getJwtSecret(), {
     expiresIn: '1d',
   });
-  const newRefreshToken = jwt.sign({ id: session.userId }, JWT_SECRET, {
+  const newRefreshToken = jwt.sign({ id: session.userId }, getJwtSecret(), {
     expiresIn: '7d',
   });
 

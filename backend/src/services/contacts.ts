@@ -4,7 +4,6 @@ import { IUser } from '../types/models';
 import { uploadImage } from './cloudinary';
 import { Express } from 'express';
 
-// Format contact for response (remove sensitive data, transform _id to id)
 export const formatContactResponse = (contact: any) => {
   const contactObj = contact.toObject ? contact.toObject() : contact;
   return {
@@ -48,7 +47,6 @@ export class ContactService {
 
     const query: any = { owner: userId };
 
-    // Apply filters
     if (filters.search) {
       query.$or = [
         { name: { $regex: filters.search, $options: 'i' } },

@@ -40,8 +40,8 @@ const sessionSchema = new Schema<ISession>(
 );
 
 sessionSchema.post('save', handeSaveError);
-sessionSchema.pre('findOneAndUpdate', setUpdateSettings);
-sessionSchema.post('findOneAndUpdate', handeSaveError);
+sessionSchema.pre('findOneAndUpdate' as any, setUpdateSettings);
+sessionSchema.post('findOneAndUpdate' as any, handeSaveError);
 
 const Session = model<ISession>('Session', sessionSchema);
 export default Session;

@@ -1,5 +1,3 @@
-// frontend/src/store/auth.ts
-
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type {
@@ -95,7 +93,6 @@ export const useAuthStore = create<AuthState>()(
         try {
           await authApi.logout();
         } catch (error) {
-          // Log error but don't throw - we want to clear local state anyway
           if (process.env.NODE_ENV === "development") {
             console.error(
               "Server-side logout failed, clearing client session anyway.",
@@ -115,9 +112,7 @@ export const useAuthStore = create<AuthState>()(
             token: newToken,
             isAuthenticated: true
           });
-          // Wait a bit to ensure token is set before fetching user
           await new Promise((resolve) => setTimeout(resolve, 0));
-          // Fetch and update user after refreshing token
           const user = await authApi.getCurrentUser();
           set({ user });
         } catch (error) {

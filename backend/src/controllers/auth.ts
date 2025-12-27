@@ -29,9 +29,16 @@ import { generateAuthUrl, validateCode } from '../utils/googleOAuth2';
 import { sendEmail } from '../services/email';
 import { getEnvVar } from '../utils/getEnvVar';
 import { loginOrSignupWithGoogle } from '../services/auth';
-import { uploadImage } from '../services/cloudinary'; // 👈 **ADD THIS LINE**
+import { uploadImage } from '../services/cloudinary';
 
-const JWT_SECRET = getEnvVar('JWT_SECRET');
+const getJwtSecret = (): string => {
+  return getEnvVar(
+    'JWT_SECRET',
+    process.env.NODE_ENV === 'development'
+      ? 'dev-secret-key-change-in-production'
+      : undefined,
+  );
+};
 
 interface AuthenticatedRequest extends Request {
   user?: IUser;
@@ -351,7 +358,6 @@ export const updateProfileController = async (
       updatePayload.email = email;
     }
 
-    // Handle photo upload
     if (req.file) {
       const result = await uploadImage(req.file);
       updatePayload.avatarURL = result.secure_url;

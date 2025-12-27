@@ -5,8 +5,61 @@ import User from '../db/models/user';
 import Session from '../db/models/session';
 import { getEnvVar } from '../utils/getEnvVar';
 import createHttpError from 'http-errors';
+import { appendFile } from 'fs/promises';
+import { join } from 'path';
 
-const JWT_SECRET = getEnvVar('JWT_SECRET');
+const LOG_PATH = join(process.cwd(), '.cursor', 'debug.log');
+
+const writeLog = async (data: any): Promise<void> => {
+  try {
+    await appendFile(LOG_PATH, JSON.stringify(data) + '\n', 'utf8');
+  } catch (err) {
+    // Ignore log write errors
+  }
+};
+
+// Lazy loading JWT_SECRET to avoid errors during module import
+const getJwtSecret = (): string => {
+  // #region agent log
+  writeLog({
+    location: 'authenticate.ts:getJwtSecret',
+    message: 'Loading JWT_SECRET',
+    data: {
+      hasJwtSecret: !!process.env.JWT_SECRET,
+      envKeys: Object.keys(process.env).filter(k => k.includes('JWT')),
+    },
+    timestamp: Date.now(),
+    sessionId: 'debug-session',
+    runId: 'post-fix',
+    hypothesisId: 'B',
+  }).catch(() => {});
+  // #endregion
+
+  try {
+    return getEnvVar('JWT_SECRET');
+  } catch (error) {
+    // #region agent log
+    writeLog({
+      location: 'authenticate.ts:getJwtSecret',
+      message: 'JWT_SECRET not found, using default for development',
+      data: {
+        error: error instanceof Error ? error.message : String(error),
+        nodeEnv: process.env.NODE_ENV,
+      },
+      timestamp: Date.now(),
+      sessionId: 'debug-session',
+      runId: 'post-fix',
+      hypothesisId: 'B',
+    }).catch(() => {});
+    // #endregion
+
+    // Allow default value only in development
+    if (process.env.NODE_ENV === 'development') {
+      return getEnvVar('JWT_SECRET', 'dev-secret-key-change-in-production');
+    }
+    throw error;
+  }
+};
 
 export const authenticate = async (
   req: CustomRequest,
@@ -26,7 +79,8 @@ export const authenticate = async (
 
     let decoded: { id: string; exp: number };
     try {
-      decoded = jwt.verify(accessToken, JWT_SECRET) as {
+      const jwtSecret = getJwtSecret();
+      decoded = jwt.verify(accessToken, jwtSecret) as {
         id: string;
         exp: number;
       };
