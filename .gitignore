@@ -42,6 +42,7 @@ yarn-error.log*
 # OS-specific
 .DS_Store
 Thumbs.db
+nul
 
 # Cache and temp files
 .cache/
@@ -49,6 +50,12 @@ Thumbs.db
 .tmp/
 temp/
 uploads/
+backend/uploads/
+backend/temp/
+frontend/.vite/
+*.swp
+*.swo
+*~
 
 # Documentation
 backend/docs/swagger.json

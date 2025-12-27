@@ -11,8 +11,6 @@ A modern contacts management application built with Node.js/Express/TypeScript b
 - **Responsive Design**: Modern UI with Tailwind CSS
 - **API Documentation**: Swagger/OpenAPI documentation
 - **Security**: Rate limiting, CORS, Helmet, input validation
-- **Docker Support**: Containerized deployment
-- **CI/CD**: GitHub Actions pipeline
 
 ## 🏗️ Architecture
 
@@ -20,7 +18,6 @@ A modern contacts management application built with Node.js/Express/TypeScript b
 contacts_app/
 ├── backend/          # Node.js/Express API
 ├── frontend/         # React/Vite application
-├── docker-compose.yml
 └── README.md
 ```
 
@@ -53,35 +50,8 @@ contacts_app/
 - Node.js >= 18.0.0
 - Yarn package manager
 - MongoDB (local or cloud)
-- Docker & Docker Compose (optional)
 
 ## 🚀 Quick Start
-
-### Option 1: Docker (Recommended)
-
-1. **Clone the repository**
-
-   ```bash
-   git clone <repository-url>
-   cd contacts_app
-   ```
-
-2. **Start with Docker Compose**
-
-   ```bash
-   # Production
-   docker-compose up -d
-
-   # Development
-   docker-compose --profile dev up -d
-   ```
-
-3. **Access the application**
-   - Frontend: http://localhost:3001
-   - Backend API: http://localhost:3000
-   - API Docs: http://localhost:3000/api-docs
-
-### Option 2: Local Development
 
 1. **Backend Setup**
 
@@ -144,31 +114,6 @@ VITE_API_URL=http://localhost:3000
 VITE_GOOGLE_CLIENT_ID=your-google-client-id
 ```
 
-## 🐳 Docker Deployment
-
-### Production Build
-
-```bash
-# Build and start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-```
-
-### Development Build
-
-```bash
-# Start development services
-docker-compose --profile dev up -d
-
-# View logs
-docker-compose logs -f backend_dev frontend_dev
-```
-
 ## 📚 API Documentation
 
 The API documentation is automatically generated using Swagger/OpenAPI and is available at:
@@ -185,18 +130,6 @@ The API documentation is automatically generated using Swagger/OpenAPI and is av
 - **Input Validation**: Request validation with Joi
 - **SQL Injection Protection**: MongoDB with parameterized queries
 - **XSS Protection**: Content Security Policy headers
-
-## 🧪 Testing
-
-```bash
-# Backend tests
-cd backend
-yarn test
-
-# Frontend tests
-cd frontend
-yarn test
-```
 
 ## 📦 Build for Production
 
@@ -218,23 +151,16 @@ yarn build
 
 ## 🚀 Deployment
 
-### Vercel (Frontend)
+### Frontend
 
-1. Connect your repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+1. Build the application: `yarn build`
+2. Deploy the `dist` folder to any static hosting service (Vercel, Netlify, etc.)
 
-### Railway/Render (Backend)
+### Backend
 
-1. Connect your repository
+1. Build the application: `yarn build`
 2. Set environment variables
-3. Deploy automatically
-
-### Self-hosted
-
-1. Build Docker images
-2. Deploy to your server with docker-compose
-3. Set up reverse proxy (nginx) for SSL
+3. Start the server: `yarn start:prod`
 
 ## 🔧 Development Scripts
 
@@ -287,8 +213,7 @@ frontend/
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+4. Submit a pull request
 
 ## 📄 License
 
@@ -301,15 +226,6 @@ For support and questions:
 - Create an issue in the repository
 - Check the API documentation
 - Review the logs for debugging
-
-## 🔄 CI/CD Pipeline
-
-The project includes GitHub Actions workflow that:
-
-- Runs linting and type checking
-- Builds the application
-- Runs security audits
-- Builds and pushes Docker images (on main branch)
 
 ## 📊 Monitoring
 
