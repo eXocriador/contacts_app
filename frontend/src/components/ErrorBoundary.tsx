@@ -47,10 +47,12 @@ class ErrorBoundary extends React.Component<
           <button onClick={this.handleReload} className="btn-primary mb-6">
             Reload Page
           </button>
-          <div className="bg-surface border border-border rounded-lg p-4 w-full max-w-xl overflow-auto text-xs text-left">
-            <pre>{this.state.error?.toString()}</pre>
-            <pre>{this.state.errorInfo?.componentStack}</pre>
-          </div>
+          {process.env.NODE_ENV === "development" && (
+            <div className="bg-surface border border-border rounded-lg p-4 w-full max-w-xl overflow-auto text-xs text-left">
+              <pre>{this.state.error?.toString()}</pre>
+              <pre>{this.state.errorInfo?.componentStack}</pre>
+            </div>
+          )}
         </div>
       );
     }

@@ -15,6 +15,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import Pagination from "../components/Pagination";
 import { useAuthStore } from "../store/auth";
 import { authApi } from "../api/auth";
+import { typeList } from "../constants/contacts";
 
 const PER_PAGE = 9;
 
@@ -80,15 +81,31 @@ const ContactsPage = () => {
       // Prepare optimistic contact
       let tempPhotoUrl: string | undefined = undefined;
       const entries = Array.from(formData.entries());
-      const newContact: any = {
-        id: "temp-" + Date.now()
+      const newContact: Contact = {
+        id: "temp-" + Date.now(),
+        name: "",
+        email: "",
+        phoneNumber: "",
+        isFavourite: false,
+        contactType: "personal",
+        owner: "",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
       for (const [key, value] of entries) {
         if (key === "photo" && value instanceof File) {
           tempPhotoUrl = URL.createObjectURL(value);
           newContact.photo = tempPhotoUrl;
-        } else {
-          newContact[key] = value;
+        } else if (key === "name" && typeof value === "string") {
+          newContact.name = value;
+        } else if (key === "email" && typeof value === "string") {
+          newContact.email = value;
+        } else if (key === "phoneNumber" && typeof value === "string") {
+          newContact.phoneNumber = value;
+        } else if (key === "isFavourite" && typeof value === "string") {
+          newContact.isFavourite = value === "true" || value === "on";
+        } else if (key === "contactType" && typeof value === "string") {
+          newContact.contactType = value as (typeof typeList)[number];
         }
       }
       queryClient.setQueryData<ContactsResponse>(contactsQueryKey, (old) => {
@@ -112,10 +129,12 @@ const ContactsPage = () => {
       if (context?.tempPhotoUrl) {
         URL.revokeObjectURL(context.tempPhotoUrl);
       }
-      toast.error(
-        (err as any)?.response?.data?.message ||
-          "Failed to create contact. Changes reverted."
-      );
+      const errorMessage =
+        err instanceof Error
+          ? (err as { response?: { data?: { message?: string } } }).response
+              ?.data?.message || err.message
+          : "Failed to create contact. Changes reverted.";
+      toast.error(errorMessage);
     },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.tempPhotoUrl) {
@@ -158,10 +177,12 @@ const ContactsPage = () => {
       if (context?.previousData) {
         queryClient.setQueryData(contactsQueryKey, context.previousData);
       }
-      toast.error(
-        (err as any)?.response?.data?.message ||
-          "Failed to update contact. Changes reverted."
-      );
+      const errorMessage =
+        err instanceof Error
+          ? (err as { response?: { data?: { message?: string } } }).response
+              ?.data?.message || err.message
+          : "Failed to update contact. Changes reverted.";
+      toast.error(errorMessage);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
@@ -198,10 +219,12 @@ const ContactsPage = () => {
       if (context?.previousData) {
         queryClient.setQueryData(contactsQueryKey, context.previousData);
       }
-      toast.error(
-        (err as any)?.response?.data?.message ||
-          "Failed to delete contact. Changes reverted."
-      );
+      const errorMessage =
+        err instanceof Error
+          ? (err as { response?: { data?: { message?: string } } }).response
+              ?.data?.message || err.message
+          : "Failed to delete contact. Changes reverted.";
+      toast.error(errorMessage);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
@@ -242,36 +265,25 @@ const ContactsPage = () => {
       typeof c.email === "string" &&
       typeof c.phoneNumber === "string"
   );
-  const invalidContacts = contacts.filter(
-    (c) =>
-      !c ||
-      typeof c.name !== "string" ||
-      typeof c.email !== "string" ||
-      typeof c.phoneNumber !== "string"
-  );
-  if (invalidContacts.length > 0) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid contacts detected:", invalidContacts);
-  }
-
-  // Debug log
-  console.log({ data, isLoading, isError, error, contacts });
 
   // Діагностика user/token
   React.useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log("ContactsPage user:", user, "token:", token);
+    let isMounted = true;
     if (!user && token) {
       authApi
         .getCurrentUser()
         .then((u) => {
-          updateUser(u);
+          if (isMounted) {
+            updateUser(u);
+          }
         })
-        .catch((err) => {
-          // eslint-disable-next-line no-console
-          console.error("Failed to load user in ContactsPage:", err);
+        .catch(() => {
+          // Silently fail - error will be handled by auth store
         });
     }
+    return () => {
+      isMounted = false;
+    };
   }, [user, token, updateUser]);
 
   if (isLoading) {
@@ -329,7 +341,11 @@ const ContactsPage = () => {
           <select
             className="input w-full md:w-40"
             value={filterState.contactType}
-            onChange={(e) => filterState.setContactType(e.target.value as any)}
+            onChange={(e) =>
+              filterState.setContactType(
+                e.target.value as (typeof typeList)[number]
+              )
+            }
             aria-label="Filter by contact type"
           >
             <option value="all">All Types</option>
@@ -353,7 +369,9 @@ const ContactsPage = () => {
           <select
             className="input w-full md:w-40"
             value={filterState.sortBy}
-            onChange={(e) => filterState.setSortBy(e.target.value as any)}
+            onChange={(e) =>
+              filterState.setSortBy(e.target.value as "name" | "createdAt")
+            }
             aria-label="Sort by"
           >
             <option value="name">Name</option>
@@ -394,7 +412,58 @@ const ContactsPage = () => {
             </svg>
           </button>
         </div>
+
+        {/* Contacts Grid */}
+        {validContacts.length === 0 ? (
+          <div className="text-center py-16 bg-surface rounded-lg">
+            <p className="text-text-secondary text-lg">No contacts found</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {validContacts.map((contact) => (
+                <ContactCard
+                  key={contact.id}
+                  contact={contact}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+            />
+          </>
+        )}
       </div>
+
+      {/* Modals */}
+      <ContactFormModal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setEditingContact(null);
+        }}
+        onSubmit={handleSaveContact}
+        contact={editingContact}
+        isSubmitting={createMutation.isPending || updateMutation.isPending}
+      />
+      <ConfirmDeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setDeletingContact(null);
+        }}
+        onConfirm={() => {
+          if (deletingContact) {
+            deleteMutation.mutate(deletingContact.id);
+          }
+        }}
+        contactName={deletingContact?.name || ""}
+        isDeleting={deleteMutation.isPending}
+      />
     </div>
   );
 };

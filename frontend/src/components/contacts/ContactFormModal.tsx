@@ -113,10 +113,23 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
         event.target.value = "";
         return;
       }
+      // Cleanup previous URL if exists
+      if (previewUrl && previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
     }
   };
+
+  // Cleanup blob URL on unmount or when modal closes
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const handleFormSubmit = async (data: CreateContactRequest) => {
     const formData = new FormData();

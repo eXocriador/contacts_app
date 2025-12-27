@@ -88,12 +88,6 @@ const ProfilePage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
-  // Діагностика user/token
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log("ProfilePage user:", user, "token:", token);
-  }, [user, token]);
-
   // Автозавантаження user, якщо є token, але user === null
   useEffect(() => {
     if (!user && token) {

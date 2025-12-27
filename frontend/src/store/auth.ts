@@ -110,10 +110,13 @@ export const useAuthStore = create<AuthState>()(
       refresh: async () => {
         try {
           const response = await authApi.refresh();
+          const newToken = response.data.accessToken;
           set({
-            token: response.data.accessToken,
+            token: newToken,
             isAuthenticated: true
           });
+          // Wait a bit to ensure token is set before fetching user
+          await new Promise((resolve) => setTimeout(resolve, 0));
           // Fetch and update user after refreshing token
           const user = await authApi.getCurrentUser();
           set({ user });

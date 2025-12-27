@@ -36,7 +36,11 @@ function onRefreshed(token: string) {
 api.interceptors.response.use(
   (response) => response, // Directly return successful responses
   async (error: AxiosError) => {
-    const originalRequest = error.config as any;
+    const originalRequest = error.config as {
+      url?: string;
+      _retry?: boolean;
+      headers?: Record<string, string>;
+    };
 
     // Якщо отримали 401 на /auth/refresh — одразу логаут і стоп
     if (
@@ -52,9 +56,11 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         // Якщо refresh вже йде — чекаємо його завершення
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           refreshSubscribers.push((token) => {
-            originalRequest.headers["Authorization"] = `Bearer ${token}`;
+            if (originalRequest.headers) {
+              originalRequest.headers["Authorization"] = `Bearer ${token}`;
+            }
             resolve(api(originalRequest));
           });
         });
@@ -67,7 +73,7 @@ api.interceptors.response.use(
         await useAuthStore.getState().refresh();
         isRefreshing = false;
         const newToken = useAuthStore.getState().token;
-        if (newToken) {
+        if (newToken && originalRequest.headers) {
           onRefreshed(newToken);
           originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
         }
